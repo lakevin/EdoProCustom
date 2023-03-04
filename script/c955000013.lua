@@ -1,7 +1,7 @@
--- Protectrix Defense Missiles
+-- Protectrix Emergency Call
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate
+	-- (1) Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--act limit
+	-- (2) Act Limit
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -20,13 +20,13 @@ function s.initial_effect(c)
 	e2:SetTargetRange(1,0)
 	e2:SetValue(s.aclimit)
 	c:RegisterEffect(e2)
-	--destroy
+	-- (3) Destroy End Phase
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
-	--2) Activate
+	-- (4) Protection
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(EFFECT_TYPE_QUICK_O)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
@@ -42,7 +42,7 @@ function s.initial_effect(c)
 end
 
 
---1)
+-- (1) + (2) + (3)
 s.listed_series={0x9990}
 function s.filter(c,e,tp)
 	return c:IsSetCard(0x9990) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -107,7 +107,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 
---2)
+-- (4)
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
