@@ -51,7 +51,7 @@ end
 
 -- (1)
 function s.filter0(c)
-	return c:Card.IsAbleToDeck and c:GetType()==TYPE_TRAP and c:IsSetCard(0x9990)
+	return c:IsAbleToDeck() and c:GetType()==TYPE_TRAP and c:IsSetCard(0x9990)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsAbleToDeck() end
