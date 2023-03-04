@@ -1,7 +1,7 @@
 --Protectrix Claymore
 local s,id=GetID()
 function s.initial_effect(c)
-	--1) tograve
+	-- (1) tograve
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -12,22 +12,23 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCountLimit(1,id)
 	c:RegisterEffect(e2)
-	--2) Special Summon
+	-- (2) Special Summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_DESTROYED)
 	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetDescription(aux.Stringid(id,0))
-	e2:SetCountLimit(1)
+	e3:SetCountLimit(1,{id,1})
 	e3:SetCondition(s.spcon)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 end
 
---1)
+-- (1)
 function s.tgfilter(c,e,tp)
 	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToGrave()
 end
@@ -46,7 +47,7 @@ function s.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()
 end
 
---2)
+-- (2)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return (r&REASON_EFFECT+REASON_BATTLE)~=0
 end
