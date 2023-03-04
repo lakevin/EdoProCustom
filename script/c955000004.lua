@@ -1,4 +1,5 @@
 -- Protectrix Colt
+local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) special summon
 	local e1=Effect.CreateEffect(c)
