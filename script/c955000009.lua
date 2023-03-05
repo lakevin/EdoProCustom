@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e2:SetCountLimit(1,id)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(TIMINGS_CHECK_MONSTER+TIMING_BATTLE_START+TIMING_MAIN_END)
-	e2:SetCost(s.cost)
+	--e2:SetCost(s.cost)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
@@ -39,15 +39,15 @@ end
 
 -- (1)
 function s.tdfilter(c)
-	return c:IsAbleToDeck() and c:GetType()==TYPE_TRAP and c:IsSetCard(0x9990)
+	return (c:GetType()==TYPE_TRAP or c:GetType()==TYPE_CONTINUOUS+TYPE_TRAP) and c:IsSetCard(0x9990) and c:IsAbleToGrave()
 end
 function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsAbleToDeck() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsAbleToGrave() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToGrave,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
 end
@@ -71,14 +71,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()==0 then return false end
 		e:SetLabel(0)
-		return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
-			and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil)
+		return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil)
 	end
 	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	local te,ceg,cep,cev,cre,cr,crp=g:GetFirst():CheckActivateEffect(false,true,true)
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	Duel.SendtoGrave(g,REASON_COST)
 	e:SetProperty(te:GetProperty())
 	local tg=te:GetTarget()
