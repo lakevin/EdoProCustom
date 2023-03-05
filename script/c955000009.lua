@@ -53,8 +53,8 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.SendtoGrave(tc,nil,2,REASON_EFFECT)
+	if tc and tc:IsRelateToEffect(e) then
+		Duel.SendtoGrave(tc,REASON_EFFECT)
 	end
 end
 
