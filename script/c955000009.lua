@@ -39,22 +39,22 @@ function s.matfilter(c,lc,sumtype,tp)
 end
 
 -- (1)
-function s.tgfilter(c)
-	return (c:GetType()==TYPE_TRAP or c:GetType()==TYPE_CONTINUOUS+TYPE_TRAP) and c:IsSetCard(0x9990) and c:IsAbleToGrave() and c:GetSequence()<5
-end
 function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
+function s.tgfilter(c)
+	return c:IsAbleToGrave() and c:IsSetCard(0x9990) and (c:GetType()==TYPE_TRAP or c:GetType()==TYPE_CONTINUOUS+TYPE_TRAP)
+end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsAbleToGrave() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToGrave,tp,LOCATION_REMOVED,0,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and s.tgfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_REMOVED,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_REMOVED,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.SendtoGrave(tc,REASON_EFFECT)
 	end
 end
