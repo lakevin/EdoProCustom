@@ -28,7 +28,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	-- (4) Protection
 	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(EFFECT_TYPE_QUICK_O)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetRange(LOCATION_GRAVE)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
