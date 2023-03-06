@@ -1,56 +1,57 @@
 --Transformation
-function c955000015.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(c955000015.target)
-	e1:SetOperation(c955000015.activate)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	--draw
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
-	e2:SetDescription(aux.Stringid(73594093,1))
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCountLimit(1,955000015+EFFECT_COUNT_CODE_OATH)
-	e2:SetTarget(c955000015.tdtg)
-	e2:SetOperation(c955000015.tdop)
+	e2:SetCountLimit(1,id)
+	e2:SetTarget(s.tdtg)
+	e2:SetOperation(s.tdop)
 	c:RegisterEffect(e2)
 end
 --check material
-function c955000015.filter1(c,e)
+function s.filter1(c,e)
 	return not c:IsImmuneToEffect(e)
 end
-function c955000015.filter2(c,e,tp,m,f,chkf)
+function s.filter2(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x9990) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
 
 --fusion target/operation
-function c955000015.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
 		local mg1=Duel.GetFusionMaterial(tp)
-		local res=Duel.IsExistingMatchingCard(c955000015.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
+		local res=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
 		if not res then
 			local ce=Duel.GetChainMaterial(tp)
 			if ce~=nil then
 				local fgroup=ce:GetTarget()
 				local mg2=fgroup(ce,e,tp)
 				local mf=ce:GetValue()
-				res=Duel.IsExistingMatchingCard(c955000015.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,mf,chkf)
+				res=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,mf,chkf)
 			end
 		end
 		return res
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function c955000015.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-	local mg1=Duel.GetFusionMaterial(tp):Filter(c955000015.filter1,nil,e)
-	local sg1=Duel.GetMatchingGroup(c955000015.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
+	local mg1=Duel.GetFusionMaterial(tp):Filter(s.filter1,nil,e)
+	local sg1=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
 	local mg2=nil
 	local sg2=nil
 	local ce=Duel.GetChainMaterial(tp)
@@ -58,7 +59,7 @@ function c955000015.activate(e,tp,eg,ep,ev,re,r,rp)
 		local fgroup=ce:GetTarget()
 		mg2=fgroup(ce,e,tp)
 		local mf=ce:GetValue()
-		sg2=Duel.GetMatchingGroup(c955000015.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,mf,chkf)
+		sg2=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,mf,chkf)
 	end
 	if sg1:GetCount()>0 or (sg2~=nil and sg2:GetCount()>0) then
 		local sg=sg1:Clone()
@@ -82,12 +83,12 @@ function c955000015.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 --2)
-function c955000015.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToDeck() and Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function c955000015.tdop(e,tp,eg,ep,ev,re,r,rp)
+function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SendtoDeck(c,nil,0,REASON_EFFECT)~=0 and c:IsLocation(LOCATION_DECK) then
 		Duel.ShuffleDeck(tp)

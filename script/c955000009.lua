@@ -19,15 +19,14 @@ function s.initial_effect(c)
 	
 	-- (2) copy trap
 	local e2=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_NO_TURN_RESET)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,id)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
-	--e2:SetCost(s.cost)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_TOHAND)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_NO_TURN_RESET)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,id)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
@@ -60,27 +59,25 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
-	return true
-end
 function s.filter(c)
-	return c:GetType()==TYPE_TRAP and c:IsSetCard(0x9990) and c:IsAbleToGraveAsCost()
+	return c:GetType()==0x4 and c:IsSetCard(0x9990) and c:IsAbleToGrave()
 		and c:CheckActivateEffect(false,true,false)~=nil
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		if e:GetLabel()==0 then return false end
-		e:SetLabel(0)
-		return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then
+		local te=e:GetLabelObject()
+		local tg=te:GetTarget()
+		return tg and tg(e,tp,eg,ep,ev,re,r,rp,0,chkc)
 	end
-	e:SetLabel(0)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_DECK,0,1,nil) end
+	e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	local te,ceg,cep,cev,cre,cr,crp=g:GetFirst():CheckActivateEffect(false,true,true)
-	Duel.SendtoGrave(g,REASON_COST)
-	e:SetProperty(te:GetProperty())
+	Duel.ClearTargetCard()
+	g:GetFirst():CreateEffectRelation(e)
 	local tg=te:GetTarget()
+	e:SetProperty(te:GetProperty())
 	if tg then tg(e,tp,ceg,cep,cev,cre,cr,crp,1) end
 	te:SetLabelObject(e:GetLabelObject())
 	e:SetLabelObject(te)
@@ -89,7 +86,9 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local te=e:GetLabelObject()
 	if not te then return end
+	if not te:GetHandler():IsRelateToEffect(e) then return end
 	e:SetLabelObject(te:GetLabelObject())
 	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
+	Duel.SendtoGrave(te:GetHandler(),REASON_COST)
 end

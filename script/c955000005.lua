@@ -1,6 +1,6 @@
 -- Protectrix EagleEye
 local s,id=GetID()
-function c955000005.initial_effect(c)
+function s.initial_effect(c)
 	-- xyz summon
 	Xyz.AddProcedure(c,nil,4,3,s.ovfilter,aux.Stringid(id,0),4,s.xyzop)
 	c:EnableReviveLimit()

@@ -22,31 +22,9 @@ function s.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	--3) redirect
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetCondition(s.recon)
-	e4:SetValue(LOCATION_REMOVED)
-	c:RegisterEffect(e4)
-	if not s.global_check then
-		s.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SUMMON_SUCCESS)
-		ge1:SetLabel(id)
-		ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		ge1:SetOperation(aux.sumreg)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=ge1:Clone()
-		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge2:SetLabel(id)
-		Duel.RegisterEffect(ge2,0)
-	end
 end
 
---1)
+-- (1)
 function s.spfilter(c)
 	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
@@ -62,7 +40,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 
---2)
+-- (2)
 function s.filter(c)
 	return c:IsSetCard(0x9990) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
@@ -82,9 +60,4 @@ function s.soperation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-end
-
---3)
-function s.recon(e)
-	return e:GetHandler():IsFaceup()
 end
