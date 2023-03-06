@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.spop)
+	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
 
