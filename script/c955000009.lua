@@ -58,7 +58,21 @@ end
 
 -- (2)
 function s.filter(c)
-	return c:GetType()==0x4 and c:IsSetCard(0x9990) and c:IsAbleToGrave()
+	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and not c:GetType()==TYPE_CONTINUOUS+TYPE_TRAP and c:IsAbleToGrave()
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoGrave(g,REASON_EFFECT)
+	end
+end
+--[[function s.filter(c)
+	return c:GetType()==0x4 and c:IsSetCard(0x9990) and c:IsAbleToGraveAsCost()
 		and c:CheckActivateEffect(false,true,false)~=nil
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -89,4 +103,4 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
 	Duel.SendtoGrave(te:GetHandler(),REASON_COST)
-end
+end]]--
