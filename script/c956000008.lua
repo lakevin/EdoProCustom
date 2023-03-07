@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9993),6,2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,2)
 	c:EnableReviveLimit()
 	-- (1) destroy set t/s
 	local e1=Effect.CreateEffect(c)
@@ -75,7 +75,7 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6  and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsSetCard(0x9993) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6  and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)

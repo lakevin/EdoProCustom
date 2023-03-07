@@ -55,26 +55,26 @@ end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc1=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
 	local tc2=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
-	return tc1 and tc2 and tc1:IsSetCard(0x9993) and tc2:IsSetCard(0x9993)
+	return tc1 and tc2 and tc1:IsSetCard(0x9992) and tc2:IsSetCard(0x9992)
 end
 
 -- (1)
 function s.tgtg(e,c)
-	return c:IsSetCard(0x9993) and c:IsType(TYPE_PENDULUM) and (c:GetSequence()==6 or c:GetSequence()==7)
+	return c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) and (c:GetSequence()==6 or c:GetSequence()==7)
 end
 
 -- (2)
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x9993) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0x9993)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0x9992)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,0x9993,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,0x9992,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if not tc then return end
 	if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
@@ -108,7 +108,7 @@ function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function s.drfilter(c,e)
-	return c:IsSetCard(0x9993) and c:IsRace(RACE_SPELLCASTER) and c:IsAbleToHand()
+	return c:IsSetCard(0x9992) and c:IsRace(RACE_SPELLCASTER) and c:IsAbleToHand()
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.drfilter,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,nil) end

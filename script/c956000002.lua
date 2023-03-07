@@ -27,10 +27,10 @@ end
 
 -- (1)
 function s.thfilter(c,tp)
-	return c:GetLevel()==4 and c:IsSetCard(0x9993) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsSetCard(0x9993) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
@@ -56,8 +56,8 @@ end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local seq=e:GetHandler():GetSequence()
 	local tc=Duel.GetFieldCard(tp,LOCATION_SZONE,13-seq)
-	return tc and tc:IsSetCard(0x9993)
+	return tc and tc:IsSetCard(0x9992)
 end
 function s.target(e,c)
-	return c~=e:GetHandler() and c:IsSetCard(0x9993)
+	return c~=e:GetHandler() and c:IsSetCard(0x9992)
 end
