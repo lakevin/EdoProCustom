@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 
---1)
+-- (1)
 function s.filter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:IsSummonPlayer(tp) and not c:IsDisabled()
 end

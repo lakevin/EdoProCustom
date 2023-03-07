@@ -1,7 +1,7 @@
 -- Protectrix Scythe
 local s,id=GetID()
 function s.initial_effect(c)
-	--1) special summon (self)
+	-- (1) special summon (self)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetCondition(s.spcon)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--2) special summon (from gy)
+	-- (2) special summon (from gy)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(955000007,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 
---1)
+-- (1)
 function s.spfilter(c)
 	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
@@ -39,7 +39,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 
---2)
+-- (2)
 function s.spfilter2(c,e,tp)
 	return c:IsSetCard(0x9990) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end

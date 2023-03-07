@@ -1,7 +1,7 @@
 -- Protectrix Halberd
 local s,id=GetID()
 function s.initial_effect(c)
-	--1) Special summon
+	-- (1) Special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetCondition(s.spcon)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--2) to hand
+	-- (2) to hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(85115440,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 
---1)
+-- (1)
 function s.spfilter(c)
 	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
@@ -40,7 +40,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 
---2)
+-- (2)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT+REASON_BATTLE)~=0
 end

@@ -4,7 +4,7 @@ function s.initial_effect(c)
 	-- xyz summon
 	Xyz.AddProcedure(c,nil,4,3,s.ovfilter,aux.Stringid(id,0),4,s.xyzop)
 	c:EnableReviveLimit()
-	--1) destroy
+	-- (1) destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_DESTROY)
@@ -31,7 +31,7 @@ function s.xyzop(e,tp,chk)
 	return true
 end
 
---1)
+-- (1)
 --isFaceup -> isOnField
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

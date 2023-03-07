@@ -1,5 +1,6 @@
 --Inferno
-function c956000013.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--pendulum summon
-	aux.EnablePendulumAttribute(c)
+	Pendulum.AddProcedure(c)
 end

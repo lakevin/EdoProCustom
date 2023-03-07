@@ -1,5 +1,6 @@
 --Sparklos
-function c956000012.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--pendulum summon
-	aux.EnablePendulumAttribute(c)
+	Pendulum.AddProcedure(c)
 end

@@ -38,12 +38,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 
---1)fusion summon
+-- (1)fusion summon
 function s.effcon(e)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_FUSION
 end
 
---2)
+-- (2)
 function s.valcon(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
 end
