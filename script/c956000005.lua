@@ -1,48 +1,49 @@
---Sharpclaw
+--Steelknight
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) to hand
+	-- (1) search + to hand
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(s.thcon)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	-- (2) Search Spell Card
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_HAND)
-	e2:SetCost(s.cost)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCountLimit(1,id)
 	c:RegisterEffect(e2)
-	-- (3) To Hand
+	-- (2) Search Spell Card
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_DRAW)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_TO_HAND)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_HAND)
-	e3:SetCondition(s.thcon)
-	e3:SetTarget(s.thtg)
-	e3:SetOperation(s.thop)
+	e3:SetCost(s.cost)
+	e3:SetTarget(s.target)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
+	-- (3) To deck + draw
+	local e4=Effect.CreateEffect(c)
+	e4:SetCountLimit(1,{id,2})
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_DRAW)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_TO_HAND)
+	e4:SetRange(LOCATION_HAND)
+	e4:SetCondition(s.tdcon)
+	e4:SetTarget(s.tdtg)
+	e4:SetOperation(s.tdop)
+	c:RegisterEffect(e4)
 end
 
 -- (1)
 function s.thfilter(c,e,tp)
 	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_WIND) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
-end
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:GetHandler():IsSetCard(0x9992)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -80,13 +81,13 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 -- (3)
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
+function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_MZONE
 end
-function s.thfilter(c)
+function s.tdfilter(c)
 	return ( c:GetSequence()==6 or c:GetSequence()==7 ) and c:IsAbleToDeck()
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,LOCATION_SZONE,0,1,nil) and Duel.IsPlayerCanDraw(tp,1) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
@@ -94,7 +95,7 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		if Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_DECK+LOCATION_EXTRA) then

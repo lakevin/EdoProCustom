@@ -1,48 +1,49 @@
 --Snakesnare
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) to hand
+	-- (1) search + to hand
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(s.thcon)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	-- (2) Equip Monster
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_EQUIP)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCondition(s.eqcon)
-	e2:SetTarget(s.eqtg)
-	e2:SetOperation(s.eqop)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCountLimit(1,id)
 	c:RegisterEffect(e2)
-	-- (3) Destroy S/T
+	-- (2) Equip Monster
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_EQUIP)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_TO_HAND)
-	e3:SetRange(LOCATION_HAND)
-	e3:SetCondition(s.descon)
-	e3:SetTarget(s.destg)
-	e3:SetOperation(s.desop)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_TO_GRAVE)
+	e3:SetCondition(s.eqcon)
+	e3:SetTarget(s.eqtg)
+	e3:SetOperation(s.eqop)
 	c:RegisterEffect(e3)
+	-- (3) special summon
+	local e4=Effect.CreateEffect(c)
+	e4:SetCountLimit(1,{id,2})
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_TO_HAND)
+	e4:SetRange(LOCATION_HAND)
+	e4:SetCondition(s.spcon)
+	e4:SetTarget(s.sptg)
+	e4:SetOperation(s.spop)
+	c:RegisterEffect(e4)
 end
 
 -- (1)
 function s.thfilter(c,e,tp)
 	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
-end
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:GetHandler():IsSetCard(0x9992)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -97,22 +98,21 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.desfilter(c,e,tp)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP)
+function s.spfilter(c)
+	return c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and not c:IsCode(id)
 end
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_MZONE
 end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsOnField() and s.desfilter(chkc) and chkc~=e:GetHandler() end
-	if chk==0 then return Duel.IsExistingTarget(s.desfilter,tp,0,LOCATION_ONFIELD,1,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,s.desfilter,tp,0,LOCATION_ONFIELD,1,2,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local tg=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp):GetFirst()
+	if tg then
+		Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
