@@ -38,7 +38,7 @@ end
 
 -- (1)
 function s.thfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
+	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_WIND) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
