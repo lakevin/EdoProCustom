@@ -19,10 +19,9 @@ function s.initial_effect(c)
 	e3:SetCountLimit(1,{id,1})
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_EQUIP)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCondition(s.eqcon)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_CHAINING)
+	e3:SetRange(LOCATION_HAND)
 	e3:SetTarget(s.eqtg)
 	e3:SetOperation(s.eqop)
 	c:RegisterEffect(e3)
@@ -59,9 +58,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
-end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
@@ -94,8 +90,38 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 		local e3=e2:Clone()
 		e3:SetCode(EFFECT_CANNOT_ATTACK)
 		c:RegisterEffect(e3)
+		--control
+		--[[local e4=Effect.CreateEffect(c)
+		e4:SetDescription(aux.Stringid(id,1))
+		e4:SetCategory(CATEGORY_CONTROL)
+		e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+		e4:SetCode(EVENT_LEAVE_FIELD)
+		e4:SetCondition(s.ctcon)
+		e4:SetTarget(s.cttg)
+		e4:SetOperation(s.ctop)
+		e4:SetReset(RESET_EVENT+0x1020000)
+		c:RegisterEffect(e4)]]--
 	end
 end
+--[[
+function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_LOST_TARGET)
+end
+function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local ec=e:GetHandler():GetPreviousEquipTarget()
+	if ec:IsLocation(LOCATION_MZONE) and ec:IsControlerCanBeChanged() then
+		Duel.SetTargetCard(ec)
+		Duel.SetOperationInfo(0,CATEGORY_CONTROL,ec,1,0,0)
+	end
+end
+function s.ctop(e,tp,eg,ep,ev,re,r,rp)
+	local ec=Duel.GetFirstTarget()
+	if ec and ec:IsRelateToEffect(e) then
+		Duel.GetControl(ec,tp)
+	end
+end
+]]--
 
 -- (3)
 function s.spfilter(c)

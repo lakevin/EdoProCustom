@@ -7,18 +7,17 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCondition(s.condition)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- (1) cannot be destroyed
+	-- cannot be destroyed
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetTargetRange(LOCATION_SZONE,0)
-	e2:SetTarget(s.tgtg)
+	e2:SetTargetRange(LOCATION_PZONE,0)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
-	-- (2) spsummon
+	-- (1) spsummon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetType(EFFECT_TYPE_IGNITION)
@@ -28,7 +27,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	-- (3) self destroy
+	-- (2) self destroy
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 	e4:SetRange(LOCATION_SZONE)
@@ -36,7 +35,7 @@ function s.initial_effect(c)
 	e4:SetCondition(s.descon)
 	e4:SetOperation(s.desop)
 	c:RegisterEffect(e4)
-	--4) BANISH + ADD TO DECK
+	-- (3) BANISH + ADD TO DECK
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
 	e5:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
@@ -51,19 +50,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 
---Activate
+-- Activate
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc1=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
 	local tc2=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
-	if not (tc1 and tc2 and tc1:IsSetCard(0x9992) and tc2:IsSetCard(0x9992)) then return false end
+	return (tc1 and tc2 and tc1:IsSetCard(0x9992) and tc2:IsSetCard(0x9992))
 end
 
 -- (1)
-function s.tgtg(e,c)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) and (c:GetSequence()==6 or c:GetSequence()==7)
-end
-
--- (2)
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -91,9 +85,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
+-- (2)
 function s.desfilter(c,tp)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_SZONE) and (c:GetSequence()==6 or c:GetSequence()==7)
+	return c:IsControler(tp) and c:IsLocation(LOCATION_PZONE) and (c:GetSequence()==6 or c:GetSequence()==7)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.desfilter,1,nil,tp)
@@ -102,7 +96,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 
---4)
+-- (3)
 function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
