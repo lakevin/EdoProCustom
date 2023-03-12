@@ -112,7 +112,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thfilter2(c,e,tp)
-	return c:GetLevel==4 and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
+	return c:GetLevel()==4 and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
 end
 function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
