@@ -1,4 +1,4 @@
---Snakesnare
+--Draconier Snakesnare
 local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) search + to hand

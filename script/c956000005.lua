@@ -1,4 +1,4 @@
---Steelknight
+--Draconier Nimbleclaw
 local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) search + to hand
@@ -16,14 +16,15 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- (2) Search Spell Card
 	local e3=Effect.CreateEffect(c)
-	e3:SetCountLimit(1,{id,1})
+	e3::SetCountLimit(1,{id,1})
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_HAND)
-	e3:SetCost(s.cost)
-	e3:SetTarget(s.target)
-	e3:SetOperation(s.operation)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1,id)
+	e3:SetCondition(s.secon)
+	e3:SetTarget(s.setg)
+	e3:SetOperation(s.seop)
 	c:RegisterEffect(e3)
 	-- (3) To deck + draw
 	local e4=Effect.CreateEffect(c)
@@ -59,19 +60,17 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToGraveAsCost() and c:IsDiscardable() end
-	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
+function s.secon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9992),tp,LOCATION_PZONE,0,1,nil)
 end
 function s.filter(c)
 	return c:IsSetCard(0x9992) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.setg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.seop(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local tg=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if tg then
@@ -82,16 +81,17 @@ end
 
 -- (3)
 function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_MZONE
+	return e:GetHandler():GetPreviousLocation()==LOCATION_MZONE and 
+		Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9992),tp,LOCATION_PZONE,0,1,nil)
 end
 function s.tdfilter(c)
-	return ( c:GetSequence()==6 or c:GetSequence()==7 ) and c:IsAbleToDeck()
+	return c:IsLocation(LOCATION_PZONE) and c:IsAbleToDeck()
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,LOCATION_SZONE,0,1,nil) and Duel.IsPlayerCanDraw(tp,1) end
+	if chkc then return chkc:IsLocation(LOCATION_PZONE) and chkc:IsControler(tp) and s.tdfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_PZONE,0,1,nil) and Duel.IsPlayerCanDraw(tp,1) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_SZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_PZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end

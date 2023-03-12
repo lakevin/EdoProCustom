@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.target)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
-	-- (3) Return To Hand + Search
+	-- (3) Return To Hand
 	local e4=Effect.CreateEffect(c)
 	e4:SetCountLimit(1,{id,2})
 	e4:SetDescription(aux.Stringid(id,1))
