@@ -21,12 +21,22 @@ function s.initial_effect(c)
 	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
-	c:RegisterEffect(e2)	
+	c:RegisterEffect(e2)
+	-- (3) Special Summon itself
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_SPSUMMON_PROC)
+	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e3:SetRange(LOCATION_HAND)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetCondition(s.spcon)
+	c:RegisterEffect(e3)
 end
 
 -- (1)
 function s.thfilter(c,tp)
-	return c:IsLevelBelow(6) and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsLevelBelow(6) and c:IsSetCard(0x9992) and c:IsRace(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.spfilter(c,e,tp)
 	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -65,4 +75,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp)
 	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+end
+
+-- (3)
+function s.spcon(e,c)
+	if c==nil then return true end
+	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
+		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
