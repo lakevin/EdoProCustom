@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- (2) Search Spell Card
 	local e3=Effect.CreateEffect(c)
-	e3::SetCountLimit(1,{id,1})
+	e3:SetCountLimit(1,{id,1})
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_IGNITION)
