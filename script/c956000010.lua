@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9992),6,3,nil,nil,5)
+	Xyz.AddProcedure(c,nil,6,3,s.ovfilter,aux.Stringid(id,0),5,s.xyzop)
 	c:EnableReviveLimit()
 	-- (1) negate
 	local e1=Effect.CreateEffect(c)
@@ -33,6 +33,17 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTarget(s.reptg)
 	c:RegisterEffect(e3)
+end
+
+--xyz summon
+s.listed_series={0x9992}
+function s.ovfilter(c,tp,lc)
+	return c:IsFaceup() and c:IsSetCard(0x9992,lc,SUMMON_TYPE_XYZ,tp) and c:IsType(TYPE_XYZ) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
+end
+function s.xyzop(e,tp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+	return true
 end
 
 -- (1)
