@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- (2) Inactivate
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetDescription(aux.Stringid(id,3))
 	e3:SetCategory(CATEGORY_DISABLE+CATEGORY_REMOVE)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
@@ -53,14 +53,14 @@ function s.thfilter(c,e,tp)
 		and not c:IsCode(id) 
 end
 function s.cpfilter(c)
-	return c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsMonster() and not c:IsCode(id) and c:IsAbleToRemoveAsCost()
+	return c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsMonster() and not c:IsCode(id) and c:IsAbleToRemove()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
 		local sel=0
 		if Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) then sel=sel+1 end
-		if Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) then sel=sel+2 end
+		if Duel.IsExistingMatchingCard(s.cpfilter,tp,LOCATION_GRAVE,0,1,nil) then sel=sel+2 end
 		e:SetLabel(sel)
 		return sel~=0
 	end
@@ -98,7 +98,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		-- copy effect
 		if Duel.IsExistingMatchingCard(s.cpfilter,tp,LOCATION_GRAVE,0,1,nil) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+			local g=Duel.SelectMatchingCard(tp,s.cpfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 			local tc=g:GetFirst()
 			local c=e:GetHandler()
 			if tc and Duel.Remove(g,POS_FACEUP,REASON_COST)~=0 and tc:IsLocation(LOCATION_GRAVE)
