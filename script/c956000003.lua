@@ -36,10 +36,10 @@ end
 
 -- (1)
 function s.thfilter(c,tp)
-	return c:IsLevelBelow(6) and c:IsSetCard(0x9992) and c:IsRace(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsLevelBelow(6) and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsAbleToHand()
 end
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
