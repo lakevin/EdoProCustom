@@ -28,6 +28,8 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	local tc=Duel.GetFirstTarget()
+	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) then return end
+	Duel.Destroy(tc,REASON_EFFECT)
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
