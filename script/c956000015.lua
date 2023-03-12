@@ -129,7 +129,7 @@ end
 
 -- (3)
 function s.desfilter(c,tp)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_PZONE) and (c:GetSequence()==6 or c:GetSequence()==7)
+	return c:IsControler(tp) and c:IsLocation(LOCATION_PZONE)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.desfilter,1,nil,tp)
