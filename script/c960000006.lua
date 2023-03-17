@@ -26,5 +26,5 @@ function s.extraop(mg,e,tp,eg,ep,ev,re,r,rp)
 	local mat2=mg:Filter(Card.IsLocation,nil,LOCATION_DECK):Filter(Card.IsSetCard,nil,0x9999)
 	mg:Sub(mat2)
 	Duel.ReleaseRitualMaterial(mg)
-	Duel.Remove(mat,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
+	Duel.Remove(mat2,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
 end
