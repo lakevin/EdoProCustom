@@ -36,6 +36,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 
+-- (1)
 function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ec=e:GetLabelObject()
@@ -84,17 +85,6 @@ function s.repval(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
 end
 
--- (3)
-function s.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local g=c:GetEquipGroup():Filter(s.eqfilter,nil)
-	return #g>0 and ep==tp and r&REASON_BATTLE~=0
-		and (Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler())
-end
-function s.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Damage(1-tp,ev,REASON_EFFECT)
-end
-
 -- (2)
 function s.adcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -110,4 +100,15 @@ function s.atkval(e,c)
 	else
 		return atk
 	end
+end
+
+-- (3)
+function s.damcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local g=c:GetEquipGroup():Filter(s.eqfilter,nil)
+	return #g>0 and ep==tp and r&REASON_BATTLE~=0
+		and (Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler())
+end
+function s.damop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Damage(1-tp,ev,REASON_EFFECT)
 end

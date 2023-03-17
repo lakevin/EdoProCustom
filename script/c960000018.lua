@@ -25,6 +25,7 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
 end
+
 -- 1) to deck
 function s.filter(c)
 	return c:IsSetCard(0x9999) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() and not c:IsCode(id)
@@ -41,6 +42,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
+
 -- 2) banish
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
