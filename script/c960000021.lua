@@ -2,8 +2,8 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
+	Xyz.AddProcedure(c,nil,9,2,nil,aux.Stringid(id,0),5,nil)
 	c:EnableReviveLimit()
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),3,2)
 	--indes
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

@@ -27,7 +27,7 @@ function s.initial_effect(c)
 end
 -- 1) to deck
 function s.filter(c)
-	return c:IsSetCard(0x9999) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() and not c:IsCode(960000016)
+	return c:IsSetCard(0x9999) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() and not c:IsCode(id)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and s.filter(chkc) end

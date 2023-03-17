@@ -4,19 +4,20 @@ function s.initial_effect(c)
 	-- link summon
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9999),2,2)
 	c:EnableReviveLimit()
-	-- (1) equip
+	-- (1) Equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,id)
+	e1:SetCountLimit(1)
 	e1:SetCondition(s.eqcon)
 	e1:SetTarget(s.eqtg)
 	e1:SetOperation(s.eqop)
 	c:RegisterEffect(e1)
-	-- (2) atk/def
+	aux.AddEREquipLimit(c,s.eqcon,function(ec,_,tp) return ec:IsControler(1-tp) end,s.equipop,e1)
+	-- (2) Change ATK/DEF
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -24,17 +25,14 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_SET_ATTACK)
 	e2:SetCondition(s.adcon)
 	e2:SetValue(s.atkval)
-	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 	-- (3) damage
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e4:SetProperty(EFFECT_FLAG_AVAILABLE_BD)
 	e4:SetCode(EVENT_DAMAGE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCondition(s.damcon)
 	e4:SetOperation(s.damop)
-	e4:SetLabelObject(e1)
 	c:RegisterEffect(e4)
 end
 
@@ -85,22 +83,29 @@ end
 function s.repval(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
 end
+
+-- (3)
 function s.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local ec=e:GetLabelObject():GetLabelObject()
-	return ec and ec:GetFlagEffect(id)~=0 and ep==tp and bit.band(r,REASON_BATTLE)~=0
+	local c=e:GetHandler()
+	local g=c:GetEquipGroup():Filter(s.eqfilter,nil)
+	return #g>0 and ep==tp and r&REASON_BATTLE~=0
 		and (Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler())
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(1-tp,ev,REASON_EFFECT)
 end
+
+-- (2)
 function s.adcon(e,tp,eg,ep,ev,re,r,rp)
-	local ec=e:GetLabelObject():GetLabelObject()
-	return ec and ec:GetFlagEffect(id)~=0
+	local c=e:GetHandler()
+	local g=c:GetEquipGroup():Filter(s.eqfilter,nil)
+	return #g>0
 end
 function s.atkval(e,c)
-	local ec=e:GetLabelObject():GetLabelObject()
-	local atk=ec:GetTextAttack()
-	if ec:IsFacedown() or bit.band(ec:GetOriginalType(),TYPE_MONSTER)==0 or atk<0 then
+	local c=e:GetHandler()
+	local g=c:GetEquipGroup():Filter(s.eqfilter,nil)
+	local atk=g:GetFirst():GetTextAttack()
+	if g:GetFirst():IsFacedown() or g:GetFirst():GetOriginalType()&TYPE_MONSTER==0 or atk<0 then
 		return 0
 	else
 		return atk
