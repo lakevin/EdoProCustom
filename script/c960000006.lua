@@ -5,9 +5,9 @@ function s.initial_effect(c)
 	local e1=Ritual.CreateProc({handler=c,lvtype=RITPROC_EQUAL,extrafil=s.extrafil,extraop=s.extraop,matfilter=s.forcedgroup})
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DECKDES)
 	e1:SetDescription(aux.Stringid(id,0))
-	--[[e1:SetCondition(s.spcon1)
+	e1:SetCondition(s.spcon1)
 	c:RegisterEffect(e1)
-	-- (2) Activate
+	--[[-- (2) Activate
 	local e2=Ritual.CreateProc({handler=c,filter=s.ritualfil2,lvtype=RITPROC_EQUAL,extrafil=s.extrafil,extraop=s.extraop,matfilter=s.forcedgroup})
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DECKDES)
 	e1:SetDescription(aux.Stringid(id,1))
