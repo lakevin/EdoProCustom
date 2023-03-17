@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,nil,9,2,nil,aux.Stringid(id,0),5,nil)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9998),9,2)
 	c:EnableReviveLimit()
 	--indes
 	local e1=Effect.CreateEffect(c)
@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_QUICK_O)
-	e2:SetProperty(EFFECT_FLAG2_XMDETACH+EFFECT_FLAG_CARD_TARGET)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)

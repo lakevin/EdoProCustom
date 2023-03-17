@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	c:EnableReviveLimit()
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),3,4,nil,nil,5)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9998),9,2,nil,aux.Stringid(id,0),5,nil)
 	-- (1) cannot disable spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
