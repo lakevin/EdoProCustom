@@ -34,7 +34,7 @@ end
 
 --add to hand
 function s.thfilter(c)
-	return c:IsSetCard(0x9999) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return (c:IsSetCard(0x9998) or c:IsSetCard(0x9999)) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
