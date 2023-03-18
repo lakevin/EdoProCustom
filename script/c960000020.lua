@@ -36,11 +36,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 
+function s.eqfilter(c)
+	return c:GetFlagEffect(id)~=0
+end
 -- (1)
 function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local ec=e:GetLabelObject()
-	return ec==nil or ec:GetFlagEffect(id)==0
+	local g=e:GetHandler():GetEquipGroup():Filter(s.eqfilter,nil)
+	return #g==0
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsAbleToChangeControler() end
@@ -50,39 +52,26 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToChangeControler,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
-function s.eqlimit(e,c)
-	return e:GetOwner()==c
+function s.equipop(c,e,tp,tc)
+	if not c:EquipByEffectAndLimitRegister(e,tp,tc,id) then return end
+	--substitute
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_EQUIP)
+	e1:SetCode(EFFECT_DESTROY_SUBSTITUTE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetValue(s.repval)
+	tc:RegisterEffect(e1)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsType(TYPE_MONSTER) and tc:IsControler(1-tp) then
-		if c:IsFaceup() and c:IsRelateToEffect(e) then
-			if not Duel.Equip(tp,tc,c,false) then return end
-			--Add Equip limit
-			tc:RegisterFlagEffect(id,RESET_EVENT+0x1fe0000,0,0)
-			e:SetLabelObject(tc)
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
-			e1:SetCode(EFFECT_EQUIP_LIMIT)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
-			e1:SetValue(s.eqlimit)
-			tc:RegisterEffect(e1)
-			--substitute
-			local e2=Effect.CreateEffect(c)
- 			e2:SetType(EFFECT_TYPE_EQUIP)
- 			e2:SetCode(EFFECT_DESTROY_SUBSTITUTE)
- 			e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
- 			e2:SetReset(RESET_EVENT+0x1fe0000)
- 			e2:SetValue(s.repval)
- 			tc:RegisterEffect(e2)
-		else Duel.SendtoGrave(tc,REASON_EFFECT) end
+	if tc and tc:IsRelateToEffect(e) and tc:IsMonster() and tc:IsControler(1-tp) and s.eqcon(e,tp,eg,ep,ev,re,r,rp) then
+		s.equipop(c,e,tp,tc)
 	end
 end
-
 function s.repval(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0
+	return r&REASON_BATTLE~=0
 end
 
 -- (2)

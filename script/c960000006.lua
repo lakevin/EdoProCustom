@@ -2,7 +2,9 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
-	Ritual.AddProcEqual{handler=c,filter=s.ritualfil,extrafil=s.extrafil,extraop=s.extraop,extratg=s.extratg}
+	local e1=Ritual.AddProcEqual{handler=c,filter=s.ritualfil,location=LOCATION_HAND|LOCATION_REMOVED,extrafil=s.extrafil,extraop=s.extraop,extratg=s.extratg}
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	c:RegisterEffect(e1)
 end
 s.listed_series={0x9998,0x9999}
 function s.ritualfil(c)

@@ -1,43 +1,33 @@
--- Contractor Protection
+-- Pact with the Black Winged Chain
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	local e1=Ritual.AddProcEqual{handler=c,filter=s.ritualfil,location=LOCATION_DECK|LOCATION_REMOVED,matfilter=s.mfilter,stage2=s.stage2}
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
-	-- (1) Cannot be target
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e2:SetRange(LOCATION_FZONE)
-	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(s.target)
-	e2:SetValue(1)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	c:RegisterEffect(e3)
-	-- (2) self destroy
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetCode(EFFECT_SELF_DESTROY)
-	e4:SetCondition(s.descon)
-	c:RegisterEffect(e4)
 end
+s.listed_series={0x9998,0x9999}
 
--- (1)
-function s.target(e,c)
-	return c:IsFaceup() and c:IsSetCard(0x9999)
+function s.mfilter(c)
+	return c:IsLocation(LOCATION_REMOVED) and c:HasLevel() and c:IsSetCard(0x9999) and c:IsAbleToDeck()
 end
-
--- (2)
-function s.filter(c)
-	return c:IsFaceup() and not c:IsSetCard(0x9999)
+function s.stage2(mat,e,tp,eg,ep,ev,re,r,rp,tc)
+	tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,1))
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetCountLimit(1)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetLabelObject(tc)
+	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	e1:SetCondition(s.tdcon)
+	e1:SetOperation(s.tdop)
+	Duel.RegisterEffect(e1,tp)
 end
-function s.descon(e)
-	return Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsTurnPlayer(1-tp) and e:GetLabelObject():GetFlagEffect(id)>0
+end
+function s.tdop(e,tp,eg,ep,ev,re,r,rp)
+	local sc=e:GetLabelObject()
+	Duel.Remove(sc,FACE_UP,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end

@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 
--- 1)
+-- (1)
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -34,7 +34,7 @@ function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	return true
 end
 
--- 2)
+-- (2)
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
