@@ -6,11 +6,11 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.tkcon)
+	--e1:SetCondition(s.tkcon)
 	e1:SetTarget(s.tktg)
 	e1:SetOperation(s.tkop)
 	c:RegisterEffect(e1)
@@ -35,12 +35,12 @@ function s.initial_effect(c)
 end
 
 -- (1)
-function s.tkfilter(c,tp)
+--[[function s.tkfilter(c,tp)
 	return c:IsFaceup() and c:IsControler(1-tp)
 end
 function s.tkcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.tkfilter,1,nil,tp)
-end
+end]]--
 function s.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,2600,2100,9,RACE_WINGEDBEAST,ATTRIBUTE_DARK) end
