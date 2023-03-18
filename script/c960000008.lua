@@ -39,5 +39,7 @@ function s.filter(c)
 	return c:IsFaceup() and not c:IsSetCard(0x9999)
 end
 function s.descon(e)
-	return Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	if not Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil) then
+		return true
+	end
 end

@@ -20,6 +20,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_REMOVE)
 	e3:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	e3:SetOperation(s.target)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
@@ -35,10 +36,16 @@ function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 -- (2)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingMatchingCard(nil,tp,0,LOCATION_ONFIELD,1,nil) end
+	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,1-tp,0)
+end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local sg=g:Select(tp,1,1,nil)
-	Duel.HintSelection(sg)
-	Duel.Destroy(sg,REASON_EFFECT)
+	local g=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil)
+	if #g>0 then
+		Duel.HintSelection(g)
+		Duel.Destroy(g,REASON_EFFECT)
+	end
 end
