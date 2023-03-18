@@ -11,7 +11,7 @@ function s.ritualfil(c)
 	return c:IsSetCard(0x9999) and c:IsRitualMonster()
 end
 function s.mfilter(c)
-	return c:HasLevel() and c:IsSetCard(0x9999) and c:IsAbleToRemove()
+	return not c:IsType(TYPE_RITUAL) and c:IsSetCard(0x9999) and c:HasLevel() and c:IsAbleToRemove()
 end
 function s.extrafil(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
