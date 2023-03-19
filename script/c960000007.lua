@@ -6,25 +6,25 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	-- (1) Special Summon
+	-- (1) remove
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_FZONE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.activate)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetCode(EFFECT_TO_GRAVE_REDIRECT)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetTarget(s.rmtarget)
+	e2:SetTargetRange(0xff,0xff)
+	e2:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e2)
-	-- (2) remove
+	-- (2) Special Summon
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e3:SetCode(EFFECT_TO_GRAVE_REDIRECT)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetTarget(s.rmtarget)
-	e3:SetTargetRange(0xff,0xff)
-	e3:SetValue(LOCATION_REMOVED)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCountLimit(1,id)
+	e3:SetTarget(s.target)
+	e3:SetOperation(s.activate)
 	c:RegisterEffect(e3)
 	--extra summon
 	local e4=Effect.CreateEffect(c)
@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 	e4:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e4:SetCountLimit(1)
+	e4:SetCountLimit(1,id)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9998))
 	c:RegisterEffect(e4)
 	--
@@ -49,6 +49,14 @@ function s.initial_effect(c)
 end
 
 -- (1)
+function s.rmtarget(e,c)
+	return not c:IsLocation(0x80) and not c:IsType(TYPE_SPELL+TYPE_TRAP)
+end
+function s.checktg(e,c)
+	return not c:IsPublic()
+end
+
+-- (2)
 function s.filter(c,e,tp)
 	return c:IsSetCard(0x9999) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -65,12 +73,4 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-
--- (2)
-function s.rmtarget(e,c)
-	return not c:IsLocation(0x80) and not c:IsType(TYPE_SPELL+TYPE_TRAP)
-end
-function s.checktg(e,c)
-	return not c:IsPublic()
 end
