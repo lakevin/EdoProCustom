@@ -29,5 +29,5 @@ function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local sc=e:GetLabelObject()
-	Duel.Remove(sc,FACE_UP,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	Duel.Remove(sc,POS_FACEUP,REASON_EFFECT)
 end
