@@ -26,6 +26,7 @@ function s.initial_effect(c)
 	e2:SetHintTiming(0,TIMING_MAIN_END)
 	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.condition)
+	e2:SetCost(s.cost)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
@@ -78,6 +79,9 @@ end]]--
 function s.filter(c)
 	return c:IsTrap() and c:IsSetCard(0x9990) and c:IsAbleToGraveAsCost()
 		and c:CheckActivateEffect(false,true,false)~=nil and c:CheckActivateEffect(false,true,false):GetOperation()~=nil
+end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp and Duel.GetCurrentPhase()&PHASE_MAIN1+PHASE_MAIN2~=0 and e:GetHandler():IsAbleToGrave(tp)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
