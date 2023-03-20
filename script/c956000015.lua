@@ -49,11 +49,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 	-- (3) self destroy
 	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e6:SetType(EFFECT_TYPE_SINGLE)
+	e6:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e6:SetRange(LOCATION_SZONE)
-	e6:SetCode(EVENT_DESTROY)
+	e6:SetCode(EFFECT_SELF_DESTROY)
 	e6:SetCondition(s.descon)
-	e6:SetOperation(s.desop)
 	c:RegisterEffect(e6)
 	-- (4) BANISH + ADD TO DECK
 	local e7=Effect.CreateEffect(c)
@@ -134,9 +134,6 @@ end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	--return eg:IsExists(s.desfilter,1,nil,tp)
 	return not Duel.GetFieldCard(tp,LOCATION_PZONE,0) or not Duel.GetFieldCard(tp,LOCATION_PZONE,1)
-end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 
 -- (4)
