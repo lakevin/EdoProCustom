@@ -128,11 +128,7 @@ function s.thop2(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.desfilter(c,tp)
-	return c:IsControler(tp) and c:IsPreviousLocation(LOCATION_PZONE)
-end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	--return eg:IsExists(s.desfilter,1,nil,tp)
 	return not Duel.GetFieldCard(tp,LOCATION_PZONE,0) or not Duel.GetFieldCard(tp,LOCATION_PZONE,1)
 end
 
