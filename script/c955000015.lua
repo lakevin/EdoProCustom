@@ -20,6 +20,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.tdop)
 	c:RegisterEffect(e2)
 end
+
 --check material
 function s.filter1(c,e)
 	return not c:IsImmuneToEffect(e)
