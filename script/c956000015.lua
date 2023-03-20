@@ -128,8 +128,8 @@ function s.thop2(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.GetFieldCard(tp,LOCATION_PZONE,0) or not Duel.GetFieldCard(tp,LOCATION_PZONE,1) then
+function s.descon(e)
+	if not Duel.GetFieldCard(e:GetHandlerPlayer(),LOCATION_PZONE,0) or not Duel.GetFieldCard(e:GetHandlerPlayer(),LOCATION_PZONE,1) then
 		return TRUE
 	end
 end
