@@ -129,7 +129,9 @@ end
 
 -- (3)
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.GetFieldCard(tp,LOCATION_PZONE,0) or not Duel.GetFieldCard(tp,LOCATION_PZONE,1)
+	if not Duel.GetFieldCard(tp,LOCATION_PZONE,0) or not Duel.GetFieldCard(tp,LOCATION_PZONE,1) then
+		return TRUE
+	end
 end
 
 -- (4)
