@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
@@ -21,6 +21,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetRange(LOCATION_HAND)
+	e3:SetCountLimit(1,{id,1})
 	e3:SetCondition(s.discon)
 	e3:SetCost(s.discost)
 	e3:SetTarget(s.distg)
@@ -40,6 +41,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_TO_HAND)
 	e4:SetRange(LOCATION_HAND)
+	e4:SetCountLimit(1,{id,2})
 	e4:SetCondition(s.spcon)
 	e4:SetTarget(s.sptg)
 	e4:SetOperation(s.spop)
@@ -48,6 +50,22 @@ end
 
 -- (1)
 function s.thfilter(c,e,tp)
+	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
+		and not c:IsCode(id) 
+end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+	end
+end
+--[[function s.thfilter(c,e,tp)
 	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
 end
@@ -113,7 +131,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 	end
-end
+end]]--
 
 -- (2)
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
@@ -130,8 +148,11 @@ function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
 	Duel.NegateEffect(ev)
-	Duel.Remove(ev,POS_FACEUP,REASON_EFFECT)
+	if tc and tc:IsRelateToEffect(e) then
+		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+	end
 end
 
 
