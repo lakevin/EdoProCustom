@@ -132,7 +132,7 @@ function s.desfilter(c,tp)
 	return c:IsControler(tp) and c:IsPreviousLocation(LOCATION_PZONE)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.desfilter,1,nil,tp)
+	return eg:IsExists(s.desfilter,1,nil,tp) or (not Duel.GetFieldCard(tp,LOCATION_PZONE,0) or not Duel.GetFieldCard(tp,LOCATION_PZONE,1))
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
