@@ -130,7 +130,7 @@ end
 -- (3)
 function s.descon(e)
 	if not Duel.GetFieldCard(e:GetHandlerPlayer(),LOCATION_PZONE,0) or not Duel.GetFieldCard(e:GetHandlerPlayer(),LOCATION_PZONE,1) then
-		return TRUE
+		return true
 	end
 end
 
