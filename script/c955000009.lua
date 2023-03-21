@@ -87,10 +87,6 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	return true
 end
-function s.filter(c)
-	return c:GetType()==TYPE_TRAP and (c:IsSetCard(0x4c) or c:IsSetCard(0x89)) and c:IsAbleToGraveAsCost()
-		and c:CheckActivateEffect(false,true,true)~=nil
-end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()==0 then return false end
