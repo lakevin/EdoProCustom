@@ -77,7 +77,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end]]--
 function s.filter(c)
-	return c:IsTrap() and c:IsSetCard(0x9990) and c:IsAbleToGraveAsCost()
+	return c:IsTrap() and not c:GetType()==TYPE_CONTINUOUS|TYPE_COUNTER and c:IsSetCard(0x9990) and c:IsAbleToGraveAsCost()
 		and c:CheckActivateEffect(false,true,false)~=nil and c:CheckActivateEffect(false,true,false):GetOperation()~=nil
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
