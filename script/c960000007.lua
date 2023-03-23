@@ -1,12 +1,12 @@
 -- Abyss of the Chains
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	-- perm remove
+	--Remove
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
@@ -16,14 +16,13 @@ function s.initial_effect(c)
 	e2:SetTargetRange(0xff,0xff)
 	e2:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e2)
-	-- perm additional normal summon
+	--Extra summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 	e3:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e3:SetCountLimit(1)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9998))
 	c:RegisterEffect(e3)
 	-- (1) Special Summon
