@@ -1,6 +1,7 @@
 -- Dodo
 local s,id=GetID()
 function s.initial_effect(c)
+	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
 	-- (1) token special summon
 	local e1=Effect.CreateEffect(c)
@@ -35,22 +36,15 @@ function s.initial_effect(c)
 end
 
 -- (1)
---[[function s.tkfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(1-tp)
-end
-function s.tkcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.tkfilter,1,nil,tp)
-end]]--
 function s.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,2600,2100,9,RACE_WINGEDBEAST,ATTRIBUTE_DARK) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,2500,2000,9,RACE_WINGEDBEAST,ATTRIBUTE_DARK) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
-	--Special summon token, locked to insects for extra deck while it on the field
 function s.tkop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,2600,2100,9,RACE_WINGEDBEAST,ATTRIBUTE_DARK) then
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,2500,2000,9,RACE_WINGEDBEAST,ATTRIBUTE_DARK) then
 		local token=Duel.CreateToken(tp,id+1)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 	end

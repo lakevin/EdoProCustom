@@ -5,6 +5,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(s.actcon)
 	c:RegisterEffect(e1)
 	-- (1) Cannot be target
 	local e2=Effect.CreateEffect(c)
@@ -29,17 +30,21 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 
+-- activate
+function s.filter(c)
+	return c:IsFaceup() and c:IsSetCard(0x9998)
+end
+function s.actcon(e)
+	return Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+end
+
 -- (1)
 function s.target(e,c)
 	return c:IsSetCard(0x9999)
 end
 
 -- (2)
-function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9998)
-end
+
 function s.descon(e)
-	if not Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil) then
-		return true
-	end
+	return not Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end

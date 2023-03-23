@@ -1,6 +1,7 @@
 -- Gryphon
 local s,id=GetID()
 function s.initial_effect(c)
+	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
 	-- (1) base attack
 	local e2=Effect.CreateEffect(c)
@@ -29,7 +30,8 @@ function s.filter(c)
 end
 function s.atkval(e,c)
 	local atk=c:GetAttack()
-	return Duel.GetMatchingGroupCount(s.filter,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)*200+atk
+	local bonus=Duel.GetMatchingGroupCount(s.filter,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)
+	return bonus*100+atk
 end
 
 -- (2)
