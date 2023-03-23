@@ -54,5 +54,5 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.splimit(e,c)
-	return c:IsSetCard(0x9999)
+	return not c:IsSetCard(0x9999)
 end
