@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	-- (1) base attack
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_SET_BASE_ATTACK)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(s.atkval)
@@ -29,9 +29,7 @@ function s.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
 end
 function s.atkval(e,c)
-	local atk=c:GetAttack()
-	local bonus=Duel.GetMatchingGroupCount(s.filter,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)
-	return bonus*100+atk
+	return Duel.GetMatchingGroupCount(s.filter,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)*100
 end
 
 -- (2)
