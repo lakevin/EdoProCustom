@@ -3,6 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,2)
+	c:EnableReviveLimit()
 	-- (1) halve atk/def
 	local e1=Effect.CreateEffect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)

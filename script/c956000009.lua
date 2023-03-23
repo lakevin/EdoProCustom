@@ -3,6 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,2)
+	c:EnableReviveLimit()
 	-- (1) face-down
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_POSITION)
