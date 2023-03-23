@@ -21,7 +21,7 @@ end
 
 --Activate
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9998)
+	return c:IsFaceup() and c:IsSetCard(0x9999)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp or not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
@@ -49,7 +49,7 @@ end
 
 --activate from hand
 function s.hfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9999)
+	return c:IsFaceup() and c:IsSetCard(0x9998)
 end
 function s.handcon(e)
 	return Duel.IsExistingMatchingCard(s.hfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
