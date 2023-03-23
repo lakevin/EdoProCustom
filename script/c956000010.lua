@@ -3,7 +3,6 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	Xyz.AddProcedure(c,nil,6,3,s.ovfilter,aux.Stringid(id,0),5,s.xyzop)
-	c:EnableReviveLimit()
 	-- (1) negate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
