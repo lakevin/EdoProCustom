@@ -75,7 +75,7 @@ end
 
 -- (2)
 function s.filter(c)
-	return c:IsMonster() and c:IsSetCard(0x9999) and not c:IsRitualMonster() and c:IsAbleToRemove()
+	return c:IsMonster() and c:IsSetCard(0x9999) --[[and not c:IsRitualMonster() and c:IsAbleToRemove()]]--
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_DECK) and s.filter(chkc,e,tp) end
