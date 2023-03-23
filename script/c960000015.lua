@@ -30,7 +30,7 @@ end
 
 -- (1)
 function s.filter(c,g,mc)
-	return c:IsFaceup() and (g:IsContains(c) or c==mc)
+	return (g:IsContains(c) or c==mc)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
