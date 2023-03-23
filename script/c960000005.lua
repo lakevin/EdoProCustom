@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--ritual level
-	Ritual.AddWholeLevelTribute(c,aux.FilterBoolFunction(Card.IsSetCard,0x9998))
+	Ritual.AddWholeLevelTribute(c,aux.FilterBoolFunction(Card.IsSetCard,0x9999))
 	-- (1) banish
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
