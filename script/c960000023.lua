@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	c:EnableReviveLimit()
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9998),9,2,nil,aux.Stringid(id,0),5,nil)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9999),9,2,nil,aux.Stringid(id,0),5,nil)
 	-- (1) cannot disable spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -60,14 +60,14 @@ function s.effcon(e)
 end
 -- (2)+(3)
 function s.atkfilter(c)
-	return ( c:IsSetCard(0x9998) or c:IsSetCard(0x9999) )  and c:GetAttack()>=0
+	return c:GetAttack()>=0
 end
 function s.atkval(e,c)
 	local g=e:GetHandler():GetOverlayGroup():Filter(s.atkfilter,nil)
 	return g:GetSum(Card.GetAttack)/2
 end
 function s.deffilter(c)
-	return ( c:IsSetCard(0x9998) or c:IsSetCard(0x9999) ) and c:GetDefense()>=0
+	return c:GetDefense()>=0
 end
 function s.defval(e,c)
 	local g=e:GetHandler():GetOverlayGroup():Filter(s.deffilter,nil)
