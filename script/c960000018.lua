@@ -43,7 +43,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2) special summon
-function s.spfilter(c)
+function s.spfilter(c,e,tp)
 	return c:IsMonster() and c:IsSetCard(0x9999) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
