@@ -84,7 +84,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
+	local tc=Duel.SelectTarget(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if tc then
 		if Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
 			local c=e:GetHandler()
