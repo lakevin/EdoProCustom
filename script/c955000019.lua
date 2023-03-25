@@ -1,9 +1,9 @@
 -- Protectrix CR-Suit Apocalyptic
 local s,id=GetID()
 function s.initial_effect(c)
-	-- fusion material
+	-- Xyz material
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9990),7,2)
 	c:EnableReviveLimit()
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsRace,RACE_PSYCHIC),s.matfilter)
 	-- (1) Banish from your opp Field, Hand, GY or Decktop
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
