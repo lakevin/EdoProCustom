@@ -6,8 +6,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.condition)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
@@ -29,8 +28,12 @@ end
 -- SelectOption
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
-	local op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
-	e:SetLabel(op)
+	if Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 then
+		local op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
+		e:SetLabel(op)
+	else
+		e:SetLabel(1)
+	end
 	if op==0 then
 		if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 			and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
