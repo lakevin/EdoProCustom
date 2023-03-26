@@ -4,13 +4,13 @@ function s.initial_effect(c)
 	--Link summon procedure
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,s.matfilter,2,2,s.lcheck)
-	-- (1) to hand or copy effect
+	-- (1) Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_PZONE)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
@@ -75,7 +75,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)]]--
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(0x27)
+	return not c:IsSetCard(0x9992)
 end
 
 -- (2)

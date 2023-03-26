@@ -21,6 +21,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,{id,1})
+	e3:SetCost(s.secost)
 	e3:SetCondition(s.secon)
 	e3:SetTarget(s.setg)
 	e3:SetOperation(s.seop)
@@ -59,11 +60,18 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
+function s.filter(c)
+	return c:IsSetCard(0x9992) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+end
+function s.cfilter(c)
+	return c:IsDiscardable()
+end
 function s.secon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9992),tp,LOCATION_PZONE,0,1,nil)
 end
-function s.filter(c)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,s.cfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.setg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
