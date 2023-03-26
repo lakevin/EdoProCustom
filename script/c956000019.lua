@@ -31,7 +31,7 @@ end
 
 -- link summon
 function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(0x9990,lc,sumtype,tp) and c:IsRace(RACE_DRAGON,lc,sumtype,tp)
+	return c:IsSetCard(0x9992,lc,sumtype,tp) and c:IsRace(RACE_DRAGON,lc,sumtype,tp)
 end
 
 --- (1)

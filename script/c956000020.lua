@@ -29,7 +29,7 @@ end
 
 -- link summon
 function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(0x9990,lc,sumtype,tp)
+	return c:IsSetCard(0x9992,lc,sumtype,tp)
 end
 function s.lcheck(g,lc,sumtype,tp)
 	return g:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER,lc,sumtype,tp)
