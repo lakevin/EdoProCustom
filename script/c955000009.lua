@@ -32,11 +32,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 
--- link summon
-function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(0x9990,lc,sumtype,tp)
-end
-
 -- (1)
 function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
@@ -58,24 +53,6 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (2)
---[[function s.filter(c)
-	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and not c:GetType()==TYPE_CONTINUOUS+TYPE_TRAP and c:IsAbleToGrave()
-end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp and Duel.GetCurrentPhase()&PHASE_MAIN1+PHASE_MAIN2~=0 and e:GetHandler():IsAbleToGrave(tp)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoGrave(g,REASON_EFFECT)
-	end
-end]]--
 function s.filter(c)
 	return c:IsTrap() and not c:IsType(TYPE_CONTINUOUS|TYPE_COUNTER) and c:IsSetCard(0x9990) and c:IsAbleToGraveAsCost()
 		and c:CheckActivateEffect(false,true,false)~=nil and c:CheckActivateEffect(false,true,false):GetOperation()~=nil
