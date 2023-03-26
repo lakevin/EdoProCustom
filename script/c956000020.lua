@@ -10,8 +10,9 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.spcon)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
@@ -37,7 +38,7 @@ end
 
 -- (1)
 function s.spfilter(c,e,tp,zone)
-	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_PENDULUM) and c:IsSetCard(0x9992) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
+	return c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
@@ -50,7 +51,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		local zone=e:GetHandler():GetLinkedZone(tp)&0x1f
 		local ct=Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_TOFIELD,zone)
 		local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,nil,e,tp,zone)
-		return ct>2 and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
+		return ct>=2 and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 			and aux.SelectUnselectGroup(g,e,tp,2,2,s.spcheck,0)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_EXTRA+LOCATION_GRAVE)
