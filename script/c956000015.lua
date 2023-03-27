@@ -56,10 +56,10 @@ function s.initial_effect(c)
 	e6:SetCode(EFFECT_SELF_DESTROY)
 	e6:SetCondition(s.descon)
 	c:RegisterEffect(e6)
-	-- (4) BANISH + ADD TO DECK
+	-- (4) BANISH + ADD TO HAND
 	local e7=Effect.CreateEffect(c)
 	e7:SetDescription(aux.Stringid(id,3))
-	e7:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
+	e7:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e7:SetType(EFFECT_TYPE_IGNITION)
 	e7:SetRange(LOCATION_GRAVE)
 	e7:SetCode(EVENT_FREE_CHAIN)

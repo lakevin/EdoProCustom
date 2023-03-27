@@ -5,13 +5,14 @@ function s.initial_effect(c)
 	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,2)
 	c:EnableReviveLimit()
 	-- (1) face-down
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_POSITION)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e2:SetTarget(s.turntg)
-	e2:SetOperation(s.turnop)
-	c:RegisterEffect(e2)
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_POSITION)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTarget(s.turntg)
+	e1:SetOperation(s.turnop)
+	c:RegisterEffect(e1)
 	-- (2) return hand
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
@@ -29,31 +30,26 @@ function s.initial_effect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_DESTROY)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_TO_GRAVE)
+	e4:SetCode(EVENT_LEAVE_FIELD)
 	e4:SetCondition(s.spcon)
 	e4:SetTarget(s.sptg)
 	e4:SetOperation(s.spop)
 	c:RegisterEffect(e4)
-	local e5=e4:Clone()
-	e5:SetCode(EVENT_REMOVE)
-	c:RegisterEffect(e5)
-	local e6=e4:Clone()
-	e6:SetCode(EVENT_TO_DECK)
-	c:RegisterEffect(e6)
 end
 
 -- (1)
-function s.tgfilter(c)
-	return c:IsCanTurnSet()
-end
 function s.turntg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,0,LOCATION_MZONE,1,nil) end
-	local g=Duel.GetMatchingGroup(s.tgfilter,tp,0,LOCATION_MZONE,nil)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,g:GetCount(),0,0)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,1,nil) end
+	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,nil)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,#g,0,0)
 end
 function s.turnop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.tgfilter,tp,0,LOCATION_MZONE,nil)
-	if Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)~=0 then
+	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,nil)
+	if #g>0 then
+		Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
+	end
+	-- Cannot change positions
+	--[[if Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)~=0 then
 		local og=Duel.GetOperatedGroup()
 		local tc=og:GetFirst()
 		while tc do
@@ -64,7 +60,7 @@ function s.turnop(e,tp,eg,ep,ev,re,r,rp)
 			tc:RegisterEffect(e1)
 			tc=og:GetNext()
 		end
-	end
+	end]]--
 end
 
 -- (2)
@@ -76,7 +72,7 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:IsAbleToHand() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.thfilter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

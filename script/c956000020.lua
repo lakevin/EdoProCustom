@@ -26,6 +26,24 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
+	--Cannot be Link Material the turn it's Link Summoned
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+	e3:SetCondition(s.lkcon)
+	e3:SetValue(1)
+	c:RegisterEffect(e3)
+	--Cards this points to cannot be targeted
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e4:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetTarget(function(e,c) return e:GetHandler():GetLinkedGroup():IsContains(c) end)
+	e4:SetValue(aux.tgoval)
+	c:RegisterEffect(e4)
 end
 
 -- link summon
@@ -34,6 +52,10 @@ function s.matfilter(c,lc,sumtype,tp)
 end
 function s.lcheck(g,lc,sumtype,tp)
 	return g:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER,lc,sumtype,tp)
+end
+function s.lkcon(e)
+	local c=e:GetHandler()
+	return c:IsStatus(STATUS_SPSUMMON_TURN) and c:IsSummonType(SUMMON_TYPE_LINK)
 end
 
 -- (1)

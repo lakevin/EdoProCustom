@@ -20,9 +20,9 @@ function s.initial_effect(c)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
 	e3:SetValue(300)
 	c:RegisterEffect(e3)
-	-- (3) SPECIAL SUMMON
+	-- (3) Return to Deck + Special Summon
 	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
+	e4:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
 	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_FZONE)
@@ -30,13 +30,24 @@ function s.initial_effect(c)
 	e4:SetTarget(s.target1)
 	e4:SetOperation(s.operation1)
 	c:RegisterEffect(e4)
-	-- (4) ADD TO HAND
+	-- (4) Add to hand
 	local e5=e4:Clone()
 	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e5:SetDescription(aux.Stringid(id,1))
 	e5:SetTarget(s.target2)
 	e5:SetOperation(s.operation2)
 	c:RegisterEffect(e5)
+	-- (4) BANISH + RETURN TO DECK + DRAW
+	local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(id,3))
+	e6:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
+	e6:SetType(EFFECT_TYPE_IGNITION)
+	e6:SetRange(LOCATION_GRAVE)
+	e6:SetCode(EVENT_FREE_CHAIN)
+	e6:SetCost(s.drcost)
+	e6:SetTarget(s.drtg)
+	e6:SetOperation(s.drop)
+	c:RegisterEffect(e6)
 end
 
 -- (2)
@@ -88,8 +99,8 @@ function s.operation2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (34)
---[[function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
+-- (4)
+function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
@@ -115,4 +126,4 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end
-end]]--
+end
