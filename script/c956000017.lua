@@ -36,12 +36,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
+	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	local g=tg:Filter(Card.IsRelateToEffect,nil,e)
+	if #g>0 then
+		Duel.Destroy(g,REASON_EFFECT)
 	end
 end
