@@ -33,6 +33,14 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTarget(s.reptg)
 	c:RegisterEffect(e3)
+	-- (4) ATK Up
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_UPDATE_ATTACK)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetValue(s.atkval)
+	c:RegisterEffect(e4)
 end
 
 --xyz summon
@@ -100,4 +108,9 @@ function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		c:RemoveOverlayCard(tp,1,1,REASON_EFFECT)
 		return true
 	else return false end
+end
+
+-- (4)
+function s.atkval(e,c)
+	return c:GetOverlayCount()*500
 end
