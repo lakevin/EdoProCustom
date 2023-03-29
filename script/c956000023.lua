@@ -88,8 +88,8 @@ function s.penfilter1(c,e,tp)
 end
 function s.penfilter2(c,e,tp,mc,attr)
 	if c.rum_limit and not c.rum_limit(mc,e) or Duel.GetLocationCountFromEx(tp,tp,mc,c)<=0 then return false end
-	return c:IsType(TYPE_XYZ) and mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and mc:IsAttribute(attr,c,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and c:IsAttribute(attr)
-		and mc:IsCanBeXyzMaterial(c,tp) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+	return c:IsType(TYPE_XYZ)  and c:IsRank(6) and c:IsAttribute(attr) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+		and mc:IsType(TYPE_PENDULUM) and mc:IsAttribute(attr) and mc:IsCanBeXyzMaterial(c,tp)
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.penfilter1(chkc,e,tp) end
