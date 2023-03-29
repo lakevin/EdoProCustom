@@ -87,7 +87,7 @@ function s.penfilter1(c,e,tp)
 		and Duel.IsExistingMatchingCard(s.penfilter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,attr)
 end
 function s.penfilter2(c,e,tp,mc,attr)
-	if Duel.GetLocationCountFromEx(tp,tp,mc,c)<=0 then return false end
+	if c.rum_limit or Duel.GetLocationCountFromEx(tp,tp,mc,c)<=0 then return false end
 	return c:IsType(TYPE_XYZ)  and c:IsRank(6) and c:IsAttribute(attr) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 		and mc:IsType(TYPE_PENDULUM) and mc:IsAttribute(attr) and mc:IsCanBeXyzMaterial(c,tp)
 end
