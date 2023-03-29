@@ -82,15 +82,14 @@ end
 
 -- (2)
 function s.penfilter1(c,e,tp)
-	local at=c:GetAttribute()
-	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
-	return #pg<=1 and c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsLevel(6)
-		and Duel.IsExistingMatchingCard(s.penfilter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,at,pg)
+	local attr=c:GetAttribute()
+	return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsLevel(6)
+		and Duel.IsExistingMatchingCard(s.penfilter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,attr)
 end
-function s.penfilter2(c,e,tp,mc,at,pg)
+function s.penfilter2(c,e,tp,mc,attr)
 	if c.rum_limit and not c.rum_limit(mc,e) or Duel.GetLocationCountFromEx(tp,tp,mc,c)<=0 then return false end
-	return c:IsType(TYPE_XYZ) and mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and mc:IsAttribute(at,c,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and c:IsAttribute(at)
-		and mc:IsCanBeXyzMaterial(c,tp) and (#pg<=0 or pg:IsContains(mc)) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+	return c:IsType(TYPE_XYZ) and mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and mc:IsAttribute(attr,c,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and c:IsAttribute(attr)
+		and mc:IsCanBeXyzMaterial(c,tp) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.penfilter1(chkc,e,tp) end
@@ -104,9 +103,8 @@ function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
-	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(tc),tp,nil,nil,REASON_XYZ)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.penfilter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank()+1,pg)
+	local g=Duel.SelectMatchingCard(tp,s.penfilter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetAttribute())
 	local sc=g:GetFirst()
 	if sc then
 		sc:SetMaterial(tc)
