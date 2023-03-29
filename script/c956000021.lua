@@ -65,7 +65,7 @@ function s.ptop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.tffilter(c)
+function s.tffilter(c,e,tp)
 	return c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DRAGON) 
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
