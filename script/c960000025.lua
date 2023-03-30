@@ -81,6 +81,19 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(s.desfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+		return false
+	else return true end
+end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	local tg=g:Filter(s.desfilter,nil,e:GetLabel())
+	Duel.Destroy(tg,REASON_EFFECT)
+end
 
 -- (2)
 function s.condition2(e,tp,eg,ep,ev,re,r,rp)
