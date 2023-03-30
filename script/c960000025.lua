@@ -57,6 +57,16 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
 		end
 		sg:KeepAlive()
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+		e1:SetCountLimit(1)
+		e1:SetLabel(fid)
+		e1:SetLabelObject(sg)
+		e1:SetCondition(s.descon)
+		e1:SetOperation(s.desop)
+		Duel.RegisterEffect(e1,tp)
 		Duel.SpecialSummonComplete()
 	end
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
