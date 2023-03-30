@@ -81,6 +81,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
+function s.desfilter(c,fid)
+	return c:GetFlagEffectLabel(id)==fid
+end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	if not g:IsExists(s.desfilter,1,nil,e:GetLabel()) then
