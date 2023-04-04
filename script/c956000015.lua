@@ -86,7 +86,7 @@ end
 
 -- (2)
 function s.thfilter(c)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_SPELL+TYPE_QUICKPLAY) and c:IsAbleToHand()
+	return c:IsSetCard(0x9992) and c:IsType(TYPE_SPELL) and c:IsType(TYPE_QUICKPLAY) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
