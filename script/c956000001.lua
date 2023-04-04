@@ -13,15 +13,29 @@ function s.initial_effect(c)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	-- (2) negate destruction by effect
-	--[[ local e2=Effect.CreateEffect(c)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetRange(LOCATION_PZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(s.target)
-	e2:SetValue(1)
-	c:RegisterEffect(e2)]]--
+	-- (2) synchro limit
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetValue(s.synlimit)
+	c:RegisterEffect(e2)
+	-- (3) special summon itself
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_SPSUMMON_PROC)
+	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e3:SetRange(LOCATION_HAND)
+	e3:SetCondition(s.sscon)
+	c:RegisterEffect(e3)
+	-- (4) changelv
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e4:SetCountLimit(1,id)
+	e4:SetTarget(s.lvtg)
+	e4:SetOperation(s.lvop)
+	c:RegisterEffect(e4)
 end
 
 -- (1)
@@ -52,6 +66,41 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
---function s.target(e,c)
---	return c~=e:GetHandler() and c:IsSetCard(0x9992)
---end
+function s.synlimit(e,c)
+	if not c then return false end
+	return not c:IsRace(RACE_DRAGON)
+end
+
+-- (3)
+function s.ssfilter(c)
+	return c:IsSetCard(0x9992) and c:IsFaceup()
+end
+function s.sscon(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.ssfilter,tp,LOCATION_MZONE,0,1,nil)
+end
+
+-- (4)
+function s.lvfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x9992) and not c:IsLevel(3) and c:HasLevel()
+end
+function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.lvfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.lvfilter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	Duel.SelectTarget(tp,s.lvfilter,tp,LOCATION_MZONE,0,1,1,nil)
+end
+function s.lvop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CHANGE_LEVEL)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetValue(3)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+	end
+end
