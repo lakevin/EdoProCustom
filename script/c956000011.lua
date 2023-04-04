@@ -1,12 +1,12 @@
 --Draconier's Lost World
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) Activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	-- (1) atk & def
+	--ATK/DEF
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
 	e3:SetValue(300)
 	c:RegisterEffect(e3)
-	-- (3) Return to Deck + Special Summon
+	-- (1) TODECK && SPECIAL_SUMMON
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
 	e4:SetDescription(aux.Stringid(id,0))
@@ -30,27 +30,35 @@ function s.initial_effect(c)
 	e4:SetTarget(s.target1)
 	e4:SetOperation(s.operation1)
 	c:RegisterEffect(e4)
-	-- (4) Add to hand
-	local e5=e4:Clone()
-	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	-- (2) TOHAND
+	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
-	e5:SetTarget(s.target2)
-	e5:SetOperation(s.operation2)
+	e5:SetType(EFFECT_TYPE_IGNITION)
+	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e5:SetRange(LOCATION_SZONE)
+	e5:SetCountLimit(1,id)
+	e5:SetTarget(s.thtg)
+	e5:SetOperation(s.thop)
 	c:RegisterEffect(e5)
-	-- (4) BANISH + RETURN TO DECK + DRAW
-	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,3))
-	e6:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
-	e6:SetType(EFFECT_TYPE_IGNITION)
-	e6:SetRange(LOCATION_GRAVE)
-	e6:SetCode(EVENT_FREE_CHAIN)
-	e6:SetCost(s.drcost)
-	e6:SetTarget(s.drtg)
-	e6:SetOperation(s.drop)
+	local e6=e5:Clone()
+	e6:SetDescription(aux.Stringid(id,2))
+	e6:SetTarget(s.thtg2)
+	e6:SetOperation(s.thop2)
 	c:RegisterEffect(e6)
+	-- (3) REMOVE && TODECK+DRAW
+	local e7=Effect.CreateEffect(c)
+	e7:SetDescription(aux.Stringid(id,3))
+	e7:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
+	e7:SetType(EFFECT_TYPE_IGNITION)
+	e7:SetRange(LOCATION_GRAVE)
+	e7:SetCode(EVENT_FREE_CHAIN)
+	e7:SetCost(s.drcost)
+	e7:SetTarget(s.drtg)
+	e7:SetOperation(s.drop)
+	c:RegisterEffect(e7)
 end
 
--- (2)
+-- (1)
 function s.tdfilter1(c,e,tp)
 	return c:IsFaceup() and c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode())
@@ -81,25 +89,39 @@ function s.operation1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
-function s.filter2(c)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) and c:IsAbleToHand()
+-- (2)
+function s.thfilter(c,e,tp)
+	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
 end
-function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE+LOCATION_EXTRA)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND+CATEGORY_SEARCH,nil,1,tp,LOCATION_GRAVE+LOCATION_EXTRA)
 end
-function s.operation2(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,1,nil)
-	if g:GetCount()>0 then
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+	end
+end
+function s.thfilter2(c,e,tp)
+	return c:GetLevel()==4 and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
+end
+function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND+CATEGORY_SEARCH,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+end
+function s.thop2(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
+	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
 
--- (4)
+-- (3)
 function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
