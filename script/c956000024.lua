@@ -50,8 +50,8 @@ function s.initial_effect(c)
 	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e6:SetRange(LOCATION_PZONE)
 	e6:SetCountLimit(1)
-	e6:SetTarget(s.costg)
-	e6:SetOperation(s.cosop)
+	e6:SetTarget(s.target)
+	e6:SetOperation(s.operation)
 	c:RegisterEffect(e6)
 end
 
