@@ -1,4 +1,4 @@
--- Protectrix Colt
+-- Protectrix Musket
 local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) special summon
@@ -135,7 +135,7 @@ function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	if #sg>1 and sg:GetClassCount(Card.GetPreviousControler)==1 then
 		local ft=Duel.GetLocationCount(sg:GetFirst():GetPreviousControler(),LOCATION_MZONE)
 		if ft==1 then
-			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,1))
 			local tc=sg:Select(tp,1,1,nil):GetFirst()
 			Duel.ReturnToField(tc)
 			sg:RemoveCard(tc)
