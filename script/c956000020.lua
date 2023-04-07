@@ -4,28 +4,6 @@ function s.initial_effect(c)
 	--Link summon procedure
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,s.matfilter,2,2,s.lcheck)
-	-- (1) Special Summon
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.spcon)
-	e1:SetTarget(s.sptg)
-	e1:SetOperation(s.spop)
-	c:RegisterEffect(e1)
-	-- (2) to hand
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
 	--Cannot be Link Material the turn it's Link Summoned
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
@@ -44,6 +22,28 @@ function s.initial_effect(c)
 	e4:SetTarget(function(e,c) return e:GetHandler():GetLinkedGroup():IsContains(c) end)
 	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
+	-- (1) Special Summon
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
+	c:RegisterEffect(e1)
+	-- (2) atkup
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_ATKCHANGE)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
+	c:RegisterEffect(e2)
 end
 
 -- link summon
@@ -60,7 +60,8 @@ end
 
 -- (1)
 function s.spfilter(c,e,tp,zone)
-	return c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
+	return c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_PENDULUM) 
+		and c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
@@ -102,31 +103,37 @@ function s.splimit(e,c)
 end
 
 -- (2)
-function s.thfilter(c)
-	return c:IsLevelBelow(6) and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) 
-		and c:GetTextAttack()>0 and c:IsAbleToHand()
+function s.thfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(0x9992) and not c:IsType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_TOKEN|TYPE_XYZ|TYPE_LINK)
+		and c:IsRace(RACE_DRAGON) and c:IsAbleToHand() and Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c)
 end
 function s.atkfilter(c)
 	return c:IsSetCard(0x9992) and c:IsFaceup()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingTarget(s.thfilter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return false end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.SendtoHand(g,nil,REASON_EFFECT)
-	Duel.SetTargetParam(g:GetFirst():GetTextAttack())
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil,tp)
+	e:SetLabelObject(g:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,g)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	local g=Duel.GetTargetCards(e)
+	if #g~=2 then return end
+	local hc=g:GetFirst()
+	local tc=g:GetNext()
+	if hc~=e:GetLabelObject() then tc,hc=hc,tc end
+	if hc:IsFaceup() and tc:IsFaceup() and Duel.SendtoHand(hc,nil,REASON_EFFECT)~=0 then
+		local sg=Duel.GetOperatedGroup()
+		if not sg:IsExists(Card.IsLocation,1,nil,LOCATION_HAND) then return end
+		local atk=hc:GetBaseAttack()
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM))
+		e1:SetValue(atk)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 	end
