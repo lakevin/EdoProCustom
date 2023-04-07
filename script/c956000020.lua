@@ -102,28 +102,32 @@ function s.splimit(e,c)
 end
 
 -- (2)
-function s.thfilter(c,tp)
-	return c:IsLevelBelow(6) and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsAbleToHand()
+function s.thfilter(c)
+	return c:IsLevelBelow(6) and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) 
+		and c:GetTextAttack()>0 and c:IsAbleToHand()
 end
-function s.tffilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.atkfilter(c)
+	return c:IsSetCard(0x9992) and c::IsFaceup()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingTarget(s.thfilter,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingMatchingCard(s.tffilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(s.thfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
+	Duel.SendtoHand(g,nil,REASON_EFFECT)
+	Duel.SetTargetParam(g:GetFirst():GetTextAttack())
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0
-		and tc:IsLocation(LOCATION_HAND+LOCATION_DECK) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.tffilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp)
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM))
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
 	end
 end
