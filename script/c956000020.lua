@@ -107,7 +107,7 @@ function s.thfilter(c)
 		and c:GetTextAttack()>0 and c:IsAbleToHand()
 end
 function s.atkfilter(c)
-	return c:IsSetCard(0x9992) and c::IsFaceup()
+	return c:IsSetCard(0x9992) and c:IsFaceup()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
