@@ -18,9 +18,11 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_HAND)
-	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
+	e3:SetHintTiming(0,TIMING_BATTLE_PHASE+TIMING_DESTROY+TIMING_REMOVE)
+	e3:SetCountLimit(1,{id,1})
 	e3:SetCost(s.ptcost)
 	e3:SetTarget(s.pttg)
 	e3:SetOperation(s.ptop)
@@ -31,6 +33,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_TO_HAND)
 	e4:SetRange(LOCATION_HAND)
+	e4:SetCountLimit(1,{id,2})
 	e4:SetCondition(s.descon)
 	e4:SetTarget(s.destg)
 	e4:SetOperation(s.desop)
@@ -56,34 +59,34 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
+function s.ptfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x9992)
+end
 function s.ptcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsDiscardable() end
 	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
 end
 function s.pttg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.ptfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.ptfilter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.SelectTarget(tp,s.ptfilter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function s.ptop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
-	local c=e:GetHandler()
-	-- "Draconier" monsters target protection
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
-	e1:SetValue(aux.tgoval)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-	-- "Draconier" monsters destruction protection
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e2:SetProperty(0)
-	e2:SetValue(aux.indoval)
-	Duel.RegisterEffect(e2,tp)
-	aux.RegisterClientHint(c,0,tp,1,0,aux.Stringid(id,4),RESET_PHASE+PHASE_END,1)
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		-- "Draconier" immun
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(3110)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_IMMUNE_EFFECT)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetValue(saux.tgoval)
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		e1:SetOwnerPlayer(tp)
+		tc:RegisterEffect(e1)
+	end
 end
 
 -- (3)
