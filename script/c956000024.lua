@@ -33,26 +33,36 @@ function s.initial_effect(c)
 	e4:SetTarget(s.atttg)
 	e4:SetOperation(s.attop)
 	c:RegisterEffect(e4)
-	-- (3) Place itself in the pendulum zone
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,1))
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetProperty(EFFECT_FLAG_DELAY)
-	e5:SetCode(EVENT_DESTROYED)
-	e5:SetCondition(s.pencon)
-	e5:SetTarget(s.pentg)
-	e5:SetOperation(s.penop)
-	c:RegisterEffect(e5)
-	-- [ PENDULUM EFFECT ]
+	-- (2) Destroy
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,0))
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_PHASE+PHASE_END)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1)
+	e4:SetTarget(s.destg)
+	e4:SetOperation(s.desop)
+	c:RegisterEffect(e4)
+	-- (4) Place itself in the pendulum zone
 	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,0))
-	e6:SetType(EFFECT_TYPE_IGNITION)
-	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e6:SetRange(LOCATION_PZONE)
-	e6:SetCountLimit(1)
-	e6:SetTarget(s.target)
-	e6:SetOperation(s.operation)
+	e6:SetDescription(aux.Stringid(id,1))
+	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e6:SetProperty(EFFECT_FLAG_DELAY)
+	e6:SetCode(EVENT_DESTROYED)
+	e6:SetCondition(s.pencon)
+	e6:SetTarget(s.pentg)
+	e6:SetOperation(s.penop)
 	c:RegisterEffect(e6)
+	-- [ PENDULUM EFFECT ]
+	local e7=Effect.CreateEffect(c)
+	e7:SetDescription(aux.Stringid(id,0))
+	e7:SetType(EFFECT_TYPE_IGNITION)
+	e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e7:SetRange(LOCATION_PZONE)
+	e7:SetCountLimit(1)
+	e7:SetTarget(s.target)
+	e7:SetOperation(s.operation)
+	c:RegisterEffect(e7)
 end
 
 -- cannot be targeted + destroyed
@@ -83,6 +93,32 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
+function s.tgfilter(c)
+	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.desfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,c)
+end
+function s.desfilter(c,tc)
+	return c:IsFaceup() and c:IsAttribute(tc:GetAttribute())
+end
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.tgfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local tc=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,1,nil):GetFirst()
+	local dg=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tc)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,tp,0)
+end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if not (tc:IsFaceup() and tc:IsRelateToEffect(e)) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tc)
+	if #g>0 and Duel.Destroy(tc,REASON_EFFECT) then
+		Duel.HintSelection(g,true)
+		Duel.Destroy(g,REASON_EFFECT)
+	end
+end
+
+-- (4)
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return r&REASON_EFFECT+REASON_BATTLE~=0 and c:IsPreviousLocation(LOCATION_MZONE) and c:IsFaceup()
@@ -98,7 +134,7 @@ function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (4) Pendulum Effect
+-- (5) Pendulum Effect
 function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON)
 end

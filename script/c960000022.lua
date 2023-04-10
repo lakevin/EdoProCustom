@@ -18,25 +18,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1,false,REGISTER_FLAG_DETACH_XMAT)
-	-- (2) Negate Normal Summon
-	--[[local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_DISABLE_SUMMON+CATEGORY_DESTROY)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_SUMMON)
-	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.condition2)
-	e2:SetCost(aux.dxmcostgen(1,1,nil))
-	e2:SetTarget(s.target2)
-	e2:SetOperation(s.operation2)
-	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)]]--
-	-- (2) Negate Special Summon
-	--[[local e3=e2:Clone()
-	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCode(EVENT_SPSUMMON)
-	c:RegisterEffect(e3,false,REGISTER_FLAG_DETACH_XMAT)
-	aux.DoubleSnareValidity(c,LOCATION_MZONE)]]--
 end
 
 -- (1)
