@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	-- (3) Return To Hand + Destroy S/T
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_DESTROY)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_TO_HAND)
 	e4:SetRange(LOCATION_HAND)
 	e4:SetCountLimit(1,{id,2})
