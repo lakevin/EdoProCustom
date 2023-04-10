@@ -32,10 +32,10 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	local e4=e3:Clone()
+	--[[local e4=e3:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1,id)
-	c:RegisterEffect(e4)
+	c:RegisterEffect(e4)]]--
 end
 
 -- (1)
