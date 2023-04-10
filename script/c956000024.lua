@@ -33,12 +33,15 @@ function s.initial_effect(c)
 	e4:SetTarget(s.atttg)
 	e4:SetOperation(s.attop)
 	c:RegisterEffect(e4)
-	-- (2) Destroy
+	-- (3) Destroy
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_PHASE+PHASE_END)
+	e4:SetDescription(aux.Stringid(id,2))
+	e4:SetCategory(CATEGORY_DESTROY)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetRange(LOCATION_MZONE)
+	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e4:SetCountLimit(1)
 	e4:SetTarget(s.destg)
 	e4:SetOperation(s.desop)
@@ -94,7 +97,7 @@ end
 
 -- (3)
 function s.tgfilter(c)
-	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.desfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,c)
+	return c:IsMonster() and Duel.IsExistingMatchingCard(s.desfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,c)
 end
 function s.desfilter(c,tc)
 	return c:IsFaceup() and c:IsAttribute(tc:GetAttribute())
