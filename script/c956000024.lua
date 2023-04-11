@@ -102,7 +102,7 @@ end
 
 -- (3)
 function s.tgfilter(c)
-	return c:IsMonster()
+	return c:IsMonster() and Duel.IsExistingMatchingCard(s.desfilter,0,0,LOCATION_MZONE,1,nil,c)
 end
 function s.desfilter(c,tc)
 	return c:IsFaceup() and c:IsAttribute(tc:GetAttribute())
@@ -112,21 +112,24 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return ph==PHASE_MAIN1 or ph==PHASE_MAIN2
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g1=Duel.SelectTarget(tp,Card.IsMonster,tp,LOCATION_MZONE,0,1,1,nil)
-	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsMonster,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingTarget(s.desfilter,tp,0,LOCATION_MZONE,1,nil,g1:GetFirst()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g2=Duel.SelectTarget(tp,s.desfilter,tp,0,LOCATION_MZONE,1,1,nil,g1:GetFirst())
-	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,2,0,0)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.tgfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local tc=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
+	local dg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil,tc)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,tp,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tg=g:Filter(Card.IsRelateToEffect,nil,e)
-	if #tg>0 then
-		Duel.Destroy(tg,REASON_EFFECT)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local tc=Duel.GetFirstTarget()
+	if not (tc:IsFaceup() and tc:IsRelateToEffect(e)) then return end
+	if tc and Duel.Destroy(tc,REASON_EFFECT) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,0,LOCATION_MZONE,1,1,nil,tc)
+		if #g>0 then
+			Duel.HintSelection(g,true)
+			Duel.Destroy(g,REASON_EFFECT)
+		end
 	end
 end
 
