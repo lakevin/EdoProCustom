@@ -114,7 +114,7 @@ end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return (chkc:IsLocation(LOCATION_HAND) or chkc:IsLocation(LOCATION_MZONE)) and s.tgfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
-	local tc=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil):GetFirst()
+	local tc=Duel.GetMatchingGroup(tp,s.tgfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil):GetFirst()
 	local dg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil,tc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,tp,0)
 end
