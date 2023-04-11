@@ -102,7 +102,7 @@ end
 
 -- (3)
 function s.tgfilter(c)
-	return c:IsMonster() and Duel.IsExistingMatchingCard(s.desfilter,0,LOCATION_HAND+LOCATION_MZONE,0,1,nil,c)
+	return c:IsMonster() and Duel.IsExistingMatchingCard(s.desfilter,0,0,LOCATION_MZONE,1,nil,c)
 end
 function s.desfilter(c,tc)
 	return c:IsFaceup() and c:IsAttribute(tc:GetAttribute()) and not c:IsCode(id)
@@ -119,8 +119,8 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,tp,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	--local tc=Duel.GetFirstTarget()
-	local tc=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil,tc)
+	local tc=Duel.GetFirstTarget()
+	--local tc=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil,tc)
 	if not (tc:IsMonster() and tc:IsRelateToEffect(e)) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	if tc and Duel.Destroy(tc,REASON_EFFECT) then
