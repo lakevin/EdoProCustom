@@ -102,7 +102,8 @@ end
 
 -- (3)
 function s.tgfilter(c)
-	return c:IsMonster() and Duel.IsExistingMatchingCard(s.desfilter,0,0,LOCATION_MZONE,1,nil,c)
+	return c:IsMonster() and ((c:IsLocation(LOCATION_MZONE) and c:IsFaceup()) or c:IsLocation(LOCATION_HAND))
+		and Duel.IsExistingMatchingCard(s.desfilter,0,0,LOCATION_MZONE,1,nil,c)
 end
 function s.desfilter(c,tc)
 	return c:IsFaceup() and c:IsAttribute(tc:GetAttribute()) and not c:IsCode(id)
@@ -112,11 +113,12 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return ph==PHASE_MAIN1 or ph==PHASE_MAIN2
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE+LOCATION_HAND) and s.tgfilter(chkc) end
+	if chkc then return s.tgfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local tc=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,1,nil):GetFirst()
 	local dg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil,tc)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,tp,0)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,tp,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
