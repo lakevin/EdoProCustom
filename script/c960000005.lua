@@ -36,7 +36,7 @@ end
 
 -- (1) banish
 function s.tgfilter(c)
-	return c:IsSetCard(0x9998) and c:IsAbleToRemove()
+	return c:IsSetCard(0x9998) and c.IsMonster() and c:IsAbleToRemove()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end

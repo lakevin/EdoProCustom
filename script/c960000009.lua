@@ -2,14 +2,14 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
-	local e1=Ritual.AddProcEqual{handler=c,filter=s.ritualfil,location=LOCATION_DECK|LOCATION_REMOVED,matfilter=s.mfilter,stage2=s.stage2}
+	local e1=Ritual.AddProcEqual{handler=c,filter=s.ritualfil,location=LOCATION_DECK|LOCATION_HAND|LOCATION_REMOVED,matfilter=s.mfilter,stage2=s.stage2}
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x9998,0x9999}
 
 function s.mfilter(c)
-	return (c:IsLocation(LOCATION_MZONE|LOCATION_GRAVE) or (c:IsLocation(LOCATION_REMOVED) and c:IsSetCard(0x9999))) and c:HasLevel() and c:IsAbleToDeck()
+	return (c:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) or (c:IsLocation(LOCATION_REMOVED) and c:IsSetCard(0x9999))) and c:HasLevel() and c:IsAbleToDeck()
 end
 function s.stage2(mat,e,tp,eg,ep,ev,re,r,rp,tc)
 	tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,1))
