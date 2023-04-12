@@ -102,7 +102,7 @@ end
 
 -- (3)
 function s.tgfilter(c)
-	return c:IsMonster() and Duel.IsExistingMatchingCard(s.desfilter,0,0,LOCATION_MZONE,1,nil,c)
+	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.desfilter,0,0,LOCATION_MZONE,1,nil,c)
 end
 function s.desfilter(c,tc)
 	return c:IsFaceup() and c:IsAttribute(tc:GetAttribute())
