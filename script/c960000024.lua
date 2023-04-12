@@ -30,7 +30,7 @@ end
 
 -- (1)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_REMOVED
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
 end
 function s.spfilter(c)
 	return c:IsSetCard(0x9999) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
