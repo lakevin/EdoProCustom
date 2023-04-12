@@ -44,7 +44,7 @@ end
 
 -- (2) special summon
 function s.spfilter(c,e,tp)
-	return c:IsMonster() and c:IsSetCard(0x9999) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+	return c:IsMonster() and c:IsSetCard(0x9998) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
