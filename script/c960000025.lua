@@ -76,14 +76,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTarget(s.splimit)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-		Duel.RegisterEffect(e2,tp)
 	end
 end
 -- normal / special summon limit
 function s.splimit(e,c)
-	return not c:IsSetCard(0x9999)
+	return false
 end
 -- destroy during end phase
 function s.desfilter(c,fid)
