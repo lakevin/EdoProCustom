@@ -7,6 +7,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x9998,0x9999}
+
 function s.ritualfil(c)
 	return c:IsSetCard(0x9999) and c:IsRitualMonster()
 end
