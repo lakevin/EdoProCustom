@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
-	local e1=Ritual.AddProcEqual{handler=c,filter=s.ritualfil,location=LOCATION_DECK|LOCATION_HAND,extrafil=s.extrafil,extraop=s.extraop,extratg=s.extratg,stage2=s.stage2}
+	local e1=Ritual.AddProcEqual{handler=c,filter=s.ritualfil,location=LOCATION_DECK|LOCATION_HAND,matfilter=s.forcedgroup,extrafil=s.extrafil,extraop=s.extraop,extratg=s.extratg,stage2=s.stage2}
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
 end
@@ -10,6 +10,9 @@ s.listed_series={0x9998,0x9999}
 
 function s.ritualfil(c)
 	return c:IsSetCard(0x9999) and c:IsRitualMonster()
+end
+function s.forcedgroup(c,e,tp)
+	return c:IsLocation(LOCATION_ONFIELD)
 end
 function s.mfilter(c)
 	return c:HasLevel() and c:IsSetCard(0x9999) and c:IsAbleToDeck()
