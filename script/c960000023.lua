@@ -68,7 +68,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e7,false,REGISTER_FLAG_DETACH_XMAT)
 	-- (8) Banish all cards on field
 	local e8=Effect.CreateEffect(c)
-	e8:SetDescription(aux.Stringid(id,0))
+	e8:SetDescription(aux.Stringid(id,3))
 	e8:SetCategory(CATEGORY_REMOVE)
 	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e8:SetCode(EVENT_SPSUMMON_SUCCESS)
