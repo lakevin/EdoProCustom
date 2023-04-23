@@ -31,7 +31,7 @@ end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
 end
-function s.spfilter(c)
+function s.spfilter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x9999) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
