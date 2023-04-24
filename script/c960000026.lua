@@ -36,22 +36,21 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local tc=Duel.GetAttacker()
 	if tc==c then tc=Duel.GetAttackTarget() end
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and s.spfilter(chkc,e,tp) end
-	if chk==0 then return tc and tc:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_REMOVED,0,1,nil,e,tp) end
+	if chk==0 then return tc and tc:IsFaceup() end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
-	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetAttacker()
-	local sc=Duel.GetFirstTarget()
 	if tc==c then tc=Duel.GetAttackTarget() end
 	if tc:IsRelateToBattle() then
 		local atk=tc:GetAttack()
-		if Duel.Destroy(tc,REASON_EFFECT)~=0 then
-			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
+		if Duel.Destroy(tc,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
+			local tg=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp):GetFirst()
+			if tg then
+				Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP)
+			end
 		end
 	end
 end
