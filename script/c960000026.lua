@@ -38,7 +38,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if tc==c then tc=Duel.GetAttackTarget() end
 	if chk==0 then return tc and tc:IsFaceup() end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -46,7 +46,9 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if tc==c then tc=Duel.GetAttackTarget() end
 	if tc:IsRelateToBattle() then
 		local atk=tc:GetAttack()
-		if Duel.Destroy(tc,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
+		if Duel.Destroy(tc,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 
+				and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_REMOVED,0,1,nil,e,tp) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 			local tg=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp):GetFirst()
 			if tg then
 				Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP)
