@@ -50,9 +50,25 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.Destroy(tc,REASON_EFFECT)~=0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 			local tg=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp):GetFirst()
-			if tg then
-				Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP)
+			if tg and Duel.SpecialSummonStep(tg,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then				
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_DISABLE)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+				tg:RegisterEffect(e1)
+				local e2=Effect.CreateEffect(c)
+				e2:SetType(EFFECT_TYPE_SINGLE)
+				e2:SetCode(EFFECT_DISABLE_EFFECT)
+				e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+				tg:RegisterEffect(e2)
+				local e3=Effect.CreateEffect(e:GetHandler())
+				e3:SetType(EFFECT_TYPE_SINGLE)
+				e3:SetCode(EFFECT_CHANGE_LEVEL)
+				e3:SetValue(9)
+				e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+				tg:RegisterEffect(e3)
 			end
+			Duel.SpecialSummonComplete()
 		end
 	end
 end
