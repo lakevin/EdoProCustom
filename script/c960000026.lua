@@ -46,8 +46,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if tc==c then tc=Duel.GetAttackTarget() end
 	if tc:IsRelateToBattle() then
 		local atk=tc:GetAttack()
-		if Duel.Destroy(tc,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 
-				and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_REMOVED,0,1,nil,e,tp) then
+		if Duel.Destroy(tc,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 			local tg=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp):GetFirst()
 			if tg then
