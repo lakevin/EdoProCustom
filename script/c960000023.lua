@@ -63,11 +63,12 @@ function s.initial_effect(c)
 	e7:SetCountLimit(1,id)
 	e7:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E|TIMING_MAIN_END)
 	e7:SetCost(aux.dxmcostgen(3,3))
+	e2:SetCondition(s.condition)
 	e7:SetTarget(s.target)
 	e7:SetOperation(s.operation)
 	c:RegisterEffect(e7,false,REGISTER_FLAG_DETACH_XMAT)
 	-- (8) Banish all cards on field
-	local e8=Effect.CreateEffect(c)
+	--[[local e8=Effect.CreateEffect(c)
 	e8:SetDescription(aux.Stringid(id,3))
 	e8:SetCategory(CATEGORY_REMOVE)
 	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
@@ -76,7 +77,7 @@ function s.initial_effect(c)
 	e8:SetCondition(s.rmcon)
 	e8:SetTarget(s.rmtg)
 	e8:SetOperation(s.rmop)
-	c:RegisterEffect(e8)
+	c:RegisterEffect(e8)]]--
 end
 -- (1)
 function s.effcon(e)
@@ -133,6 +134,9 @@ function s.tgotg(e,c)
 end
 
 -- (7)
+function s.condition()
+	return Duel.IsMainPhase()
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 and Duel.IsPlayerCanRemove(tp) end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,nil,1,1-tp,LOCATION_EXTRA)
@@ -151,7 +155,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (8)
-function s.rmcon(e)
+--[[function s.rmcon(e)
 	return e:GetHandler():GetOverlayCount()>=4
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -162,4 +166,4 @@ end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
 	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
-end
+end]]--
