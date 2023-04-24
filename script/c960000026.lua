@@ -30,7 +30,7 @@ end
 
 -- (1) cannot be targeted + destroyed
 function s.spfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x9999) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsSetCard(0x9999) and c:HasLevel() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -65,7 +65,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 				e3:SetType(EFFECT_TYPE_SINGLE)
 				e3:SetCode(EFFECT_CHANGE_LEVEL)
 				e3:SetValue(9)
-				e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+				e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 				tg:RegisterEffect(e3)
 			end
 			Duel.SpecialSummonComplete()
