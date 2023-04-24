@@ -1,4 +1,4 @@
---contractor break out
+--contractor's pandora
 local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) Special Summon from Deck
