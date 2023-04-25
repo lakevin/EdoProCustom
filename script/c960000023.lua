@@ -157,7 +157,7 @@ end
 
 -- (8)
 function s.rmcon(e)
-	return Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY and e:GetHandler():GetOverlayCount()>=5
+	return e:GetHandler():GetOverlayCount()>=5
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
