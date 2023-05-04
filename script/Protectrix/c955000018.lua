@@ -46,7 +46,7 @@ end
 
 -- fusion material
 function s.matfilter(c,fc,sumtype,tp)
-	return c:IsSetCard(0x9990) and c:IsType(0x800000)
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(0x800000)
 end
 
 -- cannot disable spsummon
@@ -61,7 +61,7 @@ end
 
 -- (2)
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9990) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsSetCard(SET_PROTECTRIX) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

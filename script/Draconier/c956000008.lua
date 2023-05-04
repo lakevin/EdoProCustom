@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	--Xyz.AddProcedure(c,nil,6,3,s.ovfilter,aux.Stringid(id,0),5,s.xyzop)
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,3)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_DRACONIER),6,3)
 	c:EnableReviveLimit()
 	-- (1) destroy
 	local e1=Effect.CreateEffect(c)
@@ -43,11 +43,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 
-s.listed_series={0x9992}
+s.listed_series={SET_DRACONIER}
 
 --xyz summon
 function s.ovfilter(c,tp,lc)
-	return c:IsFaceup() and c:IsSetCard(0x9992,lc,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
+	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER,lc,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
 end
 function s.xyzop(e,tp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
@@ -58,9 +58,9 @@ end
 -- (1)
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9992),tp,LOCATION_MZONE,0,1,e:GetHandler())
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_DRACONIER),tp,LOCATION_MZONE,0,1,e:GetHandler())
 		and Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end
-	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,0x9992),tp,LOCATION_MZONE,0,e:GetHandler())
+	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,SET_DRACONIER),tp,LOCATION_MZONE,0,e:GetHandler())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
@@ -119,7 +119,7 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6  and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6  and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)

@@ -13,12 +13,12 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9990))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_PROTECTRIX))
 	e2:SetValue(300)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_UPDATE_DEFENSE)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9990))
+	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_PROTECTRIX))
 	e3:SetValue(300)
 	c:RegisterEffect(e3)
 	-- (1) Special Summon
@@ -62,7 +62,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return (r&REASON_EFFECT)~=0
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x9990) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -79,7 +79,7 @@ end
 
 -- (2)
 function s.costfilter(c)
-	return c:IsType(TYPE_TRAP) and c:IsSetCard(0x9990) and c:IsAbleToRemoveAsCost()
+	return c:IsType(TYPE_TRAP) and c:IsSetCard(SET_PROTECTRIX) and c:IsAbleToRemoveAsCost()
 end
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_GRAVE,0,1,nil) end
@@ -104,10 +104,10 @@ end
 
 -- (3)
 function s.matfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9990) and c:IsType(TYPE_XYZ)
+	return c:IsFaceup() and c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_XYZ)
 end
 function s.rmfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP)
+	return c:IsFaceup() and c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP)
 end
 function s.mattg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.matfilter(chkc) end

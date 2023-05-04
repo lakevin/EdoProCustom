@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 	e4:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9998))
+	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_CONTRACTOR))
 	c:RegisterEffect(e4)]]--
 	-- (1) Special Summon
 	local e5=Effect.CreateEffect(c)
@@ -68,7 +68,7 @@ end
 
 -- (1)
 function s.spfilter(c,e,tp)
-	return c:IsMonster() and c:IsSetCard(0x9999) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsMonster() and c:IsSetCard(SET_GRIMM_CHAIN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and s.spfilter(chkc,e,tp) end
@@ -87,7 +87,7 @@ end
 
 -- (2)
 function s.filter(c)
-	return c:IsMonster() and c:IsSetCard(0x9999) and c:IsAbleToRemove()
+	return c:IsMonster() and c:IsSetCard(SET_GRIMM_CHAIN) and c:IsAbleToRemove()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end

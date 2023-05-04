@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_DRACONIER),6,2)
 	c:EnableReviveLimit()
 	-- (1) Return Set S/T to hand
 	local e1=Effect.CreateEffect(c)
@@ -59,7 +59,7 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.thfilter(c,e,tp)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_DRAGON)
+	return c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_DRAGON)
 		and c:IsLevel(4) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -77,7 +77,7 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_WIND) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6 and c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_WIND) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)

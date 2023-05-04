@@ -42,9 +42,9 @@ end
 
 
 -- (1) + (2) + (3) special summon
-s.listed_series={0x9990}
+s.listed_series={SET_PROTECTRIX}
 function s.filter(c,e,tp)
-	return c:IsSetCard(0x9990) and c:IsType(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -111,7 +111,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsMainPhase()
 end
 function s.target(e,c)
-	return c:IsSetCard(0x9990) and c:IsType(0x97)
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(0x97)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

@@ -26,7 +26,7 @@ end
 
 -- (1)
 function s.spfilter(c)
-	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
 function s.spcon(e,c)
 	if c==nil then return true end
@@ -45,7 +45,7 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT+REASON_BATTLE)~=0
 end
 function s.thfilter(c)
-	return c:IsSetCard(0x9990) and c:IsAbleToHand() and c:IsType(TYPE_MONSTER) and not c:IsCode(id)
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsAbleToHand() and c:IsType(TYPE_MONSTER) and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.thfilter(chkc) end

@@ -6,22 +6,22 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
 end
-s.listed_series={0x9998,0x9999}
+s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
 
 function s.ritualfil(c)
-	return c:IsSetCard(0x9999) and c:IsRitualMonster()
+	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsRitualMonster()
 end
 function s.forcedgroup(c,e,tp)
 	return c:IsLocation(LOCATION_ONFIELD)
 end
 function s.mfilter(c)
-	return c:HasLevel() and c:IsSetCard(0x9999) and c:IsAbleToDeck()
+	return c:HasLevel() and c:IsSetCard(SET_GRIMM_CHAIN) and c:IsAbleToDeck()
 end
 function s.extrafil(e,tp,eg,ep,ev,re,r,rp,chk)
 	return Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
 end
 function s.extraop(mg,e,tp,eg,ep,ev,re,r,rp)
-	local mat2=mg:Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_REMOVED):Filter(Card.IsSetCard,nil,0x9999)
+	local mat2=mg:Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_REMOVED):Filter(Card.IsSetCard,nil,SET_GRIMM_CHAIN)
 	mg:Sub(mat2)
 	Duel.ReleaseRitualMaterial(mg)
 	Duel.SendtoDeck(mat2,nil,2,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)

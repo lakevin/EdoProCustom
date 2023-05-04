@@ -18,10 +18,10 @@ end
 
 -- (1)
 function s.confilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0x9992)
+	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER)
 end
 function s.thfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_MONSTER)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.confilter,tp,LOCATION_PZONE,0,1,e:GetHandler())
@@ -58,7 +58,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e2,tp)
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(0x9992) and c:IsLocation(LOCATION_EXTRA)
+	return not c:IsSetCard(SET_DRACONIER) and c:IsLocation(LOCATION_EXTRA)
 end
 function s.lizfilter(e,c)
 	return not c:IsOriginalType(TYPE_XYZ)

@@ -21,7 +21,7 @@ end
 
 --Activate
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9999)
+	return c:IsFaceup() and c:IsSetCard(SET_GRIMM_CHAIN)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local p,loct=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_PLAYER,CHAININFO_TRIGGERING_LOCATION)
@@ -48,7 +48,7 @@ end
 
 --activate from hand
 function s.hfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9998)
+	return c:IsFaceup() and c:IsSetCard(SET_CONTRACTOR)
 end
 function s.handcon(e)
 	return Duel.IsExistingMatchingCard(s.hfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)

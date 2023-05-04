@@ -12,12 +12,12 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_DRACONIER))
 	e2:SetValue(300)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_UPDATE_DEFENSE)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
+	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_DRACONIER))
 	e3:SetValue(300)
 	c:RegisterEffect(e3)
 	-- (1) TODECK && SPECIAL_SUMMON
@@ -60,11 +60,11 @@ end
 
 -- (1)
 function s.tdfilter1(c,e,tp)
-	return c:IsFaceup() and c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsAbleToDeck()
+	return c:IsFaceup() and c:GetLevel()==4 and c:IsSetCard(SET_DRACONIER) and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode())
 end
 function s.spfilter1(c,e,tp,code)
-	return c:GetLevel()==4 and c:IsSetCard(0x9992) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==4 and c:IsSetCard(SET_DRACONIER) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -91,7 +91,7 @@ end
 
 -- (2)
 function s.thfilter(c,e,tp)
-	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
+	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DRAGON) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
@@ -106,7 +106,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thfilter2(c,e,tp)
-	return c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
+	return c:IsRace(RACE_DRAGON) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand()
 end
 function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
@@ -127,7 +127,7 @@ function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function s.drfilter(c,e)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
+	return c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.drfilter(chkc) end

@@ -24,7 +24,7 @@ end
 
 -- (1)
 function s.spfilter(c)
-	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
 function s.spcon(e,c)
 	if c==nil then return true end
@@ -49,7 +49,7 @@ function s.desfilter(c,tp)
 	end
 end
 function s.filter(c,ignore)
-	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsSSetable(ignore)
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP) and c:IsSSetable(ignore)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and s.desfilter(chkc,tp) and chkc~=e:GetHandler() end

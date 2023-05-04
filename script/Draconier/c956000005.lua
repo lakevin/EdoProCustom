@@ -43,7 +43,7 @@ end
 
 -- (1)
 function s.thfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_WIND) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
+	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_WIND) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -61,13 +61,13 @@ end
 
 -- (2)
 function s.filter(c)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
 function s.cfilter(c)
 	return c:IsDiscardable()
 end
 function s.secon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9992),tp,LOCATION_PZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_DRACONIER),tp,LOCATION_PZONE,0,1,nil)
 end
 function s.secost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil) end
@@ -89,7 +89,7 @@ end
 -- (3)
 function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_MZONE and 
-		Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9992),tp,LOCATION_PZONE,0,1,nil)
+		Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_DRACONIER),tp,LOCATION_PZONE,0,1,nil)
 end
 function s.tdfilter(c)
 	return c:IsLocation(LOCATION_PZONE) and c:IsAbleToDeck()

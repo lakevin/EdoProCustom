@@ -42,7 +42,7 @@ end
 
 -- (1)
 function s.thfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_WATER) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
+	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_WATER) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -60,7 +60,7 @@ end
 
 -- (2)
 function s.ptfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9992)
+	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER)
 end
 function s.ptcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

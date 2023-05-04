@@ -40,7 +40,7 @@ end
 
 -- (1)
 function s.spfilter(c)
-	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
 function s.spcon(e,c)
 	if c==nil then return true end
