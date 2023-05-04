@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	c:EnableReviveLimit()
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_GRIMM_CHAIN),9,2,nil,aux.Stringid(id,0),5,nil)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9999),9,2,nil,aux.Stringid(id,0),5,nil)
 	-- (1) cannot disable spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -131,7 +131,7 @@ function s.tgocon(e)
 	return e:GetHandler():GetOverlayCount()>=2
 end
 function s.tgotg(e,c)
-	return c:IsSetCard(SET_GRIMM_CHAIN) and c~=e:GetHandler()
+	return c:IsSetCard(0x9999) and c~=e:GetHandler()
 end
 
 -- (7)

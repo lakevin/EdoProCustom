@@ -48,7 +48,7 @@ end
 
 -- link summon
 function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(SET_DRACONIER,lc,sumtype,tp)
+	return c:IsSetCard(0x9992,lc,sumtype,tp)
 end
 function s.lcheck(g,lc,sumtype,tp)
 	return g:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER,lc,sumtype,tp)
@@ -60,7 +60,7 @@ end
 
 -- (1)
 function s.spfilter(c,e,tp,zone)
-	return c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_PENDULUM) 
+	return c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_PENDULUM) 
 		and c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -99,16 +99,16 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)]]--
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(SET_DRACONIER)
+	return not c:IsSetCard(0x9992)
 end
 
 -- (2)
 function s.thfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER) and not c:IsType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_TOKEN|TYPE_XYZ|TYPE_LINK)
+	return c:IsFaceup() and c:IsSetCard(0x9992) and not c:IsType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_TOKEN|TYPE_XYZ|TYPE_LINK)
 		and c:IsRace(RACE_DRAGON) and c:IsAbleToHand() and Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,0,1,c)
 end
 function s.atkfilter(c)
-	return c:IsSetCard(SET_DRACONIER) and c:IsFaceup()
+	return c:IsSetCard(0x9992) and c:IsFaceup()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

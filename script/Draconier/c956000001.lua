@@ -40,10 +40,10 @@ end
 
 -- (1)
 function s.thfilter(c,tp)
-	return c:GetLevel()==4 and c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
@@ -73,7 +73,7 @@ end
 
 -- (3)
 function s.ssfilter(c)
-	return c:IsSetCard(SET_DRACONIER) and c:IsFaceup()
+	return c:IsSetCard(0x9992) and c:IsFaceup()
 end
 function s.sscon(e,c)
 	if c==nil then return true end
@@ -84,7 +84,7 @@ end
 
 -- (4)
 function s.lvfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER) and not c:IsLevel(3) and c:HasLevel()
+	return c:IsFaceup() and c:IsSetCard(0x9992) and not c:IsLevel(3) and c:HasLevel()
 end
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.lvfilter(chkc) end

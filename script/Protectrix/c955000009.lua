@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	-- link summon
-	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_PROTECTRIX),2,2)
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9990),2,2)
 	c:EnableReviveLimit()
 	-- (1) back to grave
 	local e1=Effect.CreateEffect(c)
@@ -37,7 +37,7 @@ function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function s.tgfilter(c)
-	return c:IsAbleToGrave() and c:IsSetCard(SET_PROTECTRIX) and (c:GetType()==TYPE_TRAP or c:GetType()==TYPE_CONTINUOUS+TYPE_TRAP)
+	return c:IsAbleToGrave() and c:IsSetCard(0x9990) and (c:GetType()==TYPE_TRAP or c:GetType()==TYPE_CONTINUOUS+TYPE_TRAP)
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and s.tgfilter(chkc) end
@@ -54,7 +54,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.filter(c)
-	return c:IsTrap() and not c:IsType(TYPE_CONTINUOUS|TYPE_COUNTER) and c:IsSetCard(SET_PROTECTRIX) and c:IsAbleToGraveAsCost()
+	return c:IsTrap() and not c:IsType(TYPE_CONTINUOUS|TYPE_COUNTER) and c:IsSetCard(0x9990) and c:IsAbleToGraveAsCost()
 		and c:CheckActivateEffect(false,true,false)~=nil and c:CheckActivateEffect(false,true,false):GetOperation()~=nil
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)

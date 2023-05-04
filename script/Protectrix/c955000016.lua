@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	-- fusion material
 	c:EnableReviveLimit()
-	Fusion.AddProcMixN(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_PROTECTRIX),2)
+	Fusion.AddProcMixN(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9990),2)
 	-- (1) cannot disable spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -50,7 +50,7 @@ end
 
 --4)
 function s.thfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.thfilter(chkc) end

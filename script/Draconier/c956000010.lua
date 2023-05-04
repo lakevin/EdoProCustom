@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	--Xyz.AddProcedure(c,nil,6,3,s.ovfilter,aux.Stringid(id,0),5,s.xyzop)
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_DRACONIER),6,3)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,3)
 	c:EnableReviveLimit()
 	-- (1) negate
 	local e1=Effect.CreateEffect(c)
@@ -44,11 +44,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 
-s.listed_series={SET_DRACONIER}
+s.listed_series={0x9992}
 
 --xyz summon
 function s.ovfilter(c,tp,lc)
-	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER,lc,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
+	return c:IsFaceup() and c:IsSetCard(0x9992,lc,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
 end
 function s.xyzop(e,tp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
@@ -58,7 +58,7 @@ end
 
 -- (1)
 function s.dfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsSetCard(SET_DRACONIER)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsSetCard(0x9992)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end

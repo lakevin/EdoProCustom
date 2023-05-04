@@ -19,7 +19,7 @@ function s.initial_effect(c)
 end
 
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),SET_DRACONIER)
+	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),0x9992)
 end
 function s.cfilter(c)
 	return c:IsType(TYPE_PENDULUM) and c:IsDiscardable()

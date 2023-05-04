@@ -67,7 +67,7 @@ function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK
 end
 function s.tdfilter(c)
-	return c:IsSetCard(SET_PROTECTRIX) and ( c:IsAbleToDeck() or c:IsAbleToExtra() )
+	return c:IsSetCard(0x9990) and ( c:IsAbleToDeck() or c:IsAbleToExtra() )
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.tdfilter(chkc) end

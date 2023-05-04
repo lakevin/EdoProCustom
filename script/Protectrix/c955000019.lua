@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Xyz material
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_PROTECTRIX),7,2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9990),7,2)
 	c:EnableReviveLimit()
 	-- (1) Banish from your opp Field, Hand, GY or Decktop
 	local e1=Effect.CreateEffect(c)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_PROTECTRIX))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9990))
 	e2:SetTargetRange(LOCATION_HAND,0)
 	c:RegisterEffect(e2)
 	--cannot target

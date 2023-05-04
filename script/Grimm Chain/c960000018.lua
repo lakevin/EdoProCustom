@@ -30,7 +30,7 @@ end
 
 -- (1) banish
 function s.tgfilter(c)
-	return c:IsMonster() and c:IsSetCard(SET_GRIMM_CHAIN) and c:IsAbleToRemove() and not c:IsCode(id)
+	return c:IsMonster() and c:IsSetCard(0x9999) and c:IsAbleToRemove() and not c:IsCode(id)
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -46,7 +46,7 @@ end
 
 -- (2) special summon
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_CONTRACTOR) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+	return c:IsSetCard(0x9998) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

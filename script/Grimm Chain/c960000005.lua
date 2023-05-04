@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--ritual level
-	Ritual.AddWholeLevelTribute(c,aux.FilterBoolFunction(Card.IsSetCard,SET_GRIMM_CHAIN))
+	Ritual.AddWholeLevelTribute(c,aux.FilterBoolFunction(Card.IsSetCard,0x9999))
 	-- (1) to hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -32,14 +32,14 @@ function s.initial_effect(c)
 	e3:SetValue(s.indval)
 	c:RegisterEffect(e3)
 end
-s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
+s.listed_series={0x9998,0x9999}
 
 -- (1)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return (r&REASON_EFFECT)~=0
 end
 function s.filter(c)
-	return c:IsMonster() and c:IsSetCard(SET_CONTRACTOR) and c:IsAbleToRemove() and not c:IsCode(id)
+	return c:IsMonster() and c:IsSetCard(0x9998) and c:IsAbleToRemove() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end

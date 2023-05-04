@@ -32,7 +32,7 @@ end
 
 -- activate
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_CONTRACTOR)
+	return c:IsFaceup() and c:IsSetCard(0x9998)
 end
 function s.actcon(e)
 	return Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
@@ -40,7 +40,7 @@ end
 
 -- (1)
 function s.target(e,c)
-	return c:IsSetCard(SET_GRIMM_CHAIN)
+	return c:IsSetCard(0x9999)
 end
 
 -- (2)

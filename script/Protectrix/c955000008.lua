@@ -27,7 +27,7 @@ end
 
 -- (1)
 function s.spfilter(c)
-	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
 function s.spcon(e,c)
 	if c==nil then return true end
@@ -52,7 +52,7 @@ function s.tdfilter(c)
 	return c:IsAbleToDeck()
 end
 function s.thfilter(c)
-	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsSetCard(0x9990) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Draw(tp,1,REASON_EFFECT)==0 then return end

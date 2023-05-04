@@ -6,13 +6,13 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
 end
-s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
+s.listed_series={0x9998,0x9999}
 
 function s.ritualfil(c)
-	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsRitualMonster()
+	return c:IsSetCard(0x9999) and c:IsRitualMonster()
 end
 function s.mfilter(c)
-	return not c:IsType(TYPE_RITUAL) and c:IsSetCard(SET_GRIMM_CHAIN) and c:HasLevel() and c:IsAbleToRemove()
+	return not c:IsType(TYPE_RITUAL) and c:IsSetCard(0x9999) and c:HasLevel() and c:IsAbleToRemove()
 end
 function s.extrafil(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -26,7 +26,7 @@ function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
 end
 function s.extraop(mg,e,tp,eg,ep,ev,re,r,rp)
-	local mat2=mg:Filter(Card.IsLocation,nil,LOCATION_DECK):Filter(Card.IsSetCard,nil,SET_GRIMM_CHAIN)
+	local mat2=mg:Filter(Card.IsLocation,nil,LOCATION_DECK):Filter(Card.IsSetCard,nil,0x9999)
 	mg:Sub(mat2)
 	Duel.ReleaseRitualMaterial(mg)
 	Duel.Remove(mat2,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)

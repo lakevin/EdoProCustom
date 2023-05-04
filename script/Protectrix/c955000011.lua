@@ -28,7 +28,7 @@ end
 
 -- (1) Activate
 function s.cfilter(c,tp)
-	return c:IsPreviousSetCard(SET_PROTECTRIX) and c:GetReasonPlayer()==1-tp
+	return c:IsPreviousSetCard(0x9990) and c:GetReasonPlayer()==1-tp
 		and c:IsReason(REASON_EFFECT) and c:IsPreviousControler(tp)
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
@@ -54,7 +54,7 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK
 end
 function s.desfilter(c,e,tp)
-	return c:IsSetCard(SET_PROTECTRIX) and c:IsFaceup()
+	return c:IsSetCard(0x9990) and c:IsFaceup()
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

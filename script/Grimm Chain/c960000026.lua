@@ -21,16 +21,16 @@ function s.initial_effect(c)
 	e2:SetOperation(s.efop)
 	c:RegisterEffect(e2)
 end
-s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
+s.listed_series={0x9998,0x9999}
 
 -- synchro material
 function s.matfilter(c,scard,sumtype,tp)
-	return c:IsSetCard(SET_CONTRACTOR,scard,sumtype,tp)
+	return c:IsSetCard(0x9998,scard,sumtype,tp)
 end
 
 -- (1) cannot be targeted + destroyed
 function s.spfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_GRIMM_CHAIN) and c:HasLevel() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsSetCard(0x9999) and c:HasLevel() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -101,7 +101,7 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.dfilter(c,eg)
-	return c:IsFaceup() and c:IsSetCard(SET_GRIMM_CHAIN) and (c:IsLevel(9) or c:IsRank(9)) and not eg:IsContains(c)
+	return c:IsFaceup() and c:IsSetCard(0x9999) and (c:IsLevel(9) or c:IsRank(9)) and not eg:IsContains(c)
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(aux.NOT(Card.IsSummonLocation),1,nil,LOCATION_REMOVED) and Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_MZONE,0,1,nil,eg)

@@ -15,7 +15,7 @@ function s.initial_effect(c)
 end
 
 function s.tfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER) and c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD)
+	return c:IsFaceup() and c:IsSetCard(0x9992) and c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD)
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)

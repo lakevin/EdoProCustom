@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Synchro summon
-	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_DRACONIER),1,1,Synchro.NonTunerEx(Card.IsRace,RACE_DRAGON),1,99)
+	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9992),1,1,Synchro.NonTunerEx(Card.IsRace,RACE_DRAGON),1,99)
 	c:EnableReviveLimit()
 	--Pendulum attributes
 	Pendulum.AddProcedure(c,false)
@@ -151,7 +151,7 @@ end
 
 -- (5) Pendulum Effect
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_DRAGON)
+	return c:IsFaceup() and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) and chkc:IsDifferentAttribute(e:GetLabel()) end

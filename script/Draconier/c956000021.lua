@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_DRACONIER),6,2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,2)
 	c:EnableReviveLimit()
 	-- (1) Protect "Draconier" monsters
 	local e1=Effect.CreateEffect(c)
@@ -51,7 +51,7 @@ function s.ptop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_DRACONIER))
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
 	e1:SetValue(aux.tgoval)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
@@ -66,7 +66,7 @@ end
 
 -- (2)
 function s.tffilter(c,e,tp)
-	return c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DRAGON) 
+	return c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DRAGON) 
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.tfcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -90,7 +90,7 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)

@@ -30,7 +30,7 @@ end
 
 -- (1)
 function s.tgfilter(c,e,tp)
-	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP) and c:IsAbleToGrave()
+	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToGrave()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -52,7 +52,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return (r&REASON_EFFECT+REASON_BATTLE)~=0
 end
 function s.spfilter(c)
-	return c:IsSetCard(SET_PROTECTRIX) and c:GetLevel()==4 and not c:IsCode(id)
+	return c:IsSetCard(0x9990) and c:GetLevel()==4 and not c:IsCode(id)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

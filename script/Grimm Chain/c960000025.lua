@@ -27,7 +27,7 @@ end
 
 -- Global
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_CONTRACTOR) and c:GetAttack()<=1500 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x9998) and c:GetAttack()<=1500 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
@@ -136,7 +136,7 @@ end
 
 -- normal / special summon limit
 function s.splimit(e,c)
-	return not c:IsSetCard(SET_GRIMM_CHAIN)
+	return not c:IsSetCard(0x9999)
 end
 
 -- destroy during end phase

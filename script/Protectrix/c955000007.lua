@@ -25,7 +25,7 @@ end
 
 -- (1)
 function s.spfilter(c)
-	return c:IsSetCard(SET_PROTECTRIX) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
 function s.spcon(e,c)
 	if c==nil then return true end
@@ -41,7 +41,7 @@ end
 
 -- (2)
 function s.spfilter2(c,e,tp)
-	return c:IsSetCard(SET_PROTECTRIX) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+	return c:IsSetCard(0x9990) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter2(chkc,e,tp) end
@@ -75,7 +75,7 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(SET_PROTECTRIX) and c:IsLocation(LOCATION_EXTRA)
+	return not c:IsSetCard(0x9990) and c:IsLocation(LOCATION_EXTRA)
 end
 function s.lizfilter(e,c)
 	return not c:IsOriginalType(TYPE_XYZ)
