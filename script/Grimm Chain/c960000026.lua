@@ -113,7 +113,7 @@ function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,#g,0,0)
 end
 function s.filter(c,e)
-	return c:IsFaceup() and c:IsType(TYPE_EXTRA) and not c:IsPreviousLocation(LOCATION_REMOVED) and c:IsRelateToEffect(e)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsPreviousLocation(LOCATION_REMOVED) and c:IsRelateToEffect(e)
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
