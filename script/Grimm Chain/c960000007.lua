@@ -42,6 +42,7 @@ function s.initial_effect(c)
 	e5:SetRange(LOCATION_FZONE)
 	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e5:SetCountLimit(1,id)
+	e5:SetCondition(s.spcon)
 	e5:SetTarget(s.sptg)
 	e5:SetOperation(s.spop)
 	c:RegisterEffect(e5)
@@ -67,6 +68,12 @@ function s.checktg(e,c)
 end
 
 -- (1)
+function s.spcon(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9998),tp,LOCATION_ONFIELD,0,1,nil)
+end
 function s.spfilter(c,e,tp)
 	return c:IsMonster() and c:IsSetCard(0x9999) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

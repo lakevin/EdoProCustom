@@ -1,7 +1,7 @@
 --contractor's pandora
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) Special Summon from Deck
+	-- (1) special summon (deck)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	e1:SetCountLimit(1,id)
 	c:RegisterEffect(e1)
-	-- (2) Special Summon banished
+	-- (2) Special Summon (removed)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -26,15 +26,14 @@ function s.initial_effect(c)
 end
 
 -- Global
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x9998) and c:GetAttack()<=1500 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 
 -- (1) Deck
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(0x9998) and c:GetAttack()<=1500 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then 
 		local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
@@ -85,38 +84,42 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
+function s.spfilter2(c,e,tp,archetype)
+	return c:IsSetCard(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then 
-		local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_REMOVED,0,nil,e,tp)
-		return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
-			and Duel.GetLocationCount(tp,LOCATION_MZONE)>2 and g:GetClassCount(Card.GetCode)>=3 end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_REMOVED)
+	if chkc then return false end
+	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>2
+		and Duel.IsExistingTarget(s.spfilter2,tp,LOCATION_REMOVED,0,1,nil,e,tp,0x9998)
+		and Duel.IsExistingTarget(s.spfilter2,tp,LOCATION_REMOVED,0,1,nil,e,tp,0x9999) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g1=Duel.SelectTarget(tp,s.spfilter2,tp,LOCATION_REMOVED,0,1,1,nil,e,tp,0x9998)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g2=Duel.SelectTarget(tp,s.spfilter2,tp,LOCATION_REMOVED,0,1,1,nil,e,tp,0x9999)
+	g1:Merge(g2)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,2,0,0)
 end
 function s.activate2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_REMOVED,0,nil,e,tp)
-	if not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>2
-		and g:GetClassCount(Card.GetCode)>=3 then
-		local sg=aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,1,tp,HINTMSG_SPSUMMON)
-		local fid=c:GetFieldID()
-		for tc in aux.Next(sg) do
-			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-			tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
-		end
-		sg:KeepAlive()
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e1:SetCountLimit(1)
-		e1:SetLabel(fid)
-		e1:SetLabelObject(sg)
-		e1:SetCondition(s.descon)
-		e1:SetOperation(s.desop)
-		Duel.RegisterEffect(e1,tp)
-		Duel.SpecialSummonComplete()
-	end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft<=0 then return end
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
+	local g=Duel.GetTargetCards(e)
+	if #g==0 or #g>ft then return end
+	Duel.SpecialSummonStep(g,0,tp,tp,false,false,POS_FACEUP)
+	g:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
+	g:KeepAlive()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetCountLimit(1)
+	e1:SetLabel(fid)
+	e1:SetLabelObject(g)
+	e1:SetCondition(s.descon)
+	e1:SetOperation(s.desop)
+	Duel.RegisterEffect(e1,tp)
+	Duel.SpecialSummonComplete()
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
