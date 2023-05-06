@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	e3:SetCountLimit(1,{id,1})
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetRange(LOCATION_REMOVED)
-	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)return eg:IsExists(s.rtfilter,1,nil,tp)end)
+	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(s.rtfilter,1,nil,tp) end)
 	e3:SetTarget(s.rttg)
 	e3:SetOperation(s.rtop)
 	c:RegisterEffect(e3)
@@ -43,14 +43,11 @@ function s.initial_effect(c)
 end
 
 -- (1)
-function s.spfilter(c)
-	return c:IsSetCard(0x9998) and c:IsFaceup()
-end
 function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9998),tp,LOCATION_MZONE,0,1,nil)
 end
 
 -- (2)

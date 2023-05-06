@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(s.target)
+	e2:SetTarget(function(e,c) return c:IsSetCard(0x9999) end)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -31,20 +31,11 @@ function s.initial_effect(c)
 end
 
 -- activate
-function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9998)
-end
 function s.actcon(e)
-	return Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
-end
-
--- (1)
-function s.target(e,c)
-	return c:IsSetCard(0x9999)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9998),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 
 -- (2)
-
 function s.descon(e)
-	return not Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	return not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9998),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
