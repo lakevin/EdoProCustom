@@ -311,3 +311,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
 
 ## Example Decks
 <img src="./protectrix-deck-example-1.png">
+
+<style>
+img {max-width: none;}
+</style>
