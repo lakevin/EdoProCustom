@@ -306,10 +306,11 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
 <br>
 
 ## Combos
+### Going First
 <table>
     <tr>
         <td>
-            <h3>(Going First)<br>Opening Hand:</h3>
+            <h3>Opening Hand</h3>
         </td>
         <td align="center">
             <img src="../pics/955000001.jpg" height=95px width=65px>
