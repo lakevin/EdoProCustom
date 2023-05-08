@@ -183,7 +183,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
         </tr>
         <tr>
             <td>Protectrix Laserblade</td>
-            <td style="text-align: center;"><img src="../pics/955000006.jpg" height=160px width=110px></td>
+            <td width=110px><img src="../pics/955000006.jpg" height=160px width=110px></td>
             <td>
                 2 Level 4 "Protectrix" is an easy condition in the <b>Protectrix</b> archetype and this card helps you to build bigger boards. It can Special Summon any Level 4 Psychic-Type monster from your Deck. For example, this could be used for a Fusion Summon into "Protectrix Zerastia" or "Protectrix Walkyria".
             </td>
@@ -254,7 +254,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
         </tr>
         <tr>
             <td>Emergency Teleport</td>
-            <td style="text-align: center;"><img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=160px width=110px></td>
+            <td width=110px><img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=160px width=110px></td>
             <td>
                 Consistency card to get "Protectrix Claymore" easier on the board.
             </td>
