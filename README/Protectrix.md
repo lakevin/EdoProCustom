@@ -877,177 +877,81 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             </td>
             <td colspan="2">&nbsp;</td>
         </tr>
+    </table>
+    <br>
+    <h3>In this situation you have multiple options</h3>
+    <ol type="A">
+        <li><h3>Special Summon 3rd "Protectrix Laserblade" and Fusion Summon "Protectrix Zerastia"</h3></li>
+        <li><h3>Fusion Summon into "Protectrix Walkyria" to going into "Protectrix CR-Suit Apocalyptic"</h3></li>
+    </ol>
+    <br>
+     <table>
         <tr>
-            <td><h3>Step 8A.1</h3></td>
+            <td><h3>End Board A</h3></td>
             <td align="center">
-                <img src="../pics/955000015.jpg" height=95px width=65px><br>
-                Activate
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="../pics/955000007.jpg" height=95px width=65px><br>
-                Fusion
+                <img src="../pics/955000018.jpg" height=95px width=65px><br>
+                To Hand
             </td>
             <td align="center">
                 +
             </td>
             <td align="center">
-                <img src="../pics/955000002.jpg" height=95px width=65px><br>
-                Fusion
+                <img src="../pics/955000005.jpg" height=95px width=65px><br>
+                Destroy
             </td>
             <td align="center">
-                =>
+                +
             </td>
             <td align="center">
-                <img src="../pics/955000017.jpg" height=95px width=65px><br>
-                Special
+                <img src="../pics/955000012.jpg" height=95px width=65px><br>
+                Negate
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                (<img src="../pics/955000009.jpg" height=95px width=65px><br>
+                Interrupt
+            </td>
+            <td align="center">
+                OR
+            </td>
+            <td align="center">
+                <img src="../pics/955000005.jpg" height=95px width=65px>)<br>
+                2. Destroy
+            </td>
+        </tr>
+    </table>
+    <br>
+    <table>
+        <tr>
+            <td><h3>End Board B</h3></td>
+            <td align="center">
+                <img src="../pics/955000019.jpg" height=95px width=65px><br>
+                Hand -1
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000005.jpg" height=95px width=65px><br>
+                Destroy
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000012.jpg" height=95px width=65px><br>
+                Negate
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000009.jpg" height=95px width=65px><br>
+                Interrupt
             </td>
             <td colspan="2">&nbsp;</td>
-        </tr>
-        <tr>
-            <td><h3>Step 8A.2</h3></td>
-            <td align="center">
-                <img src="../pics/955000017.jpg" height=95px width=65px><br>
-                Activate
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="../pics/955000008.jpg" height=95px width=65px><br>
-                Special
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="../pics/955000008.jpg" height=95px width=65px><br>
-                Level 7
-            </td>
-            <td colspan="4">&nbsp;</td>
-        </tr>
-        <tr>
-            <td><h3>Step 8A.3</h3></td>
-            <td align="center">
-                <img src="../pics/955000017.jpg" height=95px width=65px><br>
-                Fusion
-            </td>
-            <td align="center">
-                +
-            </td>
-            <td align="center">
-                <img src="../pics/955000008.jpg" height=95px width=65px><br>
-                Fusion
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="../pics/955000019.jpg" height=95px width=65px><br>
-                Special
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="../pics/955000019.jpg" height=95px width=65px><br>
-                Activate
-            </td>
-            <td colspan="3">&nbsp;</td>
-        </tr>
-        <tr>
-            <td><h3>End Board 8B</h3></td>
-            <td align="center">
-                <img src="../pics/955000018.jpg" height=95px width=65px><br>
-                To Hand
-            </td>
-            <td align="center">
-                +
-            </td>
-            <td align="center">
-                <img src="../pics/955000009.jpg" height=95px width=65px><br>
-                Negate
-            </td>
-            <td align="center">
-                +
-            </td>
-            <td align="center">
-                <img src="../pics/955000012.jpg" height=95px width=65px><br>
-                Negate
-            </td>
-            <td colspan="4">&nbsp;</td>
-        </tr>
-        <tr>
-            <td>
-                <h3>Step 8B.1<br>*<sup><sub><b>Protectrix</b> monster in hand</sub></sup></h3>
-            </td>
-            <td align="center">
-                <img src="./img/placeholder.jpg" height=95px width=65px><br>
-                Activate(*)
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="../pics/955000022.jpg" height=95px width=65px><br>
-                Banish
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="./img/placeholder.jpg" height=95px width=65px><br>
-                Special(*)
-            </td>
-            <td colspan="4">&nbsp;</td>
-        </tr>
-        <tr>
-            <td>
-                <h3>Step 8B.2<br>*<sup><sub><b>Protectrix</b> monster in hand</sub></sup></h3>
-            </td>
-            <td align="center">
-                <img src="./img/placeholder.jpg" height=95px width=65px><br>
-                Overlay(*)
-            </td>
-            <td align="center">
-                +
-            </td>
-            <td align="center">
-                <img src="../pics/955000002.jpg" height=95px width=65px><br>
-                Overlay
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="../pics/955000006.jpg" height=95px width=65px><br>
-                Special
-            </td>
-            <td colspan="4">&nbsp;</td>
-        </tr>
-        <tr>
-            <td><h3>End Board 8B</h3></td>
-            <td align="center">
-                <img src="../pics/955000018.jpg" height=95px width=65px><br>
-                To Hand
-            </td>
-            <td align="center">
-                +
-            </td>
-            <td align="center">
-                <img src="../pics/955000009.jpg" height=95px width=65px><br>
-                Negate
-            </td>
-            <td align="center">
-                +
-            </td>
-            <td align="center">
-                <img src="../pics/955000012.jpg" height=95px width=65px><br>
-                Negate
-            </td>
-            <td colspan="4">&nbsp;</td>
         </tr>
     </table>
 </details>
