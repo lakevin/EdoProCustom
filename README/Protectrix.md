@@ -314,13 +314,13 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 <h3>Opening Hand</h3>
             </td>
             <td align="center">
-                <img src="../pics/955000001.jpg" height=95px width=65px>
+                <img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=95px width=65px>
             </td>
             <td align="center">
                 OR
             </td>
             <td align="center">
-                <img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=95px width=65px>
+                <img src="../pics/955000014.jpg" height=95px width=65px>
             </td>
             <td align="center">
                 +
@@ -332,13 +332,70 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 +
             </td>
             <td align="center">
-                <img src="./img/placeholder.jpg" height=95px width=65px><br>
-                <sup><sub><b>Protectrix</b> monster</sub></sup>
+                <img src="https://s3.duellinksmeta.com/cards/62de2101e9066c4257aa9597_w360.webp" height=95px width=65px>
             </td>
             <td colspan="2"></td>
         </tr>
         <tr>
             <td><h3>Step 1</h3></td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/62de2101e9066c4257aa9597_w360.webp" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/62de2101e9066c4257aa9597_w360.webp" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/62de2101e9066c4257aa9597_w360.webp" height=95px width=65px><br>
+                Search
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 2.1</h3></td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000013.jpg" height=95px width=65px><br>
+                Send to GY
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 2.2</h3></td>
+            <td align="center">
+                <img src="../pics/955000014.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Search
+            </td>
+            <td align="center">
+                =>
+            </td>
             <td align="center">
                 <img src="../pics/955000001.jpg" height=95px width=65px><br>
                 Normal
@@ -350,10 +407,17 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 <img src="../pics/955000013.jpg" height=95px width=65px><br>
                 Send to GY
             </td>
-            <td colspan="6"></td>
+            <td colspan="2"></td>
         </tr>
         <tr>
-            <td><h3>Step 2</h3></td>
+            <td><h3>Step 3</h3></td>
+            <td align="center">
+                <img src="../pics/955000003.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
             <td align="center">
                 <img src="../pics/955000013.jpg" height=95px width=65px><br>
                 Banish
@@ -365,10 +429,10 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 <img src="../pics/955000003.jpg" height=95px width=65px><br>
                 Special
             </td>
-            <td colspan="6">&nbsp;</td>
+            <td colspan="4">&nbsp;</td>
         </tr>
         <tr>
-            <td><h3>Step 3</h3></td>
+            <td><h3>Step 4</h3></td>
             <td align="center">
                 <img src="../pics/955000003.jpg" height=95px width=65px><br>
                 Activate
@@ -403,7 +467,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             </td>
         </tr>
         <tr>
-            <td><h3>Step 4</h3></td>
+            <td><h3>Step 5</h3></td>
             <td align="center">
                 <img src="../pics/955000003.jpg" height=95px width=65px><br>
                 Overlay
@@ -425,17 +489,17 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td colspan="4">&nbsp;</td>
         </tr>
         <tr>
-            <td><h3>Step 5</h3></td>
+            <td><h3>Step 6</h3></td>
             <td align="center">
                 <img src="../pics/955000006.jpg" height=95px width=65px><br>
-                Overlay
+                Activate
             </td>
             <td align="center">
-                +
+                =>
             </td>
             <td align="center">
                 <img src="../pics/955000008.jpg" height=95px width=65px><br>
-                Overlay
+                Special
             </td>
             <td align="center">
                 =>
@@ -448,13 +512,19 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 =>
             </td>
             <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Draw/Return
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
                 <img src="../pics/955000015.jpg" height=95px width=65px><br>
                 Search
             </td>
-            <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
-            <td><h3>Step 6</h3></td>
+            <td><h3>Step 7</h3></td>
             <td align="center">
                 <img src="../pics/955000001.jpg" height=95px width=65px><br>
                 Link
@@ -483,7 +553,283 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
-            <td><h3>Step 7</h3></td>
+            <td><h3>Step 8</h3></td>
+            <td align="center">
+                <img src="../pics/955000015.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000006.jpg" height=95px width=65px><br>
+                Fusion
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                <sup><sub>Psychic monster</sub></sup>
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000018.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>Step 9</h3></td>
+            <td align="center">
+                <img src="../pics/955000015.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Draw +1
+            </td>
+            <td colspan="6">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>End Board</h3></td>
+            <td align="center">
+                <img src="../pics/955000018.jpg" height=95px width=65px><br>
+                To Hand
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000009.jpg" height=95px width=65px><br>
+                Interrupt
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/62de2101e9066c4257aa9597_w360.webp" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000012.jpg" height=95px width=65px><br>
+                Negate
+            </td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+    </table>
+</details>
+
+<br>
+
+<details>
+    <summary>Going First #2</summary>
+    <table>
+        <tr>
+            <td valign="center">
+                <h3>Opening Hand</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px>
+            </td>
+            <td align="center">
+                OR
+            </td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=95px width=65px>
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000014.jpg" height=95px width=65px>
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 1</h3></td>
+            <td align="center">
+                <img src="../pics/955000014.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000003.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="6"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 2.1</h3></td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Normal
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000022.jpg" height=95px width=65px><br>
+                Send to GY
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000022.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 2.2</h3></td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000022.jpg" height=95px width=65px><br>
+                To Grave
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000022.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 3</h3></td>
+            <td align="center">
+                <img src="../pics/955000003.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Destroy
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000012.jpg" height=95px width=65px><br>
+                Set
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000007.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 4</h3></td>
+            <td align="center">
+                <img src="../pics/955000003.jpg" height=95px width=65px><br>
+                Overlay
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000022.jpg" height=95px width=65px><br>
+                Overlay
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000006.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>Step 5</h3></td>
+            <td align="center">
+                <img src="../pics/955000006.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Draw/Return
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000015.jpg" height=95px width=65px><br>
+                Search
+            </td>
+        </tr>
+        <tr>
+            <td><h3>Step 6</h3></td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Link
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Link
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000009.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>Step 8</h3></td>
             <td align="center">
                 <img src="../pics/955000015.jpg" height=95px width=65px><br>
                 Activate
@@ -512,7 +858,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
-            <td><h3>Step 8</h3></td>
+            <td><h3>Step 9</h3></td>
             <td align="center">
                 <img src="../pics/955000015.jpg" height=95px width=65px><br>
                 Activate
@@ -550,6 +896,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
         </tr>
     </table>
 </details>
+
 
 <br>
 

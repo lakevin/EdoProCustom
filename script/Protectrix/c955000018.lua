@@ -4,7 +4,6 @@ function s.initial_effect(c)
 	-- fusion material
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsRace,RACE_PSYCHIC),s.matfilter)
-	
 	-- cannot disable spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -12,7 +11,6 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCondition(s.effcon)
 	c:RegisterEffect(e1)
-
 	-- (1) cannot target
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -29,7 +27,6 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetValue(s.indval)
 	c:RegisterEffect(e3)
-	
 	-- (2) tohand
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_TOHAND)
@@ -61,7 +58,7 @@ end
 
 -- (2)
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9990) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsSetCard(0x9990) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
