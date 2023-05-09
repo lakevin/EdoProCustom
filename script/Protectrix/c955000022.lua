@@ -69,5 +69,5 @@ end
 -- (3)
 function s.cannotmatfilter(e,c)
 	if not c then return false end
-	return not c:IsSetCard(0x9990) and aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK)
+	return not c:IsSetCard(0x9990) --and aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK)
 end
