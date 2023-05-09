@@ -721,7 +721,9 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td colspan="2"></td>
         </tr>
         <tr>
-            <td><h3>Step 3</h3></td>
+            <td>
+                <h3>Step 3</h3>
+            </td>
             <td align="center">
                 <img src="../pics/955000003.jpg" height=95px width=65px><br>
                 Activate
@@ -744,10 +746,10 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 +
             </td>
             <td align="center">
-                <img src="../pics/955000007.jpg" height=95px width=65px><br>
+                <img src="../pics/955000002.jpg" height=95px width=65px><br>
                 Special
             </td>
-            <td colspan="4"></td>
+            <td colspan="2"></td>
         </tr>
         <tr>
             <td><h3>Step 4</h3></td>
@@ -769,10 +771,19 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 <img src="../pics/955000006.jpg" height=95px width=65px><br>
                 Special
             </td>
-            <td colspan="4">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+            <td align="center">
+                Tip
+            </td>
+            <td align="center">
+                <img src="../pics/955000022.jpg" height=95px width=65px><br>
+                Detach
+            </td>
         </tr>
         <tr>
-            <td><h3>Step 5</h3></td>
+            <td>
+                <h3>Step 5</h3>
+            </td>
             <td align="center">
                 <img src="../pics/955000006.jpg" height=95px width=65px><br>
                 Activate
@@ -809,56 +820,65 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
         <tr>
             <td><h3>Step 6</h3></td>
             <td align="center">
-                <img src="../pics/955000001.jpg" height=95px width=65px><br>
-                Link
+                <img src="../pics/955000002.jpg" height=95px width=65px><br>
+                Overlay
             </td>
             <td align="center">
                 +
             </td>
             <td align="center">
                 <img src="../pics/955000008.jpg" height=95px width=65px><br>
-                Link
-            </td>
-            <td align="center">
-                =>
-            </td>
-            <td align="center">
-                <img src="../pics/955000009.jpg" height=95px width=65px><br>
-                Special
-            </td>
-            <td colspan="4">&nbsp;</td>
-        </tr>
-        <tr>
-            <td><h3>Step 8</h3></td>
-            <td align="center">
-                <img src="../pics/955000015.jpg" height=95px width=65px><br>
-                Activate
+                Overlay
             </td>
             <td align="center">
                 =>
             </td>
             <td align="center">
                 <img src="../pics/955000006.jpg" height=95px width=65px><br>
-                Link
+                Special
+            </td>
+            <td colspan="2">&nbsp;</td>
+            <td align="center">
+                Tip
             </td>
             <td align="center">
-                +
+                <img src="../pics/955000002.jpg" height=95px width=65px><br>
+                Detach
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 7</h3>
             </td>
             <td align="center">
-                <img src="./img/placeholder.jpg" height=95px width=65px><br>
-                <sup><sub><b>Protectrix</b> monster</sub></sup>
+                <img src="../pics/955000006.jpg" height=95px width=65px><br>
+                Activate
             </td>
             <td align="center">
                 =>
             </td>
             <td align="center">
-                <img src="../pics/955000018.jpg" height=95px width=65px><br>
-                To Grave
+                <img src="../pics/955000007.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000007.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000002.jpg" height=95px width=65px><br>
+                Special
             </td>
             <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
-            <td><h3>Step 9</h3></td>
+            <td><h3>Step 8A.1</h3></td>
             <td align="center">
                 <img src="../pics/955000015.jpg" height=95px width=65px><br>
                 Activate
@@ -867,13 +887,148 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 =>
             </td>
             <td align="center">
-                <img src="./img/placeholder.jpg" height=95px width=65px><br>
-                Draw +1
+                <img src="../pics/955000007.jpg" height=95px width=65px><br>
+                Fusion
             </td>
-            <td colspan="6">&nbsp;</td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000002.jpg" height=95px width=65px><br>
+                Fusion
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000017.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
-            <td><h3>End Board</h3></td>
+            <td><h3>Step 8A.2</h3></td>
+            <td align="center">
+                <img src="../pics/955000017.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Level 7
+            </td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>Step 8A.3</h3></td>
+            <td align="center">
+                <img src="../pics/955000017.jpg" height=95px width=65px><br>
+                Fusion
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Fusion
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000019.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000019.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td colspan="3">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>End Board 8B</h3></td>
+            <td align="center">
+                <img src="../pics/955000018.jpg" height=95px width=65px><br>
+                To Hand
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000009.jpg" height=95px width=65px><br>
+                Negate
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000012.jpg" height=95px width=65px><br>
+                Negate
+            </td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 8B.1<br>*<sup><sub><b>Protectrix</b> monster in hand</sub></sup></h3>
+            </td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Activate(*)
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000022.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Special(*)
+            </td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 8B.2<br>*<sup><sub><b>Protectrix</b> monster in hand</sub></sup></h3>
+            </td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Overlay(*)
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000002.jpg" height=95px width=65px><br>
+                Overlay
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000006.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>End Board 8B</h3></td>
             <td align="center">
                 <img src="../pics/955000018.jpg" height=95px width=65px><br>
                 To Hand
