@@ -333,7 +333,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             </td>
             <td align="center">
                 <img src="./img/placeholder.jpg" height=95px width=65px><br>
-                <h5>"Protectrix"<br>monster</h5>
+                <sup><sub>"Protectrix"<br>monster</sub></sup>
             </td>
             <td colspan="2"></td>
         </tr>
@@ -500,7 +500,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             </td>
             <td align="center">
                 <img src="./img/placeholder.jpg" height=95px width=65px><br>
-                <h5>"Protectrix" monster</h5>
+                <sup><sub>"Protectrix" monster</sub></sup>
             </td>
             <td align="center">
                 =>
