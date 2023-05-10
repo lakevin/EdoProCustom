@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,3,nil,nil,99)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),7,3,nil,nil,99)
 	c:EnableReviveLimit()
 	-- Can use Level 6 monsters as Level 7 materials
 	local e0=Effect.CreateEffect(c)
