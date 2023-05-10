@@ -104,17 +104,16 @@ end
 
 -- (2)
 function s.thfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0x9992) and not c:IsType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_TOKEN|TYPE_XYZ|TYPE_LINK)
-		and c:IsRace(RACE_DRAGON) and c:IsAbleToHand() and Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,0,1,c)
+	return c:IsFaceup() and c:IsSetCard(0x9992) and c:IsAbleToHand() and Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,0,1,c)
 end
 function s.atkfilter(c)
-	return c:IsSetCard(0x9992) and c:IsFaceup()
+	return c:IsFaceup() and c:IsSetCard(0x9992)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil,tp)
+	local g=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	e:SetLabelObject(g:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,g)
