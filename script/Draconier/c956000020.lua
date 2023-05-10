@@ -125,10 +125,10 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local hc=g:GetFirst()
 	local tc=g:GetNext()
 	if hc~=e:GetLabelObject() then tc,hc=hc,tc end
-	local atk=hc:GetBaseAttack()
 	if hc:IsFaceup() and tc:IsFaceup() and Duel.SendtoHand(hc,nil,REASON_EFFECT)~=0 then
 		local sg=Duel.GetOperatedGroup()
-		if not sg:IsExists(Card.IsLocation,1,nil,LOCATION_HAND) then return end
+		local atk=hc:GetBaseAttack()
+		if not sg:IsExists(Card.IsLocation,1,nil,LOCATION_HAND+LOCATION_EXTRA) then return end
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
