@@ -2,9 +2,18 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	--Xyz.AddProcedure(c,nil,6,3,s.ovfilter,aux.Stringid(id,0),5,s.xyzop)
 	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,3)
 	c:EnableReviveLimit()
+	-- Can use Level 6 monsters as Level 7 materials
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e0:SetCode(EFFECT_XYZ_LEVEL)
+	e0:SetRange(LOCATION_EXTRA)
+	e0:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e0:SetTarget(function(e,c) return c:IsLevel(6) and c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) end)
+	e0:SetValue(function(e,_,rc) return rc==e:GetHandler() and 2 or 0 end)
+	c:RegisterEffect(e0)
 	-- (1) destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)

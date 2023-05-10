@@ -951,7 +951,6 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
                 <img src="../pics/955000009.jpg" height=95px width=65px><br>
                 Interrupt
             </td>
-            <td colspan="2">&nbsp;</td>
         </tr>
     </table>
 </details>
