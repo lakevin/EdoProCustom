@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e0:SetRange(LOCATION_EXTRA)
 	e0:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e0:SetTarget(function(e,c) return c:IsLevel(6) and c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) end)
-	e0:SetValue(function(e,_,rc) return rc==e:GetHandler() and 2 or 0 end)
+	e0:SetValue(7)
 	c:RegisterEffect(e0)
 	-- (1) negate
 	local e1=Effect.CreateEffect(c)
