@@ -1,6 +1,8 @@
 --Madrago
 local s,id=GetID()
 function s.initial_effect(c)
+	--cannot normal summon/set
+	c:EnableReviveLimit()
 	--pendulum summon
 	Pendulum.AddProcedure(c)
 	-- (1) to hand
