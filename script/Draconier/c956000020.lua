@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Link summon procedure
 	c:EnableReviveLimit()
-	Link.AddProcedure(c,s.matfilter,2,2,s.lcheck)
+	Link.AddProcedure(c,s.matfilter,2,3,s.lcheck)
 	--Cannot be Link Material the turn it's Link Summoned
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
