@@ -107,9 +107,9 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td>Protectrix Command Center</td>
             <td><img src="../pics/955000021.jpg" height=137px width=94px></td>
             <td>
-                The powerful Field Spell of this archetype, which gives an ATK/DEF boost. Also it has a destruction effect to trigger the effects of "Claymore" or "Halberd" or its own <b>[Destroyed]</b> effect, which allows you to Special Summon any <b>Protectrix</b> monster from your Deck.
+                The powerful Field Spell of this archetype, which gives an ATK/DEF boost. Also it has a destruction effect to trigger the effects of "Protectrix Claymore" or "Protectrix Halberd" or its own <b>[Destroyed]</b> effect, which allows you to Special Summon any <b>Protectrix</b> monster from your Deck.
             </td>
-            <td align="center">3x</td>
+            <td align="center">2-3x</td>
         </tr>
     </table>
 </details>
@@ -148,7 +148,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td>
                 The <b>Protectrix</b> version of a archetype specific negation Trap card. Also it can recycle <b>Protectrix</b> from your Graveyard, when sent from the deck to the GY.
             </td>
-            <td align="center">2x</td>
+            <td align="center">2-3x</td>
         </tr>
         <tr>
             <td>Protectrix Emergency Call</td>
@@ -159,12 +159,20 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td align="center">2x</td>
         </tr>
         <tr>
-            <td>Protectrix Rampage</td>
-            <td><img src="../pics/955000012.jpg" height=137px width=94px></td>
+            <td>Protectrix Reincarnation</td>
+            <td><img src="../pics/955000020.jpg" height=137px width=94px></td>
             <td>
-                The <b>Protectrix</b> version of a archetype specific negation Trap card. Also it can recycle <b>Protectrix</b> from your Graveyard, when sent from the deck to the GY.
+                This card can be used to Special Summon <b>Protectrix</b> monsters from your GY by using the effect of "Protectrix Wiretap". Moreover it can be used to recycle banished <b>Protectrix</b> Trap cards.
             </td>
-            <td align="center">2x</td>
+            <td align="center">1-2x</td>
+        </tr>
+        <tr>
+            <td>Protectrix Wrath</td>
+            <td><img src="../pics/955000022.jpg" height=137px width=94px></td>
+            <td>
+                This card is an extender for the <b>Protectrix</b> archetype. One of the best options when going first to build up bigger board. But it can only be used to SPecial Summon <b>Protectrix</b> monsters.
+            </td>
+            <td align="center">1-2x</td>
         </tr>
     </table>
 </details>
@@ -187,7 +195,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td>
                 2 Level 4 "Protectrix" is an easy condition in the <b>Protectrix</b> archetype and this card helps you to build bigger boards. It can Special Summon any Level 4 Psychic-Type monster from your Deck. For example, this could be used for a Fusion Summon into "Protectrix Zerastia" or "Protectrix Walkyria".
             </td>
-            <td align="center">2x</td>
+            <td align="center">2-3x</td>
         </tr>
         <tr>
             <td>Protectrix Eagle Eye</td>
@@ -955,6 +963,287 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
     </table>
 </details>
 
+<br>
+
+<details>
+    <summary>Going Secound #1</summary>
+    <table>
+        <tr>
+            <td valign="center">
+                <h3>Opening Hand</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px>
+            </td>
+            <td align="center">
+                OR
+            </td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=95px width=65px>
+            </td>
+            <td align="center">
+                OR
+            </td>
+            <td align="center">
+                <img src="../pics/955000014.jpg" height=95px width=65px>
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 1.1</h3></td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Normal
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000011.jpg" height=95px width=65px><br>
+                Send to GY
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000011.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Destroy
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Destroy <sup><sub>(Oponnent)</sub></sup>
+            </td>
+        </tr>
+         <tr>
+            <td><h3>Step 1.2</h3></td>
+            <td align="center">
+                <img src="../pics/955000014.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                Same like Step 1.1
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td><h3>Step 1.3</h3></td>
+            <td align="center">
+                <img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a51fd1_w360.webp" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                Same like Step 1.1
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 2</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000007.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="6"></td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 3</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/955000007.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <sup><sub>Restricted<br><b>Protectrix</b><br>Summons</sub></sup>
+            </td>
+            <td colspan="4"></td>
+        </tr>
+    </table>
+    <br>
+    <h3>If you have any Level 4 Protectrix monster in your hand, you can Special Summon it by banishing "Protectrix Rampage".</h3>
+    <br>
+     <table>
+     <tr>
+        <td><h3>Step 4</h3></td>
+            <td align="center">
+                <img src="../pics/955000003.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000011.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000003.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 5</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/955000007.jpg" height=95px width=65px><br>
+                Overlay
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000003.jpg" height=95px width=65px><br>
+                Overlay
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000006.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 6</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/955000006.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Draw/Return
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000015.jpg" height=95px width=65px><br>
+                Search
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 7.1</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Link
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000008.jpg" height=95px width=65px><br>
+                Link
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000009.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Step 7.2</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/955000001.jpg" height=95px width=65px><br>
+                Fusion
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/955000006.jpg" height=95px width=65px><br>
+                Fusion
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/955000018.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="4"></td>
+        </tr>
+    </table>
+</details>
 
 <br>
 
