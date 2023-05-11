@@ -274,7 +274,15 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td>
                 A further target for "Emergency Teleport" to interrupt your opponent or perform a Synchro Summon.
             </td>
-            <td align="center">3x<br>(Optional)</td>
+            <td align="center">0-3x<br>(Optional)</td>
+        </tr>
+        <tr>
+            <td>Foolish Burial Goods</td>
+            <td><img src="https://s3.duellinksmeta.com/cards/60c2b3aaa0e24f2d54a521e0_w360.webp" height=137px width=94px></td>
+            <td>
+                A tech card to trigger Trap card effects on milling. Also a good alternativ when "Protectrix Claymore" gets negated.
+            </td>
+            <td align="center">0-3x<br>(Optional)</td>
         </tr>
         <tr>
             <td>Kashtira Fenrir</td>
@@ -282,7 +290,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td>
                 Kashtira Engine for alternative plays and interruption.
             </td>
-            <td align="center">3x<br>(Optional)</td>
+            <td align="center">0-3x<br>(Optional)</td>
         </tr>
         <tr>
             <td>Kashtira Unicorn</td>
@@ -290,7 +298,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td>
                 Kashtira Engine for alternative plays and interruption.
             </td>
-            <td align="center">2-3x<br>(Optional)</td>
+            <td align="center">0-2x<br>(Optional)</td>
         </tr>
         <tr>
             <td>Kashtiratheosis</td>
@@ -298,7 +306,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td>
                 Kashtira Engine for alternative plays and interruption.
             </td>
-            <td align="center">1-2x<br>(Optional)</td>
+            <td align="center">0-2x<br>(Optional)</td>
         </tr>
         <tr>
             <td>Kashtira Shangri-Ira</td>
@@ -306,7 +314,7 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
             <td>
                 Kashtira Engine for alternative plays and interruption.
             </td>
-            <td align="center">1x<br>(Optional)</td>
+            <td align="center">0-1x<br>(Optional)</td>
         </tr>
     </table>
 </details>
