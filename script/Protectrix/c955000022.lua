@@ -19,6 +19,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCountLimit(1,id)
+	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -48,6 +49,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK
+end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id,0x9990,TYPE_MONSTER+TYPE_EFFECT,2000,0,4,RACE_PSYCHIC,ATTRIBUTE_WATER) end

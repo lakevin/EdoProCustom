@@ -19,6 +19,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetCountLimit(1,id)
+	e2:SetTarget(s.tdcon)
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
 	e2:SetHintTiming(TIMING_STANDBY_PHASE+TIMING_END_PHASE)
@@ -48,6 +49,9 @@ end
 
 
 -- (2)
+function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK
+end
 function s.tdfilter(c)
 	return c:IsType(TYPE_TRAP) and c:IsSetCard(0x9990)
 end
