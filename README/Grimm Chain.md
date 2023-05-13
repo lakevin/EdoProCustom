@@ -28,7 +28,7 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
             <td>Oz Vessalius, the Contractor</td>
             <td><img src="../pics/960000001.jpg" height=137px width=94px></td>
             <td>
-                It's the <b>one card combo</b> of the deck. When <b>[Summoned]</b> its milling <b>Protectrix</b> Trap Cards. When <b>[Destroyed]</b> its Special Summon 1 Level 4 <b>Protectrix</b> monster from Deck.
+                [Searcher] <b>Grimm Chain</b> monsters (also the Ritual monsters)
             </td>
             <td align="center">3x</td>
         </tr>
@@ -36,7 +36,7 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
             <td>Gilbert Nightray, the Contractor</td>
             <td><img src="../pics/960000002.jpg" height=137px width=94px></td>
             <td>
-                This card is an extender and can <b>[Special Summon]</b> itself by banishing 1 <b>Protectrix</b> Trap card from GY. When <b>[Destroyed]</b>: add to hand 1 "Protectrix" monster from the GY.
+                [Searcher] <b>Grimm Chain</b> or <b>Contractor</b> Spell Cards.
             </td>
             <td align="center">2-3x</td>
         </tr>
@@ -44,7 +44,7 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
             <td>Rufus Barma, the Contractor</td>
             <td><img src="../pics/960000003.jpg" height=137px width=94px></td>
             <td>
-                This card is an extender and can <b>[Special Summon]</b> itself by banishing 1 <b>Protectrix</b> Trap card from GY. Also this card can destroy 1 face-up card you control to <b>[Search]</b> and Set a <b>Protectrix</b> Trap card from your deck. This effect is important to trigger <b>[Destroyed]</b> effects.</li>
+                [Searcher] <b>Grimm Chain</b> or <b>Contractor</b> Trap Cards. 
             </td>
             <td align="center">1-2x</td>
         </tr>
@@ -52,7 +52,7 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
             <td>Xerxes Break, the Contractor</td>
             <td><img src="../pics/960000004.jpg" height=137px width=94px></td>
             <td>
-                This card is an extender: It can be <b>[Special Summon]</b> (from hand) by banishing 2 <b>Protectrix</b> Trap card from GY. This card can banish monster cards with interuption or negation effects temporary. Also it can attack directly, but the damage is halved. Hard to summon so 1-2 copies are fine.
+                [Extender] Special Summons 1 <b>Contractor</b> monster from your deck.
             </td>
             <td align="center">3x</td>
         </tr>
@@ -60,38 +60,48 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
             <td>Glen Baskerville, the Contractor</td>
             <td><img src="../pics/960000005.jpg" height=137px width=94px></td>
             <td>
-                This card can also <b>[Special Summon]</b> itself by banishing 1 <b>Protectrix</b> Trap card from GY. One of the key cards in this deck, which can revive Level 4 or lower <b>Protectrix</b> Monster cards from the GY. The downside of this card is, that it locks you to Special Summon only <b>Protectrix</b> monsters for the rest of this turn. So be careful, when playing other archetypes with it.
+                This card is primarly used as whole material for Ritual Summons. And if it is used you can banish 1 <b>Contractor</b> monster from your deck. The banished card is a traget for "Eques, Grimm Chain of the Abyss".
             </td>
             <td align="center">2-3x</td>
         </tr>
         <tr>
             <td>Gryphon, the Black Winged Chain</td>
             <td><img src="../pics/960000011.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                This card is a resource remover, which can [Banish] 1 monster in any Graveyards.
+            </td>
             <td align="center">1x</td>
         </tr>
         <tr>
             <td>Raven, the Black Winged Chain</td>
             <td><img src="../pics/960000012.jpg" height=137px width=94px></td>
-            <td> </td>
+            <td>
+                This card is a once per turn [Monster Negate] which also increase its ATK with this effect.
+            </td>
             <td align="center">1x</td>
         </tr>
         <tr>
             <td>Dodo, the Black Winged Chain</td>
             <td><img src="../pics/960000013.jpg" height=137px width=94px></td>
-            <td> </td>
+            <td>
+                This card generates [Tokens] which can be used for link summons. Moreover it can [Stall] your opponent with its protection effect, while you control a Token.
+            </td>
             <td align="center">1x</td>
         </tr>
         <tr>
             <td>Jabberwock, the Black Winged Chain</td>
             <td><img src="../pics/960000015.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                Multi [Destroyer] for all cards in this card's column that your opponent controls.
+            </td>
             <td align="center">1x</td>
         </tr>
         <tr>
             <td>Owl, the Black Winged Chain</td>
             <td><img src="../pics/960000024.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                This card functions as an additional Ritual Spell card.
+            </td>
             <td align="center">1x</td>
         </tr>
         <tr>
@@ -136,25 +146,33 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
         <tr>
             <td>Alliance with the Black Winged Chain</td>
             <td><img src="../pics/960000006.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                Ritual Spell card for <b>Grimm Chain</b> Ritual monsters. [Special Summons] banished monsters or from your hand. [Materials] can be used from your field, hand or banished from your deck.
+            </td>
             <td align="center">3x</td>
         </tr>
         <tr>
             <td>Abyss of Grimm Chains</td>
             <td><img src="../pics/960000007.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                Field Spell that [Banish] all monsters instead of sending them to the GY. It helps to trigger the effects of your monsters when banished and is also a Floodgate.
+            </td>
             <td align="center">3x</td>
         </tr>
         <tr>
             <td>Pact with the Black Winged Chain</td>
             <td><img src="../pics/960000009.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                Ritual Spell card for <b>Grimm Chain</b> Ritual monsters. [Special Summons] from your hand or deck (but only temporary). [Materials] can be used from your field or banished cards by shuffeling back into deck.
+            </td>
             <td align="center">2x</td>
         </tr>
         <tr>
             <td>Contractor's Pandora</td>
             <td><img src="../pics/960000025.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                This card is increase the consistency of Summoning Ritual Monsters. This allows an one card combo which ends with "The Intention of the Abyss" on the board. Best targets are "Oz Vessalius, the Contractor" and "Gilbert Nightray, the Contractor" to be Special Summones by this card.
+            </td>
             <td align="center">3x</td>
         </tr>
     </table>
@@ -175,13 +193,17 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
         <tr>
             <td>Contractor Counter</td>
             <td><img src="../pics/960000008.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                All <b>Contractor</b> monster have its own protection do effect. To also protect your <b>Grimm Chain</b> monsters from targeting or destruction this card can be useful.
+            </td>
             <td align="center">0-1x</td>
         </tr>
         <tr>
             <td>Contractor Protection</td>
             <td><img src="../pics/960000010.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                This Trap card is an [Omni Negate] which can only be used, when you control a <b>Contractor</b> and <b>Grimm Chain</b> monster.
+            </td>
             <td align="center">2-3x</td>
         </tr>
     </table>
@@ -202,31 +224,46 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
         <tr>
             <td>Doldum, Grimm Chain of the Abyss</td>
             <td><img src="../pics/960000020.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                2 "Grimm Chain" monsters<br>
+                This card can equip at maximum 1 monster card your opponent controls to itself. An option to get rid of annoying monsters.
+            </td>
             <td align="center">1-2x</td>
         </tr>
         <tr>
             <td>Bloody Rabbit, Grimm Chain of the Abyss</td>
             <td><img src="../pics/960000021.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                2 Level 3 Spellcaster-type monsters<br>
+                [Banishes] 1 monster card your opponent controls. Helps against destruction protection effects.
+            </td>
             <td align="center">1-2x</td>
         </tr>
         <tr>
             <td>Mad Hatter, Grimm Chain of the Abyss</td>
             <td><img src="../pics/960000022.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                3 Level 3 "Grimm Chain" monsters<br>
+                Powerful [Omni Negate] card. Can be summoned by the "Eques, Grimm Chain of the Abyss" combo.
+            </td>
             <td align="center">2-3x</td>
         </tr>
         <tr>
-            <td>The Will of the Abyss</td>
+            <td>The Intention of the Abyss</td>
             <td><img src="../pics/960000023.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                2 or more Level 9 "Grimm Chain" monsters<br>
+                An ultimative boss monster, which can banish monster from your opponents Extra Deck to take away the opponent's options. Each time a card is banished the power of this card can be increased. But if this card hast do many materials it wipes the board.
+            </td>
             <td align="center">1x</td>
         </tr>
         <tr>
             <td>Headhunter, Grimm Chain of the Abyss</td>
             <td><img src="../pics/960000026.jpg" height=137px width=94px></td>
-            <td></td>
+            <td>
+                1 "Contractor" Tuner + 2 DARK monsters<br>
+                This card can [Destroy] monsters during Damage Step and [Special Summons] monsters banished monsters and change its Level to 9. Which helps to Summon "The Intention of the Abyss". A Xyz monster which uses this card as material obtain the effect to negates all effects of Special Summoned monsters, except they were banished before.
+            </td>
             <td align="center">1-2x</td>
         </tr>
     </table>
@@ -283,7 +320,7 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
 
 ## Combos
 <details>
-    <summary>Going First #1</summary>
+    <summary>Combo #1</summary>
     <table>
         <tr>
             <td valign="center">
@@ -349,7 +386,7 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
                 <img src="../pics/960000006.jpg" height=95px width=65px><br>
                 Search
             </td>
-            <td colspan="2"></td>
+            <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
             <td><h3>Step 3</h3></td>
@@ -563,14 +600,319 @@ The **Grimm Chain** archetype focuses mainly on Ritual Summons. All Main Deck **
                 <img src="../pics/960000007.jpg" height=95px width=65px><br>
                 Floodgate
             </td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+    </table>
+</details>
+
+<br>
+
+<details>
+    <summary>Combo #2</summary>
+    <table>
+        <tr>
+            <td valign="center">
+                <h3>Opening hand (Option A)</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/960000001.jpg" height=95px width=65px>
+            </td>
             <td align="center">
                 +
             </td>
             <td align="center">
+                <img src="../pics/960000006.jpg" height=95px width=65px>
+            </td>
+            <td colspan="3">&nbsp;</td>
+            <td align="center">
+                <img src="../pics/960000001.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000024.jpg" height=95px width=65px><br>
+                Search
+            </td>
+        </tr>
+        <tr>
+            <td valign="center">
+                <h3>Opening hand (Option B)</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/960000002.jpg" height=95px width=65px>
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000024.jpg" height=95px width=65px>
+            </td>
+            <td colspan="3">&nbsp;</td>
+            <td align="center">
                 <img src="../pics/960000002.jpg" height=95px width=65px><br>
-                Defense
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000006.jpg" height=95px width=65px><br>
+                Search
+            </td>
+        </tr>
+        <tr>
+            <td><h3>Ritual Summon</h3></td>
+            <td align="center">
+                <img src="../pics/960000006.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000016.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000017.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000018.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000024.jpg" height=95px width=65px><br>
+                Special
+            </td>
+        </tr>
+        <tr>
+            <td colspan="10">
+                <br>
+                <h3>→ Proceed with Step 4 of Combo #1</h3>
+                <br>
+            </td>
+        </tr>
+    </table>
+</details>
+
+<br>
+
+<details>
+    <summary>Combo #3 - Eques Combo</summary>
+    <table>
+        <tr>
+            <td valign="center">
+                <h3>Requirements</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/960000001.jpg" height=95px width=65px><br>
+                Banished
+            </td>
+            <td colspan="8">&nbsp;</td>
+        </tr>
+        <tr>
+            <td valign="center">
+                <h3>Opening hand</h3>
+            </td>
+            <td align="center">
+                <img src="../pics/960000012.jpg" height=95px width=65px>
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000006.jpg" height=95px width=65px>
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000007.jpg" height=95px width=65px>
+            </td>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>Ritual Summon</h3></td>
+            <td align="center">
+                <img src="../pics/960000006.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000016.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000017.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000018.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000012.jpg" height=95px width=65px><br>
+                Special
+            </td>
+        </tr>
+        <tr>
+            <td><h3>Trigger Effects</h3></td>
+            <td align="center">
+                <img src="../pics/960000016.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000005.jpg" height=95px width=65px><br>
+                Search
+            </td>
+            <td align="center">&nbsp;</td>
+            <td align="center">
+                <img src="../pics/960000017.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000017.jpg" height=95px width=65px><br>
+                Special
             </td>
             <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td align="center">
+                <img src="../pics/960000018.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000001.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">&nbsp;</td>
+            <td align="center">
+                <img src="../pics/960000016.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000016.jpg" height=95px width=65px><br>
+                To hand
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000016.jpg" height=95px width=65px><br>
+                Special
+            </td>
+        </tr>
+        <tr>
+            <td><h3>Now put all togeteher...</h3></td>
+            <td align="center">
+                <img src="../pics/960000007.jpg" height=95px width=65px><br>
+                Activate
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000018.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td align="center">=></td>
+            <td align="center">
+                <img src="../pics/960000019.jpg" height=95px width=65px><br>
+                Banish
+            </td>
+            <td align="center">=></td>
+            <td align="center">
+                <img src="./img/placeholder.jpg" height=95px width=65px><br>
+                Destroy
+            </td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td align="center">
+                <img src="../pics/960000016.jpg" height=95px width=65px><br>
+                Overlay
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000017.jpg" height=95px width=65px><br>
+                Overlay
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000018.jpg" height=95px width=65px><br>
+                Overlay
+            </td>
+            <td align="center">
+                =>
+            </td>
+            <td align="center">
+                <img src="../pics/960000022.jpg" height=95px width=65px><br>
+                Special
+            </td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3>End Board</h3></td>
+            <td align="center">
+                <img src="../pics/960000022.jpg" height=95px width=65px><br>
+                Negate
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000012.jpg" height=95px width=65px><br>
+                Negate
+            </td>
+            <td align="center">
+                +
+            </td>
+            <td align="center">
+                <img src="../pics/960000007.jpg" height=95px width=65px><br>
+                Floodgate
+            </td>
+            <td colspan="4">&nbsp;</td>
         </tr>
     </table>
 </details>

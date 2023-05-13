@@ -1118,8 +1118,8 @@ The **Protectrix** archetype is centered on milling Trap Cards from the player's
     <br>
     <h3>If you have any Level 4 Protectrix monster in your hand, you can Special Summon it by banishing "Protectrix Rampage".</h3>
     <br>
-     <table>
-     <tr>
+    <table>
+    <tr>
         <td><h3>Step 4</h3></td>
             <td align="center">
                 <img src="../pics/955000003.jpg" height=95px width=65px><br>
