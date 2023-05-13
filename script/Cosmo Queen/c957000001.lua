@@ -1,5 +1,6 @@
 --Cosmo Queen - Mistress Of The Stars
 local s,id=GetID()
+local CARD_COSMO_QUEEN=38999506
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
