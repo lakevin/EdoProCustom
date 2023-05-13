@@ -38,9 +38,7 @@ function s.initial_effect(c)
 	e4:SetCategory(CATEGORY_DESTROY)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_LEAVE_FIELD)
-	e4:SetCondition(s.spcon)
-	e4:SetTarget(s.sptg)
-	e4:SetOperation(s.spop)
+	e4:SetTarget(s.target)
 	c:RegisterEffect(e4)
 	
 end
