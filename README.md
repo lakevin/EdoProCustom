@@ -6,10 +6,15 @@ Welcome to my Edopro Custom Card repository. My idea is to create new archetypes
 
 ## Custom Card Details
 
--> Wiki
+### Wiki
 
-1. Grimm Chain
-2. Protectrix
-3. Draconier
+Wiki: https://github.com/lakevin/EdoProCustom/wiki
+
+### Archetypes
+
+1. Grimm Chain | 26 cards | Finished. (Support planned)
+2. Protectrix | 22 cards | Finished. (Support planned)
+3. Draconier | 24 cards | Finished. (Support planned)
+4. Cosmoverse | Working on...
 
 More infos coming soon...
