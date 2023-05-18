@@ -4,13 +4,13 @@ Welcome to my Edopro Custom Card repository. My idea is to create new archetypes
 
 (I do not own all the artworks of the cards.)
 
-## Custom Card Details
-
-### Wiki
+## Wiki
 
 Wiki: https://github.com/lakevin/EdoProCustom/wiki
 
-### Archetypes
+## Custom Card Details
+
+### Custom Archetypes
 
 1. Grimm Chain | 26 cards | Finished. (Support planned)
 2. Protectrix | 22 cards | Finished. (Support planned)
