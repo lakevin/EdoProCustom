@@ -40,7 +40,6 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_LEAVE_FIELD)
 	e4:SetTarget(s.target)
 	c:RegisterEffect(e4)
-	
 end
 
 -- (1)
