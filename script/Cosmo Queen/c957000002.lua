@@ -31,6 +31,7 @@ function s.initial_effect(c)
 	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetCountLimit(1,id)
 	e5:SetCondition(s.spcon)
 	e5:SetTarget(s.sptg)
 	e5:SetOperation(s.spop)
@@ -105,8 +106,7 @@ end
 -- (2)
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
-	return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetTurnPlayer()~=tp
-		and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
+	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -130,8 +130,7 @@ end
 
 --
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1 
-		and e:GetHandler():GetPreviousLocation()==LOCATION_SZONE
+	return e:GetHandler():GetPreviousLocation()==LOCATION_SZONE
 end
 function s.mfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_COSMOVERSE) and not c:IsType(TYPE_TOKEN)

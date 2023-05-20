@@ -93,14 +93,13 @@ function s.eqlimit(e,c)
 end
 function s.efilter(e,te)
 	return te:GetOwnerPlayer()~=e:GetHandlerPlayer() and te:GetOwner()~=e:GetOwner()
-		and te:IsActiveType(TYPE_MONSTER)
+		and (te:IsActiveType(TYPE_SPELL) or te:IsActiveType(TYPE_TRAP))
 end
 
 -- (2)
 function s.sccon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
-	return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetTurnPlayer()~=tp
-		and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
+	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
 function s.scfilter1(c,tp,mc)
 	return c:IsFaceup()
