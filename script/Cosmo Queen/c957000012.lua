@@ -1,6 +1,7 @@
 --Cosmo Queen - Galactic Sorceress
 local s,id=GetID()
 local CARD_COSMO_QUEEN=38999506
+local SET_COSMOVERSE=0x9995
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsCode,CARD_COSMO_QUEEN),s.matfilter)

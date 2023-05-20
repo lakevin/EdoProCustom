@@ -1,6 +1,7 @@
 --Cosmo Queen - Dark Empress
 local s,id=GetID()
 local CARD_COSMO_QUEEN=38999506
+local SET_COSMOVERSE=0x9995
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	Xyz.AddProcedure(c,s.matfilter,8,2)
