@@ -44,7 +44,7 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1)
 	c:RegisterEffect(e4)
-	--Can be treated as a level 3 or 5 for the Xyz summon of a WATER monster
+	--Can be treated as a level 8
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_XYZ_LEVEL)
@@ -52,6 +52,16 @@ function s.initial_effect(c)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetValue(s.xyzlv)
 	c:RegisterEffect(e5)
+	--xyz summon
+	local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(id,1))
+	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e6:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e6:SetCondition(s.spcon)
+	e6:SetTarget(s.sptg)
+	e6:SetOperation(s.spop)
+	c:RegisterEffect(e6)
 end
 s.listed_series={SET_COSMOVERSE}
 
@@ -117,7 +127,25 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-	--xyz
+end
+--
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
+end
+function s.mfilter(c)
+	return c:IsFaceup() and c:IsSetCard(SET_COSMOVERSE) and not c:IsType(TYPE_TOKEN)
+end
+function s.xyzfilter(c,mg)
+	return c:IsSetCard(SET_COSMOVERSE) and c:IsXyzSummonable(nil,mg)
+end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		local g=Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_MZONE,0,nil)
+		return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,g)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_MZONE,0,nil)
 	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,g)
 	if #xyzg>0 then
@@ -125,13 +153,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
 		Duel.XyzSummon(tp,xyz,nil,g,1,99)
 	end
-end
--- (2) Xyz Summon
-function s.mfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_COSMOVERSE) and not c:IsType(TYPE_TOKEN)
-end
-function s.xyzfilter(c,mg)
-	return c:IsSetCard(SET_COSMOVERSE) and c:IsXyzSummonable(nil,mg)
 end
 
 -- (3) Check if a Cosmo Queen is summoned on field
