@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	e5:SetOperation(s.spop)
 	c:RegisterEffect(e5)
 	-- (3) equip (graveyard)
-	local e3=Effect.CreateEffect(c)
+	--[[local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,3))
 	e3:SetCategory(CATEGORY_EQUIP)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -54,7 +54,7 @@ function s.initial_effect(c)
 	local e4=e3:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1)
-	c:RegisterEffect(e4)
+	c:RegisterEffect(e4)]]--
 end
 s.listed_series={SET_COSMOVERSE}
 
