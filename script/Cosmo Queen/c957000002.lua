@@ -118,6 +118,7 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
+	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	--change level
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -127,36 +128,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(8)
 	e1:SetReset(RESET_EVENT+0xff0000)
 	c:RegisterEffect(e1)
-	--special
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-end
--- (2) Xyz Summon
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
-end
-function s.mfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_COSMOVERSE) and not c:IsType(TYPE_TOKEN)
-end
-function s.xyzfilter(c,mg)
-	return c:IsSetCard(SET_COSMOVERSE) and c:IsXyzSummonable(nil,mg)
-end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_CHANGE_LEVEL)
-	e1:SetValue(8)
-	e1:SetReset(RESET_EVENT+0xff0000)
-	c:RegisterEffect(e1)
-	if chk==0 then
-		local g=Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_MZONE,0,nil)
-		return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,g)
-	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	--xyz
 	local g=Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_MZONE,0,nil)
 	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,g)
 	if #xyzg>0 then
@@ -164,6 +136,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
 		Duel.XyzSummon(tp,xyz,nil,g,1,99)
 	end
+end
+-- (2) Xyz Summon
+function s.mfilter(c)
+	return c:IsFaceup() and c:IsSetCard(SET_COSMOVERSE) and not c:IsType(TYPE_TOKEN)
+end
+function s.xyzfilter(c,mg)
+	return c:IsSetCard(SET_COSMOVERSE) and c:IsXyzSummonable(nil,mg)
 end
 
 -- (3) Check if a Cosmo Queen is summoned on field
