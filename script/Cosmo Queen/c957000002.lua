@@ -44,6 +44,14 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1)
 	c:RegisterEffect(e4)
+	--Can be treated as a level 3 or 5 for the Xyz summon of a WATER monster
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_XYZ_LEVEL)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetValue(s.xyzlv)
+	c:RegisterEffect(e5)
 end
 s.listed_series={SET_COSMOVERSE}
 
@@ -109,15 +117,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-	--change level
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_CHANGE_LEVEL)
-	e1:SetValue(8)
-	e1:SetReset(RESET_EVENT+0xff0000)
-	c:RegisterEffect(e1)
 	--xyz
 	local g=Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_MZONE,0,nil)
 	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,g)
@@ -138,4 +137,13 @@ end
 -- (3) Check if a Cosmo Queen is summoned on field
 function s.rtfilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsCode(CARD_COSMO_QUEEN)
+end
+
+-- (4)
+function s.xyzlv(e,c,rc)
+	if rc:IsSetCard(SET_COSMOVERSE) then
+		return 8,e:GetHandler():GetLevel()
+	else
+		return e:GetHandler():GetLevel()
+	end
 end
