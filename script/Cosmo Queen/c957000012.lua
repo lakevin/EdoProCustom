@@ -4,8 +4,8 @@ local CARD_COSMO_QUEEN=38999506
 local SET_COSMOVERSE=0x9995
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsCode,CARD_COSMO_QUEEN),s.matfilter)
 	c:EnableReviveLimit()
+	Fusion.AddProcCodeFun(c,CARD_COSMO_QUEEN,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),1,true)
 	--Name becomes "Cosmo Queen" while on the field on in GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -47,10 +47,6 @@ function s.initial_effect(c)
 	e4:SetTarget(s.thtg)
 	e4:SetOperation(s.thop)
 	c:RegisterEffect(e4)
-end
--- fusion
-function s.matfilter(c,fc,sumtype,tp)
-	return c:IsRace(RACE_SPELLCASTER) or c:IsSetCard(SET_COSMOVERSE)
 end
 
 -- (1)
