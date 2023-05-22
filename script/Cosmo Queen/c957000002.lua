@@ -45,14 +45,6 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1)
 	c:RegisterEffect(e4)
-	--Can be treated as a level 8
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_XYZ_LEVEL)
-	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetValue(s.xyzlv)
-	c:RegisterEffect(e5)
 end
 s.listed_series={SET_COSMOVERSE}
 
@@ -110,7 +102,7 @@ function s.xyzcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
 function s.mfilter(c,tp,mc)
-	return c:IsFaceup()
+	return c:IsFaceup() and c:IsSetCard(SET_COSMOVERSE)
 		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,tp,Group.FromCards(c,mc))
 end
 function s.xyzfilter(c,tp,mg)
@@ -134,6 +126,14 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
+	--change level
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetValue(8)
+	e1:SetReset(RESET_EVENT+0xff0000)
+	c:RegisterEffect(e1)
+	--xyz summon
 	local mg=Group.FromCards(c,tc)
 	local g=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,tp,mg)
 	if #g>0 then
