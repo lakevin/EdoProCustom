@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e1:SetValue(CARD_COSMO_QUEEN)
 	c:RegisterEffect(e1)
-	-- (1) If special summoned, inflict 200 damage per "Fire Formation" spell/trap 
+	-- (1) If special summoned, inflict 200 damage per "Cosmo Queen" spell/trap 
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DAMAGE)
@@ -50,17 +50,14 @@ function s.initial_effect(c)
 end
 
 -- (1)
-function s.damfilter(c)
-	return c:IsFaceup() and c:IsCode(CARD_COSMO_QUEEN)
-end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=Duel.GetMatchingGroupCount(s.damfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
+	local ct=Duel.GetMatchingGroupCount(aux.FilterBoolFunction(Card.IsCode,CARD_COSMO_QUEEN),tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
 	if chk==0 then return ct>0 end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ct*200)
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroupCount(s.damfilter,tp,LOCATION_ONFIELD,0,nil)
+	local ct=Duel.GetMatchingGroupCount(aux.FilterBoolFunction(Card.IsCode,CARD_COSMO_QUEEN),tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	if ct>0 then
 		Duel.Damage(p,ct*200,REASON_EFFECT)
