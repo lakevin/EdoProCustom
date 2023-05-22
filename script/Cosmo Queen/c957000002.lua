@@ -114,7 +114,7 @@ function s.mfilter(c,tp,mc)
 		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,Group.FromCards(c,mc))
 end
 function s.xyzfilter(c,tp,mg)
-	return c:IsSetCard(SET_COSMOVERSE) and c:IsType(TYPE_XYZ) and c:IsXyzSummonable(nil,mg,2,2)
+	return c:IsSetCard(SET_COSMOVERSE) and c:IsXyzSummonable(nil,mg,2,2)
 end
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
