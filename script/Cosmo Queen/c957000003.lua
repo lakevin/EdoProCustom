@@ -143,8 +143,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
 function s.fscon(e,tp)
-	local c=e:GetHandler()
-	return c:GetSummonType()==SUMMON_TYPE_SPECIAL+1 and c:IsPreviousLocation(LOCATION_SZONE)
+	return e:GetHandler():IsPreviousLocation(LOCATION_SZONE)
 end
 
 
