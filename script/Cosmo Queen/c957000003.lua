@@ -36,6 +36,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetCondition(s.fscon)
 	e3:SetTarget(Fusion.SummonEffTG(table.unpack(params)))
 	e3:SetOperation(Fusion.SummonEffOP(table.unpack(params)))
 	c:RegisterEffect(e3)
@@ -141,20 +142,10 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
---
-function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=Duel.GetMatchingGroupCount(aux.FilterBoolFunction(Card.IsCode,CARD_COSMO_QUEEN),tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
-	if chk==0 then return ct>0 end
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ct*200)
+function s.fscon(c,tp)
+	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousControler(tp)
 end
-function s.damop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroupCount(aux.FilterBoolFunction(Card.IsCode,CARD_COSMO_QUEEN),tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
-	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	if ct>0 then
-		Duel.Damage(p,ct*200,REASON_EFFECT)
-	end
-end
+
 
 -- (3) Check if a Cosmo Queen is summoned on field
 function s.rtfilter(c,tp)
