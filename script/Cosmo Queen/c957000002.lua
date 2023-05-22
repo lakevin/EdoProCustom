@@ -113,8 +113,8 @@ function s.mfilter(c,tp,mc)
 	return c:IsSetCard(SET_COSMOVERSE) 
 		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,Group.FromCards(c,mc))
 end
-function s.xyzfilter(c,tp,mg)
-	return c:IsSetCard(SET_COSMOVERSE) and c:IsXyzSummonable(nil,mg,2,2)
+function s.xyzfilter(c,mg)
+	return c:IsSetCard(SET_COSMOVERSE) and c:IsType(TYPE_XYZ) and c:IsXyzSummonable(nil,mg,2,2)
 end
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -134,6 +134,7 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
+	Duel.BreakEffect()
 	local mg=Group.FromCards(c,tc)
 	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,mg)
 	if #xyzg>0 then
