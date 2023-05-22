@@ -110,11 +110,11 @@ function s.xyzcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
 function s.mfilter(c,tp,mc)
-	return c:IsSetCard(SET_COSMOVERSE) 
-		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,Group.FromCards(c,mc))
+	return c:IsFaceup()
+		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,tp,Group.FromCards(c,mc))
 end
 function s.xyzfilter(c,mg)
-	return c:IsSetCard(SET_COSMOVERSE) and Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsXyzSummonable(nil,mg,2,2)
+	return Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsXyzSummonable(nil,mg,2,2)
 end
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -134,13 +134,12 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
-	Duel.BreakEffect()
 	local mg=Group.FromCards(c,tc)
-	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,tp,mg)
-	if #xyzg>0 then
+	local g=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,tp,mg)
+	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
-		Duel.XyzSummon(tp,xyz,nil,mg)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.XyzSummon(tp,sg:GetFirst(),c,mg)
 	end
 end
 
