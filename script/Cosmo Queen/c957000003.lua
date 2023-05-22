@@ -30,6 +30,15 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Special summon (deck)
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_DAMAGE)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTarget(s.damtg)
+	e3:SetOperation(s.damop)
+	c:RegisterEffect(e3)
+	--[[local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e3:SetType(EFFECT_TYPE_IGNITION)
@@ -38,7 +47,7 @@ function s.initial_effect(c)
 	e3:SetCost(s.cost)
 	e3:SetTarget(s.extg)
 	e3:SetOperation(s.exop)
-	c:RegisterEffect(e3)
+	c:RegisterEffect(e3)]]--
 	-- (3) equip (graveyard)
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
@@ -132,43 +141,17 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
 --
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(100)
-	return true
+function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct=Duel.GetMatchingGroupCount(aux.FilterBoolFunction(Card.IsCode,CARD_COSMO_QUEEN),tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
+	if chk==0 then return ct>0 end
+	Duel.SetTargetPlayer(1-tp)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ct*200)
 end
-function s.excfilter(c)
-	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER) and c:HasLevel()
-end
-function s.exfilter(c,e,tp,chk)
-	return c:IsSetCard(SET_COSMOVERSE) and c:IsType(TYPE_FUSION) and (not chk or Duel.GetLocationCountFromEx(tp,tp,nil,c)>0) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
-end
-function s.exkfilter(c,sg,tp)
-	return Duel.GetLocationCountFromEx(tp,tp,sg,c)>0 and c:IsLevel(sg:GetSum(Card.GetOriginalLevel))
-end
-function s.excheck(sg,tp,exg,mg)
-	return mg:IsExists(s.exkfilter,1,nil,sg,tp)
-end
-function s.extg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local mg=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
-	if chk==0 then
-		if e:GetLabel()~=100 then return false end
-		e:SetLabel(0)
-		return Duel.CheckReleaseGroupCost(tp,s.excfilter,2,false,s.excheck,nil,mg)
-	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroupCost(tp,s.excfilter,2,99,false,s.excheck,nil,mg)
-	e:SetLabel(g:GetSum(Card.GetOriginalLevel))
-	Duel.Release(g,REASON_COST)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function s.exop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCountFromEx(tp)<1 then return end
-	local g=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil,e,tp,true):Filter(Card.IsLevel,nil,e:GetLabel())
-	if #g>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local tc=g:Select(tp,1,1,nil):GetFirst()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
-		tc:CompleteProcedure()
+function s.damop(e,tp,eg,ep,ev,re,r,rp)
+	local ct=Duel.GetMatchingGroupCount(aux.FilterBoolFunction(Card.IsCode,CARD_COSMO_QUEEN),tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
+	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+	if ct>0 then
+		Duel.Damage(p,ct*200,REASON_EFFECT)
 	end
 end
 
