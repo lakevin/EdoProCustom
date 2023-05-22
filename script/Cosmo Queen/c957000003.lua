@@ -28,14 +28,16 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	local params = {nil,Fusion.CheckWithHandler(Fusion.OnFieldMat(aux.FilterBoolFunction(Card.IsSetCard,0x9995))),nil,nil,Fusion.ForcedHandler}
+	--Special summon (deck)
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
-	e3:SetTarget(Fusion.SummonEffTG(table.unpack(params)))
-	e3:SetOperation(Fusion.SummonEffOP(table.unpack(params)))
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	e3:SetCountLimit(1,{id,2})
+	e3:SetCost(s.cost)
+	e3:SetTarget(s.extg)
+	e3:SetOperation(s.exop)
 	c:RegisterEffect(e3)
 	-- (3) equip (graveyard)
 	local e4=Effect.CreateEffect(c)
@@ -115,9 +117,6 @@ function s.efilter(e,te)
 end
 
 -- (2) Special Summon itself
-function s.fscon(c,tp)
-	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousControler(tp)
-end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
@@ -131,6 +130,46 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+end
+--
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	e:SetLabel(100)
+	return true
+end
+function s.excfilter(c)
+	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER) and c:HasLevel()
+end
+function s.exfilter(c,e,tp,chk)
+	return c:IsSetCard(SET_COSMOVERSE) and c:IsType(TYPE_FUSION) and (not chk or Duel.GetLocationCountFromEx(tp,tp,nil,c)>0) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
+end
+function s.exkfilter(c,sg,tp)
+	return Duel.GetLocationCountFromEx(tp,tp,sg,c)>0 and c:IsLevel(sg:GetSum(Card.GetOriginalLevel))
+end
+function s.excheck(sg,tp,exg,mg)
+	return mg:IsExists(s.exkfilter,1,nil,sg,tp)
+end
+function s.extg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local mg=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
+	if chk==0 then
+		if e:GetLabel()~=100 then return false end
+		e:SetLabel(0)
+		return Duel.CheckReleaseGroupCost(tp,s.excfilter,2,false,s.excheck,nil,mg)
+	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local g=Duel.SelectReleaseGroupCost(tp,s.excfilter,2,99,false,s.excheck,nil,mg)
+	e:SetLabel(g:GetSum(Card.GetOriginalLevel))
+	Duel.Release(g,REASON_COST)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function s.exop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCountFromEx(tp)<1 then return end
+	local g=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil,e,tp,true):Filter(Card.IsLevel,nil,e:GetLabel())
+	if #g>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local tc=g:Select(tp,1,1,nil):GetFirst()
+		Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
+		tc:CompleteProcedure()
+	end
 end
 
 -- (3) Check if a Cosmo Queen is summoned on field
