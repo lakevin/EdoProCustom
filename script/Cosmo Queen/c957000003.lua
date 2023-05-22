@@ -29,8 +29,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	--Special summon (deck)
-	local params = {aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE)}
-	--local params = {nil,Fusion.CheckWithHandler(Fusion.OnFieldMat(aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE))),nil,nil,Fusion.ForcedHandler}
+	--local params = {aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE)}
+	local params = {nil,aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE),nil,nil,Fusion.ForcedHandler}
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
@@ -41,16 +41,6 @@ function s.initial_effect(c)
 	e3:SetTarget(Fusion.SummonEffTG(table.unpack(params)))
 	e3:SetOperation(Fusion.SummonEffOP(table.unpack(params)))
 	c:RegisterEffect(e3)
-	--[[local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,{id,2})
-	e3:SetCost(s.cost)
-	e3:SetTarget(s.extg)
-	e3:SetOperation(s.exop)
-	c:RegisterEffect(e3)]]--
 	-- (3) equip (graveyard)
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
