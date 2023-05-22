@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	--Special summon (deck)
-	local params = {aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE)}
+	local params = {nil,Fusion.CheckWithHandler(Fusion.OnFieldMat(aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE))),nil,nil,Fusion.ForcedHandler}
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
