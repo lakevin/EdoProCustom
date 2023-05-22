@@ -15,6 +15,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.eqop)
 	c:RegisterEffect(e1)
 	-- (2) special summon
+	local params2 = {nil,Fusion.CheckWithHandler(Fusion.OnFieldMat),s.fextra,nil,Fusion.ForcedHandler}
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -25,22 +26,24 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.spcon)
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
+	e2:SetTarget(Fusion.SummonEffTG(table.unpack(params2)))
+	e2:SetOperation(Fusion.SummonEffOP(table.unpack(params2)))
+	--e2:SetTarget(s.sptg)
+	--e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	--Special summon (deck)
-	--local params = {aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE)}
-	local params = {nil,aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE),nil,nil,Fusion.ForcedHandler}
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetCondition(s.fscon)
-	e3:SetTarget(Fusion.SummonEffTG(table.unpack(params)))
-	e3:SetOperation(Fusion.SummonEffOP(table.unpack(params)))
-	c:RegisterEffect(e3)
+	local params = {aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE)}
+	--local params = {nil,Fusion.CheckWithHandler(Fusion.OnFieldMat(aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE))),nil,nil,Fusion.ForcedHandler}
+	--local e3=Effect.CreateEffect(c)
+	--e3:SetDescription(aux.Stringid(id,0))
+	--e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
+	--e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	--e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	--e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_PLAYER_TARGET)
+	--e3:SetCondition(s.fscon)
+	--e3:SetTarget(Fusion.SummonEffTG(table.unpack(params)))
+	--e3:SetOperation(Fusion.SummonEffOP(table.unpack(params)))
+	--c:RegisterEffect(e3)
 	-- (3) equip (graveyard)
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
@@ -136,6 +139,14 @@ end
 function s.fscon(e,tp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_SZONE)
 end
+--
+function s.mfilter(c,tp)
+	return c:IsFaceup() and c:IsAbleToGrave() and c:IsOriginalType(TYPE_MONSTER)
+end
+function s.fextra(e,tp,mg)
+	return Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_SZONE,0,nil)
+end
+
 
 
 -- (3) Check if a Cosmo Queen is summoned on field
