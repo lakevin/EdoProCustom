@@ -113,7 +113,7 @@ function s.mfilter(c,tp,mc)
 	return c:IsFaceup()
 		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,tp,Group.FromCards(c,mc))
 end
-function s.xyzfilter(c,mg)
+function s.xyzfilter(c,tp,mg)
 	return Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsXyzSummonable(nil,mg,2,2)
 end
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
