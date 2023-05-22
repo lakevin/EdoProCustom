@@ -24,9 +24,9 @@ function s.initial_effect(c)
 	e2:SetHintTiming(0,TIMING_MAIN_END+TIMING_BATTLE_START+TIMING_BATTLE_END)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(s.sccon)
-	e2:SetTarget(s.sctg)
-	e2:SetOperation(s.scop)
+	e2:SetCondition(s.syncon)
+	e2:SetTarget(s.syntg)
+	e2:SetOperation(s.synop)
 	c:RegisterEffect(e2)
 	-- (3) equip (graveyard)
 	local e3=Effect.CreateEffect(c)
@@ -99,37 +99,37 @@ function s.efilter(e,te)
 end
 
 -- (2)
-function s.sccon(e,tp,eg,ep,ev,re,r,rp)
+function s.syncon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
-function s.scfilter1(c,tp,mc)
+function s.synfilter1(c,tp,mc)
 	return c:IsFaceup()
-		and Duel.IsExistingMatchingCard(s.scfilter2,tp,LOCATION_EXTRA,0,1,nil,tp,Group.FromCards(c,mc))
+		and Duel.IsExistingMatchingCard(s.synfilter2,tp,LOCATION_EXTRA,0,1,nil,tp,Group.FromCards(c,mc))
 end
-function s.scfilter2(c,tp,mg)
+function s.synfilter2(c,tp,mg)
 	return Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsSynchroSummonable(nil,mg)
 end
-function s.sctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.syntg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.scfilter1(chkc,tp,c) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.synfilter1(chkc,tp,c) end
 	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingTarget(s.scfilter1,tp,LOCATION_MZONE,0,1,nil,tp,c) end
+		and Duel.IsExistingTarget(s.synfilter1,tp,LOCATION_MZONE,0,1,nil,tp,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SelectTarget(tp,s.scfilter1,tp,LOCATION_MZONE,0,1,1,nil,tp,c)
+	Duel.SelectTarget(tp,s.synfilter1,tp,LOCATION_MZONE,0,1,1,nil,tp,c)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function s.scop(e,tp,eg,ep,ev,re,r,rp)
+function s.synop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
 	local mg=Group.FromCards(c,tc)
-	local g=Duel.GetMatchingGroup(s.scfilter2,tp,LOCATION_EXTRA,0,nil,tp,mg)
+	local g=Duel.GetMatchingGroup(s.synfilter2,tp,LOCATION_EXTRA,0,nil,tp,mg)
 	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,1,nil)
