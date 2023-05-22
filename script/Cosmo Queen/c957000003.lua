@@ -15,7 +15,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.eqop)
 	c:RegisterEffect(e1)
 	-- (2) special summon
-	local params = {aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE)}
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -25,27 +24,38 @@ function s.initial_effect(c)
 	e2:SetHintTiming(0,TIMING_MAIN_END+TIMING_BATTLE_START+TIMING_BATTLE_END)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(s.fscon)
-	e2:SetTarget(s.fstg)
-	e2:SetOperation(s.fsop)
+	e2:SetCondition(s.spcon)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	-- (3) equip (graveyard)
+	local params = {aux.FilterBoolFunction(Card.IsSetCard,SET_COSMOVERSE)}
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_EQUIP)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
-	e3:SetCountLimit(1)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(s.rtfilter,1,nil,tp) end)
-	e3:SetTarget(s.eqtg)
-	e3:SetOperation(s.eqop)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCondition(s.fscon)
+	e3:SetTarget(Fusion.SummonEffTG(table.unpack(params)))
+	e3:SetOperation(Fusion.SummonEffOP(table.unpack(params)))
 	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	-- (3) equip (graveyard)
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,2))
+	e4:SetCategory(CATEGORY_EQUIP)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_SUMMON_SUCCESS)
 	e4:SetCountLimit(1)
+	e4:SetProperty(EFFECT_FLAG_DELAY)
+	e4:SetRange(LOCATION_GRAVE)
+	e4:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(s.rtfilter,1,nil,tp) end)
+	e4:SetTarget(s.eqtg)
+	e4:SetOperation(s.eqop)
 	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetCountLimit(1)
+	c:RegisterEffect(e5)
 end
 
 -- (1)
@@ -107,30 +117,25 @@ function s.efilter(e,te)
 end
 
 -- (2) Special Summon itself
-function s.fscon(e,tp,eg,ep,ev,re,r,rp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
-function s.fstg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function s.fsop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-	--fusion summon
-	local params = {aux.FilterBoolFunction(Card.IsSetCard,0x7)}
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,1))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
-	e1:SetTarget(Fusion.SummonEffTG(table.unpack(params)))
-	e1:SetOperation(Fusion.SummonEffOP(table.unpack(params)))
-	c:RegisterEffect(e1)
+end
+function s.cfilter(c,tp)
+	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousControler(tp)
+end
+function s.fscon(e,tp,eg,ep,ev,re,r,rp)
+	return not eg:IsContains(e:GetHandler()) and eg:IsExists(s.cfilter,1,nil,tp)
 end
 
 -- (3) Check if a Cosmo Queen is summoned on field
