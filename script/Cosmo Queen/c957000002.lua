@@ -102,7 +102,7 @@ function s.xyzcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
 function s.mfilter(c,tp,mc)
-	return c:IsFaceup() and c:IsSetCard(SET_COSMOVERSE)
+	return c:IsFaceup()
 		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,tp,Group.FromCards(c,mc))
 end
 function s.xyzfilter(c,tp,mg)
