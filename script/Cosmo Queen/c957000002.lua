@@ -46,13 +46,13 @@ function s.initial_effect(c)
 	e4:SetCountLimit(1)
 	c:RegisterEffect(e4)
 	--Can be treated as a level 8
-	--[[local e5=Effect.CreateEffect(c)
+	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_XYZ_LEVEL)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetValue(s.xyzlv)
-	c:RegisterEffect(e5)]]--
+	c:RegisterEffect(e5)
 end
 s.listed_series={SET_COSMOVERSE}
 
@@ -109,20 +109,20 @@ function s.xyzcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
-function s.mfilter(c,e,tp,tc)
+function s.mfilter(c,tp,mc)
 	return c:IsSetCard(SET_COSMOVERSE) 
-		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,Group.FromCards(c,tc))
+		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,Group.FromCards(c,mc))
 end
-function s.xyzfilter(c,mg)
+function s.xyzfilter(c,tp,mg)
 	return c:IsSetCard(SET_COSMOVERSE) and c:IsType(TYPE_XYZ) and c:IsXyzSummonable(nil,mg,2,2)
 end
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.mfilter(chkc,tp,c) end
 	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingTarget(s.mfilter,tp,LOCATION_MZONE,0,1,c,e,tp,c) end
+		and Duel.IsExistingTarget(s.mfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	Duel.SelectTarget(tp,s.mfilter,tp,LOCATION_MZONE,0,1,1,nil,tp,c)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
@@ -136,14 +136,14 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
 	Duel.BreakEffect()
 	--change level
-	local e1=Effect.CreateEffect(c)
+	--[[local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_CHANGE_LEVEL)
 	e1:SetValue(8)
 	e1:SetReset(RESET_EVENT+0xff0000)
-	c:RegisterEffect(e1)
+	c:RegisterEffect(e1)]]--
 	--xyz summon
 	local mg=Group.FromCards(c,tc)
 	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,mg)
