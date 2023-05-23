@@ -46,7 +46,7 @@ function s.mfilter(c,xyz,sumtype,tp)
 	return c:IsAttribute(ATTRIBUTE_DARK,xyz,sumtype,tp)
 end
 function s.ovfilter(c,tp,lc)
-	return c:IsFaceup() and c:IsCode(CARD_COSMO_QUEEN,lc,SUMMON_TYPE_XYZ,tp) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
+	return c:IsFaceup() and c:IsCode(CARD_COSMO_QUEEN) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
 end
 function s.xyzop(e,tp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
