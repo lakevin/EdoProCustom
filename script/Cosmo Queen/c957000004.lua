@@ -46,6 +46,8 @@ function s.initial_effect(c)
 	e4:SetCountLimit(1)
 	c:RegisterEffect(e4)
 end
+s.listed_series={SET_COSMOVERSE}
+s.listed_names={id,CARD_COSMO_QUEEN}
 
 -- (1)
 function s.filter(c)

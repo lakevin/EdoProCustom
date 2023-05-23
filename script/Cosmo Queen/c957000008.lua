@@ -53,6 +53,9 @@ function s.initial_effect(c)
 	e5:SetOperation(s.spop)
 	c:RegisterEffect(e5)
 end
+s.listed_series={SET_COSMOVERSE}
+s.listed_names={id,CARD_COSMO_QUEEN}
+
 -- xyz
 function s.matfilter(c,xyz,sumtype,tp)
 	return c:IsRace(RACE_SPELLCASTER,xyz,sumtype,tp) and c:IsAttribute(ATTRIBUTE_DARK,xyz,sumtype,tp)

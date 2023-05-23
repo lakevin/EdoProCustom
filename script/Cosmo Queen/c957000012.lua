@@ -48,6 +48,8 @@ function s.initial_effect(c)
 	e4:SetOperation(s.thop)
 	c:RegisterEffect(e4)
 end
+s.listed_series={SET_COSMOVERSE}
+s.listed_names={id,CARD_COSMO_QUEEN}
 
 -- (1)
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
