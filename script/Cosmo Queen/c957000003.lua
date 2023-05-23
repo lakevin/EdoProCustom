@@ -108,7 +108,11 @@ function s.efilter(e,te)
 		and te:IsActiveType(TYPE_MONSTER)
 end
 
--- (2)
+-- (2) Special Summon itself
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	local ph=Duel.GetCurrentPhase()
+	return not e:GetHandler():IsStatus(STATUS_CHAINING) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
+end
 function s.mfilter(c,tp)
 	return c:IsFaceup() and c:IsAbleToGrave() and c:IsOriginalType(TYPE_MONSTER)
 end
