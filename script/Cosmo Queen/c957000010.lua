@@ -58,10 +58,8 @@ function s.xyzop(e,tp,chk)
 end
 
 -- (2)
-function s.val(e,c)
-	function s.atkval(e,c)
-		return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,SET_COSMOVERSE),e:GetHandlerPlayer(),LOCATION_SZONE,0,nil)*-500
-	end
+function s.atkval(e,c)
+	return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,SET_COSMOVERSE),e:GetHandlerPlayer(),LOCATION_SZONE,0,nil)*-500
 end
 
 -- (3)
