@@ -55,6 +55,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if g:GetFirst():GetType()==TYPE_SYNCHRO then ct=TYPE_SYNCHRO end
 	if g:GetFirst():GetType()==TYPE_XYZ then ct=TYPE_XYZ end
 	if g:GetFirst():GetType()==TYPE_LINK then ct=TYPE_LINK end
+	print(ct)
 	e:SetLabel(ct)
 	Duel.Release(g,REASON_COST)
 end
