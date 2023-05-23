@@ -1,4 +1,4 @@
---Cosmo Queen - Galactic Sorceress
+--Cosmo Queen - Starbust Princess
 local s,id=GetID()
 local CARD_COSMO_QUEEN=38999506
 local SET_COSMOVERSE=0x9995
@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DAMAGE)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTarget(s.damtg)

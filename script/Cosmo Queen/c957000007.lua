@@ -9,17 +9,17 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetCountLimit(1)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	-- (2) negate
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DISABLE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
-	e2:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
@@ -43,14 +43,14 @@ end
 
 -- (2)
 function s.cfilter(c)
-	return c:IsCode(CARD_COSMO_QUEEN) and c:IsType(TYPE_RITUAL|TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ)
+	return c:IsCode(CARD_COSMO_QUEEN) and c:IsType(TYPE_RITUAL|TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
+	--[[if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
 		return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,nil,nil)
-	end
+	end]]--
 	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,nil,nil)
 	e:SetLabel(g:GetFirst():GetType())
 	Duel.Release(g,REASON_COST)
