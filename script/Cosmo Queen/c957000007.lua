@@ -49,12 +49,18 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,nil,nil) end
 	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,nil,nil)
-	e:SetLabel(g:GetFirst():GetType())
+	e:SetLabel(g:GetFirst())
 	Duel.Release(g,REASON_COST)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=e:GetLabel()
+	local tc=e:GetLabel()
+	local ct=nil
+	if tc:IsType(TYPE_RITUAL) then ct=TYPE_RITUAL end
+	if tc:IsType(TYPE_FUSION) then ct=TYPE_FUSION end
+	if tc:IsType(TYPE_SYNCHRO) then ct=TYPE_SYNCHRO end
+	if tc:IsType(TYPE_XYZ) then ct=TYPE_XYZ end
+	if tc:IsType(TYPE_LINK) then ct=TYPE_LINK end
 	--Negate the effects of monsters of that type while on the field
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
