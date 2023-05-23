@@ -46,7 +46,7 @@ end
 
 -- (2)
 function s.tgcon(e)
-	return not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,CARD_COSMO_QUEEN),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	return not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_COSMO_QUEEN),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 
 -- (3)
