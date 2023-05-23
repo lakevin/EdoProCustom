@@ -19,24 +19,27 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- (2) atk down
 	local e3=Effect.CreateEffect(c)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetTargetRange(0,LOCATION_MZONE)
+	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetValue(s.val)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetTargetRange(0,LOCATION_MZONE)
+	e3:SetValue(s.atkval)
 	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e4)
 	-- (3) negate
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_FREE_CHAIN)
-	e4:SetCountLimit(1)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
-	e4:SetCost(s.cost)
-	e4:SetTarget(s.target)
-	e4:SetOperation(s.operation)
-	c:RegisterEffect(e4,false,REGISTER_FLAG_DETACH_XMAT)
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,1))
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetCountLimit(1)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
+	e5:SetCost(s.cost)
+	e5:SetTarget(s.target)
+	e5:SetOperation(s.operation)
+	c:RegisterEffect(e5,false,REGISTER_FLAG_DETACH_XMAT)
 end
 s.listed_series={SET_COSMOVERSE}
 s.listed_names={id,CARD_COSMO_QUEEN}
@@ -56,7 +59,9 @@ end
 
 -- (2)
 function s.val(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsFaceup,c:GetControler(),LOCATION_SZONE,0,nil)*-300
+	function s.atkval(e,c)
+		return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,SET_COSMOVERSE),e:GetHandlerPlayer(),LOCATION_SZONE,0,nil)*-500
+	end
 end
 
 -- (3)
