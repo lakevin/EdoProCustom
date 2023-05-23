@@ -49,7 +49,14 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,nil,nil) end
 	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,nil,nil)
-	e:SetLabel(g:GetFirst():GetType())
+	local tc=g:GetFirst()
+	local ct=nil
+	if tc:GetType()==TYPE_RITUAL then ct=TYPE_RITUAL end
+	if tc:GetType()==TYPE_FUSION then ct=TYPE_FUSION end
+	if tc:GetType()==TYPE_SYNCHRO then ct=TYPE_SYNCHRO end
+	if tc:GetType()==TYPE_XYZ then ct=TYPE_XYZ end
+	if tc:GetType()==TYPE_LINK then ct=TYPE_LINK end
+	e:SetLabel(ct)
 	Duel.Release(g,REASON_COST)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
