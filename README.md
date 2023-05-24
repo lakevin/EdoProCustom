@@ -8,13 +8,28 @@ Welcome to my Edopro Custom Card repository. My idea is to create new archetypes
 
 Wiki: https://github.com/lakevin/EdoProCustom/wiki
 
-## Custom Card Details
+## Details
 
-### Custom Archetypes
+### Completed Archetypes
 
 1. Grimm Chain | 26 cards | Finished. (Support planned)
 2. Protectrix | 22 cards | Finished. (Support planned)
 3. Draconier | 24 cards | Finished. (Support planned)
-4. Cosmoverse | Working on...
+4. Cosmoverse | 14/14 cards | Finished.
 
-More infos coming soon...
+### Planned Archetypes
+
+1. Holy Grail
+2. Kniguards
+3. Warflame
+4. ???
+
+## Planned Updates
+
+### June 2023
+
+<!--
+<img src="./pics/955000023.jpg" width="200" height="292">
+<img src="./pics/955000024.jpg" width="200" height="292">
+<img src="./pics/955000025.jpg" width="200" height="292">
+-->
