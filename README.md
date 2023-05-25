@@ -28,8 +28,8 @@ Wiki: https://github.com/lakevin/EdoProCustom/wiki
 
 ### June 2023
 
-<!--
-<img src="./pics/955000023.jpg" width="200" height="292">
-<img src="./pics/955000024.jpg" width="200" height="292">
-<img src="./pics/955000025.jpg" width="200" height="292">
--->
+| Image                                                     | Name                        |
+| --------------------------------------------------------- | --------------------------- |
+| <img src="./pics/955000023.jpg" width="200" height="292"> | Protectrix Greatsword       |
+| <img src="./pics/955000024.jpg" width="200" height="292"> | Protectrix CR-Unit Unicorn  |
+| <img src="./pics/955000025.jpg" width="200" height="292"> | Protectrix Stellaria        |
