@@ -30,6 +30,6 @@ Wiki: https://github.com/lakevin/EdoProCustom/wiki
 
 | Image                                                     | Name                        |
 | --------------------------------------------------------- | --------------------------- |
-| <img src="./pics/955000023.jpg" width="200" height="292"> | Protectrix Greatsword       |
-| <img src="./pics/955000024.jpg" width="200" height="292"> | Protectrix CR-Unit Unicorn  |
-| <img src="./pics/955000025.jpg" width="200" height="292"> | Protectrix Stellaria        |
+| <img src="./pics/955000023.jpg" width="150" height="219"> | Protectrix Greatsword       |
+| <img src="./pics/955000024.jpg" width="150" height="219"> | Protectrix CR-Unit Unicorn  |
+| <img src="./pics/955000025.jpg" width="150" height="219"> | Protectrix Stellaria        |
