@@ -31,7 +31,7 @@ Wiki: https://github.com/lakevin/EdoProCustom/wiki
 #### Protectrix Greatsword 
 <img src="./pics/955000023.jpg" width="100" height="146">
 ① If you control no other monsters, you can Special Summon this card from your hand.
-② (Quick Effect) You can Tribute this card; reveal 3 "Protectrix" Trap cards with different names from your Deck, your opponent randomly picks 1 for you to Special Summon to your field, and you send the rest to the Graveyard.
+② (Quick Effect) You can Tribute this card; reveal 3 "Protectrix" Trap cards with different names from your Deck, your opponent randomly picks 1 for you to add to your hand, and you send the rest to the Graveyard.
 ③ If this card is destroyed: Add 1 "Protectrix" monster from your Deck to your hand.
 
 #### Protectrix CR-Unit Unicorn
