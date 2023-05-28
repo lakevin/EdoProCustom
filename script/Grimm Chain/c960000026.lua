@@ -1,5 +1,7 @@
 -- Headhunter, The Grimm Chain
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	--Synchro summon
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(Card.IsAttribute,ATTRIBUTE_DARK),2,99,s.matfilter)
@@ -21,16 +23,16 @@ function s.initial_effect(c)
 	e2:SetOperation(s.efop)
 	c:RegisterEffect(e2)
 end
-s.listed_series={0x9998,0x9999}
+s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
 
 -- synchro material
 function s.matfilter(c,scard,sumtype,tp)
-	return c:IsSetCard(0x9998,scard,sumtype,tp)
+	return c:IsSetCard(SET_CONTRACTOR,scard,sumtype,tp)
 end
 
 -- (1) cannot be targeted + destroyed
 function s.spfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x9999) and c:HasLevel() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsSetCard(SET_GRIMM_CHAIN) and c:HasLevel() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -84,12 +86,11 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(rc)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_DISABLE)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(s.discon)
-	e1:SetTarget(s.distg)
-	e1:SetOperation(s.disop)
+	e1:SetRange(LOCATION_EXTRA)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	rc:RegisterEffect(e1,true)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
@@ -100,42 +101,52 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 		rc:RegisterEffect(e2,true)
 	end
 end
-function s.dfilter(c,eg)
-	return c:IsFaceup() and c:IsSetCard(0x9999) and (c:IsLevel(9) or c:IsRank(9)) and not eg:IsContains(c)
+
+function s.rmfilter(c)
+	return c:IsAbleToRemove() and c:IsRitualMonster() and c:IsSetCard(SET_GRIMM_CHAIN)
 end
-function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(aux.NOT(Card.IsSummonLocation),1,nil,LOCATION_REMOVED) and Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_MZONE,0,1,nil,eg)
+function s.tfilter(c,e)
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_EFFECT) and not c:IsPreviousLocation(LOCATION_REMOVED) and c:IsRelateToEffect(e)
 end
-function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=eg:Filter(aux.NOT(Card.IsSummonLocation),nil,LOCATION_REMOVED)
-	Duel.SetTargetCard(g)
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,#g,0,0)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return eg and eg:IsExists(aux.FaceupFilter(s.tfilter),1,nil) and Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_MZONE,0,1,nil) end end
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
-function s.filter(c,e)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsPreviousLocation(LOCATION_REMOVED) and c:IsRelateToEffect(e)
-end
-function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=eg:Filter(s.filter,nil,e)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	local tc=g:GetFirst()
-	for tc in aux.Next(g) do
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e2)
-		if tc:IsType(TYPE_TRAPMONSTER) then
-			local e3=Effect.CreateEffect(e:GetHandler())
+	if tc and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
+		if not eg or #eg<1 then return end
+		local g=eg:Filter(aux.FaceupFilter(s.tfilter),nil)
+		local c=e:GetHandler()
+		for tc in aux.Next(g) do
+			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+			--Negate the effects of the Summoned monster(s)
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e1)
+			local e2=e1:Clone()
+			e2:SetCode(EFFECT_DISABLE_EFFECT)
+			tc:RegisterEffect(e2)
+			--Cannot attack
+			local e3=Effect.CreateEffect(c)
 			e3:SetType(EFFECT_TYPE_SINGLE)
-			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+			e3:SetCode(EFFECT_CANNOT_ATTACK)
+			e3:SetValue(1)
 			e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			tc:RegisterEffect(e3)
+			--Cannot be used as material for a Fusion/Synchro/Xyz/Link Summon
+			local e4=Effect.CreateEffect(c)
+			e4:SetDescription(aux.Stringid(id,1))
+			e4:SetType(EFFECT_TYPE_SINGLE)
+			e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CLIENT_HINT)
+			e4:SetCode(EFFECT_CANNOT_BE_MATERIAL)
+			e4:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK))
+			e4:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e4)
 		end
 	end
 end

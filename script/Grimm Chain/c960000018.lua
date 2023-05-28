@@ -1,5 +1,7 @@
 -- Eques, The Chain
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	-- (1) banish
 	local e1=Effect.CreateEffect(c)
@@ -31,7 +33,7 @@ end
 
 -- (1) banish
 function s.tgfilter(c)
-	return c:IsMonster() and c:IsSetCard(0x9999) and c:IsAbleToRemove() and not c:IsCode(id)
+	return c:IsMonster() and c:IsSetCard(SET_CONTRACTOR) and c:IsAbleToRemove() and not c:IsCode(id)
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -47,7 +49,7 @@ end
 
 -- (2) special summon
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x9998) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+	return c:IsSetCard(SET_CONTRACTOR) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

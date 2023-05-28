@@ -1,5 +1,7 @@
 -- Contractor Glen Baskerville
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	--ritual level
 	Ritual.AddWholeLevelTribute(c,aux.FilterBoolFunction(Card.IsSetCard,0x9999))
@@ -32,22 +34,22 @@ function s.initial_effect(c)
 	e3:SetValue(s.indval)
 	c:RegisterEffect(e3)
 end
-s.listed_series={0x9998,0x9999}
+s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
 
 -- (1)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return (r&REASON_EFFECT)~=0
 end
 function s.filter(c)
-	return c:IsMonster() and c:IsSetCard(0x9998) and c:IsAbleToRemove() and not c:IsCode(id)
+	return c:IsMonster() and c:IsAbleToRemove() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_GRAVE)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
