@@ -44,18 +44,24 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
+		-- Check field
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2
 		or Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
+		-- Perform Special Summon
+	local c=e:GetHandler()
+	local fid=c:GetFieldID()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g1=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,SET_CONTRACTOR)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g2=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,SET_GRIMM_CHAIN)
 	g1:Merge(g2)
-	local fid=c:GetFieldID()
-	Duel.SpecialSummonStep(g1,0,tp,tp,false,false,POS_FACEUP)
-	g1:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
-	g1:KeepAlive()
+	for tc in aux.Next(g1) do
+		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
+		tc:KeepAlive()
+	end
+	Duel.SpecialSummonComplete()
+		-- Destroy during End Phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
@@ -66,7 +72,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCondition(s.descon)
 	e1:SetOperation(s.desop)
 	Duel.RegisterEffect(e1,tp)
-	Duel.SpecialSummonComplete()
+		-- Cannot Normal Summon / Locked into "Grimm Chain" monsters
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
@@ -99,16 +105,19 @@ function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,2,0,0)
 end
 function s.activate2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
+		-- Check field
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
+		-- Perform special summon
+	local c=e:GetHandler()
 	local g=Duel.GetTargetCards(e)
 	if #g==0 or #g>ft then return end
 	local fid=c:GetFieldID()
 	Duel.SpecialSummonStep(g,0,tp,tp,false,false,POS_FACEUP)
 	g:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
 	g:KeepAlive()
+		-- Destroy until end phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
@@ -120,6 +129,7 @@ function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetOperation(s.desop)
 	Duel.RegisterEffect(e1,tp)
 	Duel.SpecialSummonComplete()
+		-- Cannot Normal Summon / Locked into "Grimm Chain" monsters
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
