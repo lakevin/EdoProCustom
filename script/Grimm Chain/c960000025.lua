@@ -111,26 +111,17 @@ function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	-- Perform special summon
 	local c=e:GetHandler()
-	local fid=c:GetFieldID()
 	local g=Duel.GetTargetCards(e)
-	if #g==0 or #g>ft then return end
-	for tc in aux.Next(g) do
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
+	if #g==0 then return end
+	if #g<=ft then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,ft,ft,nil)
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+		g:Sub(sg)
+		Duel.SendtoGrave(g,REASON_RULE)
 	end
-	Duel.SpecialSummonComplete()
-	g:KeepAlive()
-		-- Destroy until end phase
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e1:SetCountLimit(1)
-	e1:SetLabel(fid)
-	e1:SetLabelObject(g)
-	e1:SetCondition(s.descon)
-	e1:SetOperation(s.desop)
-	Duel.RegisterEffect(e1,tp)
 		-- Cannot Normal Summon / Locked into "Grimm Chain" monsters
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 		local e1=Effect.CreateEffect(c)
