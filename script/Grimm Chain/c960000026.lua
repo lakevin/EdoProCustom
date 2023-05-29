@@ -109,7 +109,8 @@ function s.tfilter(c,e)
 	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_EFFECT) and not c:IsPreviousLocation(LOCATION_REMOVED) and c:IsRelateToEffect(e)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg and eg:IsExists(aux.FaceupFilter(s.tfilter),1,nil) and Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_MZONE,0,1,nil) end end
+	if chk==0 then return eg and eg:IsExists(aux.FaceupFilter(s.tfilter),1,nil) 
+		and Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
