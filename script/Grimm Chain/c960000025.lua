@@ -44,10 +44,10 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-		-- Check field
+	-- Check field
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2
 		or Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
-		-- Perform Special Summon
+	-- Perform Special Summon
 	local c=e:GetHandler()
 	local fid=c:GetFieldID()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -105,17 +105,20 @@ function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,2,0,0)
 end
 function s.activate2(e,tp,eg,ep,ev,re,r,rp)
-		-- Check field
+	-- Check field
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
-		-- Perform special summon
+	-- Perform special summon
 	local c=e:GetHandler()
+	local fid=c:GetFieldID()
 	local g=Duel.GetTargetCards(e)
 	if #g==0 or #g>ft then return end
-	local fid=c:GetFieldID()
-	Duel.SpecialSummonStep(g,0,tp,tp,false,false,POS_FACEUP)
-	g:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
+	for tc in aux.Next(g) do
+		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
+	end
+	Duel.SpecialSummonComplete()
 	g:KeepAlive()
 		-- Destroy until end phase
 	local e1=Effect.CreateEffect(c)
@@ -128,7 +131,6 @@ function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCondition(s.descon)
 	e1:SetOperation(s.desop)
 	Duel.RegisterEffect(e1,tp)
-	Duel.SpecialSummonComplete()
 		-- Cannot Normal Summon / Locked into "Grimm Chain" monsters
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 		local e1=Effect.CreateEffect(c)
