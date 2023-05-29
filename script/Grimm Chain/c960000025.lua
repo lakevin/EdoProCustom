@@ -58,9 +58,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	for tc in aux.Next(g1) do
 		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
-		tc:KeepAlive()
 	end
 	Duel.SpecialSummonComplete()
+	g1:KeepAlive()
 		-- Destroy during End Phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
