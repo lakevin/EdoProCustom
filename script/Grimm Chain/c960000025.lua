@@ -110,7 +110,6 @@ function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 	if ft<=0 then return end
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	-- Perform special summon
-	local c=e:GetHandler()
 	local g=Duel.GetTargetCards(e)
 	if #g==0 then return end
 	if #g<=ft then
