@@ -59,7 +59,7 @@ function s.initial_effect(c)
 	e6:SetTarget(s.tftg)
 	e6:SetOperation(s.tfop)
 	c:RegisterEffect(e6,false,REGISTER_FLAG_DETACH_XMAT)
-	-- (7) Attach 1 card
+	-- (7) Attach 1 Extra Deck card
 	local e7=Effect.CreateEffect(c)
 	e7:SetDescription(aux.Stringid(id,3))
 	e7:SetType(EFFECT_TYPE_QUICK_O)
@@ -77,7 +77,7 @@ function s.initial_effect(c)
 	local e8=Effect.CreateEffect(c)
 	e8:SetDescription(aux.Stringid(id,4))
 	e8:SetCategory(CATEGORY_REMOVE)
-	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e8:SetCode(EVENT_PHASE+PHASE_END)
 	e8:SetRange(LOCATION_MZONE)
 	e8:SetCondition(s.rmcon)
@@ -149,7 +149,7 @@ end
 
 -- (6)
 function s.tfcon(e)
-	return e:GetHandler():GetOverlayCount()>=2
+	return e:GetHandler():GetOverlayCount()>=2 and Duel.GetTurnPlayer()==tp
 end
 function s.tffilter(c,e,tp)
 	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
