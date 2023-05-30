@@ -2,13 +2,15 @@
 --Artifact Scythe
 local s,id=GetID()
 function s.initial_effect(c)
-	--set
+	--spsummon
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EFFECT_MONSTER_SSET)
-    e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(TYPE_SPELL+TYPE_QUICKPLAY)
-    e1:SetCondition(s.setcon)
+	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	--return
 	local e2=Effect.CreateEffect(c)
