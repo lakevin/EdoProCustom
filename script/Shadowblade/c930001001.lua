@@ -46,7 +46,8 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetCode(EFFECT_MONSTER_SSET+EVENT_PHASE+PHASE_END)
+    e1:SetValue(TYPE_SPELL)
 	e1:SetTarget(s.rettg)
 	e1:SetOperation(s.retop)
 	e1:SetReset(RESET_EVENT|RESETS_STANDARD&~(RESET_TEMP_REMOVE|RESET_TURN_SET)|RESET_PHASE|PHASE_END)
@@ -58,7 +59,7 @@ function s.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) and c:IsSSetable() then
         Duel.SSet(tp,c)
 	end
 end
