@@ -88,7 +88,8 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetRange(LOCATION_EXTRA)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	rc:RegisterEffect(e1,true)
@@ -107,6 +108,9 @@ function s.rmfilter(c)
 end
 function s.tfilter(c,e)
 	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_EFFECT) and not c:IsPreviousLocation(LOCATION_REMOVED) and c:IsRelateToEffect(e)
+end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetSequence()>4
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg and eg:IsExists(aux.FaceupFilter(s.tfilter),1,nil) 

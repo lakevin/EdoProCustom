@@ -62,7 +62,7 @@ end
 
 -- (2)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSequence()>4 and Duel.GetTurnPlayer()==1-tp
+	return e:GetHandler():GetSequence()>4
 end
 function s.thcfilter(c,tp)
 	return c:IsMonster() and c:IsReleasable()
