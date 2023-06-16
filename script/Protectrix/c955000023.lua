@@ -70,7 +70,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		Duel.ConfirmCards(1-tp,cg)
 		Duel.ShuffleDeck(tp)
-		local tg=cg:Select(1-tp,1,1,nil)
+		local tg=cg:RandomSelect(1-tp,1)
 		local tc=tg:GetFirst()
 		if tc:IsAbleToHand() then
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
