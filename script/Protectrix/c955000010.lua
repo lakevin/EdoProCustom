@@ -1,5 +1,6 @@
 -- Protectrix Explosion
 local s,id=GetID()
+local WIRETAP_CODE=955000009
 function s.initial_effect(c)
 	-- (1) activate on summon
 	local e1=Effect.CreateEffect(c)
@@ -60,7 +61,7 @@ end
 
 -- (2)
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK
+	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK and not (re and re:GetHandler():IsCode(WIRETAP_CODE))
 end
 function s.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP)

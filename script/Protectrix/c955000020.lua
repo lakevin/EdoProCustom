@@ -1,5 +1,6 @@
 -- Protectrix Reincarnation
 local s,id=GetID()
+local WIRETAP_CODE=955000009
 function s.initial_effect(c)
 	-- (1) Special summon 1 "Protectrix" monster from GY
 	local e1=Effect.CreateEffect(c)
@@ -50,7 +51,7 @@ end
 
 -- (2)
 function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK
+	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK and not (re and re:GetHandler():IsCode(WIRETAP_CODE))
 end
 function s.tdfilter(c)
 	return c:IsType(TYPE_TRAP) and c:IsSetCard(0x9990)

@@ -1,5 +1,6 @@
 -- Protectrix Wrath
 local s,id=GetID()
+local WIRETAP_CODE=955000009
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -50,7 +51,7 @@ end
 
 -- (2)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK
+	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK and not (re and re:GetHandler():IsCode(WIRETAP_CODE))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

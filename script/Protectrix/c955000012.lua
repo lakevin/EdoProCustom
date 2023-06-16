@@ -1,5 +1,6 @@
 -- Protectrix Thunder Strike
 local s,id=GetID()
+local WIRETAP_CODE=955000009
 function s.initial_effect(c)
 	-- (1) Negate target effects, also become its ATK 0
 	local e1=Effect.CreateEffect(c)
@@ -20,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.tdcon)
 	e2:SetTarget(s.tdtg)
@@ -65,7 +66,7 @@ end
 
 -- (2)
 function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK
+	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK and not (re and re:GetHandler():IsCode(WIRETAP_CODE))
 end
 function s.tdfilter(c)
 	return c:IsSetCard(0x9990) and ( c:IsAbleToDeck() or c:IsAbleToExtra() )
