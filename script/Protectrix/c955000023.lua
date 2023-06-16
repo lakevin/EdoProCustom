@@ -52,17 +52,25 @@ function s.thfilter(c)
 	return c:IsSetCard(0x9990) and c:IsType(TYPE_TRAP) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,3,nil) end
+	if chk==0 then
+		local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil,e,tp)
+		return g:GetClassCount(Card.GetCode)>=3
+	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil,nil)
-	if #g>=3 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local sg=g:Select(tp,3,3,nil)
+	if g:GetClassCount(Card.GetCode)>=3 then
+		local cg=Group.CreateGroup()
+		for i=1,3 do
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local sg=g:Select(tp,1,1,nil)
+			g:Remove(Card.IsCode,nil,sg:GetFirst():GetCode())
+			cg:Merge(sg)
+		end
 		Duel.ConfirmCards(1-tp,sg)
 		Duel.ShuffleDeck(tp)
-		local tg=sg:RandomSelect(1-tp,1)
+		local tg=cg:RandomSelect(1-tp,1)
 		local tc=tg:GetFirst()
 		if tc:IsAbleToHand() then
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
