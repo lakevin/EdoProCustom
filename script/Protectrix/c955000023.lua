@@ -59,7 +59,7 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil,nil)
+	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
 	if g:GetClassCount(Card.GetCode)>=3 then
 		local cg=Group.CreateGroup()
 		for i=1,3 do
@@ -68,15 +68,15 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 			g:Remove(Card.IsCode,nil,sg:GetFirst():GetCode())
 			cg:Merge(sg)
 		end
-		Duel.ConfirmCards(1-tp,sg)
+		Duel.ConfirmCards(1-tp,cg)
 		Duel.ShuffleDeck(tp)
-		local tg=cg:RandomSelect(1-tp,1)
+		local tg=cg:Select(1-tp,1,1,nil)
 		local tc=tg:GetFirst()
 		if tc:IsAbleToHand() then
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
-			sg:RemoveCard(tc)
+			cg:RemoveCard(tc)
 		end
-		Duel.SendtoGrave(sg,REASON_EFFECT)
+		Duel.SendtoGrave(cg,REASON_EFFECT)
 	end
 end
 
