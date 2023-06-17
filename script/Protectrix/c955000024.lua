@@ -28,7 +28,7 @@ function s.initial_effect(c)
 end
 s.listed_names={c955000005}
 function s.ovfilter(c,tp,lc)
-	return c:IsFaceup() and c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,c955000005) and not c:IsStatus(lc,SUMMON_TYPE_XYZ,tp,STATUS_SUMMON_TURN|STATUS_FLIP_SUMMON_TURN|STATUS_SPSUMMON_TURN)
+	return c:IsFaceup() and c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,c955000005) --and not c:IsStatus(lc,SUMMON_TYPE_XYZ,tp,STATUS_SUMMON_TURN|STATUS_FLIP_SUMMON_TURN|STATUS_SPSUMMON_TURN)
 end
 function s.xyzop(e,tp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
