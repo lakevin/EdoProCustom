@@ -1,4 +1,4 @@
--- Protectrix CR-Suit Apocalyptic
+-- Protectrix CR-Suit Falcon
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Xyz material
