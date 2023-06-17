@@ -23,22 +23,6 @@ function s.initial_effect(c)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9990))
 	e2:SetTargetRange(LOCATION_HAND,0)
 	c:RegisterEffect(e2)
-	--cannot target
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetValue(aux.tgoval)
-	c:RegisterEffect(e3)
-	--indes
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetValue(s.indval)
-	c:RegisterEffect(e4)
 end
 
 -- (1)
@@ -68,13 +52,13 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
 		if #g>0 then
 			Duel.HintSelection(g)
-			Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+			Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 		end
 	elseif op==2 then
 		local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_HAND,nil)
 		if #g>0 then
 			local sg=g:RandomSelect(tp,1)
-			Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
+			Duel.Remove(sg,POS_FACEDOWN,REASON_EFFECT)
 		end
 	elseif op==3 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
@@ -85,18 +69,13 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,1,nil)
 		end
 		if #g>0 then
-			Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+			Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 		end
 	elseif op==4 then
 		local g=Duel.GetDecktopGroup(1-tp,1)
 		if #g>0 then
 			Duel.DisableShuffleCheck()
-			Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+			Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 		end
 	end
-end
-
---indes
-function s.indval(e,re,tp)
-	return tp~=e:GetHandlerPlayer()
 end
