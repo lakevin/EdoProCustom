@@ -104,27 +104,27 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.rmfilter(c)
-	return c:IsAbleToRemove() and c:IsRitualMonster() and c:IsSetCard(SET_GRIMM_CHAIN)
+	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsRitualMonster() and c:IsAbleToRemove()
 end
 function s.tfilter(c,e)
-	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_EFFECT) and not c:IsPreviousLocation(LOCATION_REMOVED) and c:IsRelateToEffect(e)
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_EFFECT)
+		and c:IsRelateToEffect(e) and not c:IsPreviousLocation(LOCATION_REMOVED) 
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSequence()>4
+	-- check if in extra monster zone
+	return e:GetHandler():GetSequence()>4 and Duel.GetCurrentChain()==0
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg and eg:IsExists(aux.FaceupFilter(s.tfilter),1,nil,tp) 
+	if chk==0 then return eg and eg:IsExists(s.tfilter,1,nil)
 		and Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	if not eg or #eg<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	local tc=g:GetFirst()
-	if tc and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
-		if not eg or #eg<1 then return end
-		local g=eg:Filter(aux.FaceupFilter(s.tfilter),nil)
-		local c=e:GetHandler()
+	local sg=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	local sc=sg:GetFirst()
+	if sc and Duel.Remove(sc,POS_FACEUP,REASON_EFFECT)~=0 then
 		for tc in aux.Next(g) do
 			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 			--Negate the effects of the Summoned monster(s)
