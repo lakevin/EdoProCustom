@@ -45,7 +45,7 @@ function s.initial_effect(c)
 	e5:SetTarget(s.reptg)
 	e5:SetValue(s.repval)
 	c:RegisterEffect(e5)
-	-- (6) Special Summon (Xyz)
+	-- (6) Special Summon
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(id,2))
 	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -73,24 +73,14 @@ function s.initial_effect(c)
 	e7:SetTarget(s.target)
 	e7:SetOperation(s.operation)
 	c:RegisterEffect(e7,false,REGISTER_FLAG_DETACH_XMAT)
-	-- (8) Banish all cards on field
-	local e8=Effect.CreateEffect(c)
-	e8:SetDescription(aux.Stringid(id,4))
-	e8:SetCategory(CATEGORY_REMOVE)
-	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e8:SetCode(EVENT_PHASE+PHASE_END)
-	e8:SetRange(LOCATION_MZONE)
-	e8:SetCondition(s.rmcon)
-	e8:SetTarget(s.rmtg)
-	e8:SetOperation(s.rmop)
-	c:RegisterEffect(e8)
 end
--- (1)
+
+-- (1) cannot disable spsummon
 function s.effcon(e)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_XYZ
 end
 
--- (2)+(3)
+-- (2) + (3) atk / def value
 function s.atkfilter(c)
 	return c:GetAttack()>=0
 end
@@ -106,7 +96,7 @@ function s.defval(e,c)
 	return g:GetSum(Card.GetDefense)/2
 end
 
--- (4)
+-- (4) attach 1 banished monster to this card
 function s.ovcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:GetFlagEffect(id)==0 and c:IsType(TYPE_XYZ) end
@@ -126,7 +116,7 @@ function s.ovop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (5)
+-- (5) destroy replace
 function s.repcon(e)
 	return e:GetHandler():GetOverlayCount()>=1
 end
@@ -147,7 +137,7 @@ function s.repval(e,c)
 	return s.repfilter(c,e:GetHandlerPlayer())
 end
 
--- (6)
+-- (6) special Summon 1 banished "Grimm Chain" monster
 function s.tfcon(e)
 	return e:GetHandler():GetOverlayCount()>=2 and Duel.GetTurnPlayer()==tp
 end
@@ -159,11 +149,11 @@ function s.tfcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
 end
 function s.tftg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_EXTRA) and chkc:IsControler(tp) and s.tffilter(chkc,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.tffilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(s.tffilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(s.tffilter,tp,LOCATION_REMOVED,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,s.tffilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,s.tffilter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function s.tfop(e,tp,eg,ep,ev,re,r,rp)
@@ -173,7 +163,7 @@ function s.tfop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (7)
+-- (7) Attach 1 opponent's Extra Deck monster to this card
 function s.condition()
 	return Duel.IsMainPhase()
 end
@@ -192,18 +182,4 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(c,sg,true)
 	end
 	Duel.ShuffleExtra(1-tp)
-end
-
--- (8)
-function s.rmcon(e)
-	return e:GetHandler():GetOverlayCount()>=4
-end
-function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
-end
-function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,LOCATION_MZONE)
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 end

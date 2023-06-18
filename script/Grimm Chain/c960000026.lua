@@ -113,7 +113,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSequence()>4
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg and eg:IsExists(aux.FaceupFilter(s.tfilter),1,nil) 
+	if chk==0 then return eg and eg:IsExists(aux.FaceupFilter(s.tfilter),1,nil,tp) 
 		and Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
