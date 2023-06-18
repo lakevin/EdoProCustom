@@ -43,9 +43,6 @@ function s.active(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-function s.indval(e,re,tp)
-	return tp~=e:GetHandlerPlayer()
-end
 
 -- (2)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)

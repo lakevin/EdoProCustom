@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.disop)
 	c:RegisterEffect(e3,false,REGISTER_FLAG_DETACH_XMAT)
 end
-s.listed_names={c955000005}
+s.listed_names={955000005}
 function s.ovfilter(c,tp,lc)
 	return c:IsFaceup() and c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,955000005) and not c:IsStatus(STATUS_SPSUMMON_TURN,lc,SUMMON_TYPE_XYZ,tp)
 end
