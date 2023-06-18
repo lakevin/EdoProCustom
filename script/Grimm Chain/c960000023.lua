@@ -139,7 +139,7 @@ end
 
 -- (6) special Summon 1 banished "Grimm Chain" monster
 function s.tfcon(e)
-	return e:GetHandler():GetOverlayCount()>=2 and Duel.GetTurnPlayer()==tp
+	return Duel.IsTurnPlayer(tp) and e:GetHandler():GetOverlayCount()>=2
 end
 function s.tffilter(c,e,tp)
 	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
