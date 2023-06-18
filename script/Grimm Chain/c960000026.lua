@@ -106,8 +106,7 @@ function s.rmfilter(c)
 	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsRitualMonster() and c:IsAbleToRemove()
 end
 function s.cfilter(c,e)
-	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_EFFECT)
-		and c:IsRelateToEffect(e) and not c:IsPreviousLocation(LOCATION_REMOVED) 
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_EFFECT) and not c:IsPreviousLocation(LOCATION_REMOVED) 
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg and eg:IsExists(s.cfilter,1,nil)
