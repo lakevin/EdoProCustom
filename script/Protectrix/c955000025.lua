@@ -41,13 +41,13 @@ function s.initial_effect(c)
 	e3:SetOperation(s.op3)
 	c:RegisterEffect(e3)
 	-- immune spell
-	local e4=Effect.CreateEffect(c)
+	--[[local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_IMMUNE_EFFECT)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetValue(s.efilter)
-	c:RegisterEffect(e4)
+	c:RegisterEffect(e4)]]--
 end
 
 -- cannot disable spsummon
