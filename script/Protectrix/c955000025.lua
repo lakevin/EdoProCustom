@@ -4,7 +4,7 @@ function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
 	--Fusion Summon procedure
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9990),aux.FilterBoolFunctionEx(Card.IsSetCard,0x9990),s.matfilter)
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsRace,RACE_PSYCHIC),s.matfilter)
 	-- cannot disable spsummon
 	--[[local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -50,6 +50,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)]]--
 end
 
+-- fusion material
+function s.matfilter(c,fc,sumtype,tp)
+	return c:IsSetCard(0x9990) and c:IsType(0x800000)
+end
 -- cannot disable spsummon
 function s.effcon(e)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_FUSION
