@@ -24,18 +24,18 @@ end
 s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
 
 --Activate
-function s.cfilter(c)
+function s.ctfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_GRIMM_CHAIN)
 end
 function s.rmfilter(c)
 	return c:IsAbleToRemove() and (c:IsLocation(LOCATION_SZONE) or aux.SpElimFilter(c,true,true))
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.desfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.desfilter,tp,LOCATION_MZONE,0,1,nil)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.ctfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.ctfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(s.rmfilter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,s.desfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.ctfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_ONFIELD)
 end
@@ -49,9 +49,9 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 --activate from hand
-function s.hfilter(c)
+function s.qsfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_CONTRACTOR)
 end
 function s.handcon(e)
-	return Duel.IsExistingMatchingCard(s.hfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(s.qsfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end

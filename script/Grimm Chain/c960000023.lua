@@ -160,8 +160,8 @@ function s.tfop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (7) Attach 1 opponent's Extra Deck monster to this card
-function s.condition(e)
-	return Duel.IsMainPhase() and e:GetHandler():GetOverlayCount()>=3
+function s.condition(e,tp)
+	return Duel.IsMainPhase() and Duel.IsTurnPlayer(tp) and e:GetHandler():GetOverlayCount()>=3
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 and Duel.IsPlayerCanRemove(tp) end
