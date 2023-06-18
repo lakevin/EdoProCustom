@@ -55,7 +55,7 @@ function s.initial_effect(c)
 	e6:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e6:SetCountLimit(1)
 	e6:SetCondition(s.tfcon)
-	e6:SetCost(s.tfcost)
+	e6:SetCost(aux.dxmcostgen(2,2))
 	e6:SetTarget(s.tftg)
 	e6:SetOperation(s.tfop)
 	c:RegisterEffect(e6,false,REGISTER_FLAG_DETACH_XMAT)
@@ -144,10 +144,6 @@ end
 function s.tffilter(c,e,tp)
 	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.tfcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
-end
 function s.tftg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.tffilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -165,7 +161,7 @@ end
 
 -- (7) Attach 1 opponent's Extra Deck monster to this card
 function s.condition()
-	return Duel.IsMainPhase()
+	return Duel.IsMainPhase() and e:GetHandler():GetOverlayCount()>=3
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 and Duel.IsPlayerCanRemove(tp) end
