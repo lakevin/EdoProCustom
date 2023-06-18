@@ -52,7 +52,7 @@ end
 
 -- fusion material
 function s.matfilter(c,fc,sumtype,tp)
-	return c:IsSetCard(0x9990) and c:IsType(TYPE_XYZ)
+	return c:IsSetCard(0x9990) and c:IsType(0x800000)
 end
 -- cannot disable spsummon
 function s.effcon(e)
