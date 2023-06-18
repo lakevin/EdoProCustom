@@ -138,7 +138,7 @@ function s.repval(e,c)
 end
 
 -- (6) special Summon 1 banished "Grimm Chain" monster
-function s.tfcon(e)
+function s.tfcon(e,tp)
 	return Duel.IsTurnPlayer(tp) and e:GetHandler():GetOverlayCount()>=2
 end
 function s.tffilter(c,e,tp)
@@ -160,7 +160,7 @@ function s.tfop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (7) Attach 1 opponent's Extra Deck monster to this card
-function s.condition()
+function s.condition(e)
 	return Duel.IsMainPhase() and e:GetHandler():GetOverlayCount()>=3
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
