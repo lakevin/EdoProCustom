@@ -6,12 +6,12 @@ function s.initial_effect(c)
 	--Fusion Summon procedure
 	Fusion.AddProcMixN(c,true,true,aux.FilterBoolFunctionEx(Card.IsType,TYPE_XYZ),1,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9990),2)
 	-- cannot disable spsummon
-	local e1=Effect.CreateEffect(c)
+	--[[local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_DISABLE_SPSUMMON)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCondition(s.effcon)
-	c:RegisterEffect(e1)
+	c:RegisterEffect(e1)]]--
 	-- (1) Destroy 1 card on the field
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
