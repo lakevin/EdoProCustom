@@ -4,14 +4,14 @@ function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
 	--Fusion Summon procedure
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsRace,RACE_PSYCHIC),s.matfilter)
+	Fusion.AddProcMixN(c,true,true,s.matfilter,1,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9990),2)
 	-- cannot disable spsummon
-	--[[local e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_DISABLE_SPSUMMON)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCondition(s.effcon)
-	c:RegisterEffect(e1)]]--
+	c:RegisterEffect(e1)
 	-- (1) Destroy 1 card on the field
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
@@ -41,13 +41,13 @@ function s.initial_effect(c)
 	e4:SetOperation(s.op3)
 	c:RegisterEffect(e4)
 	-- immune spell
-	--[[local e5=Effect.CreateEffect(c)
+	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetValue(s.efilter)
-	c:RegisterEffect(e5)]]--
+	c:RegisterEffect(e5)
 end
 
 -- fusion material
