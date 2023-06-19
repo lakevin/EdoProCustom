@@ -1,6 +1,7 @@
 --Cosmo Queen - Mistress Of The Stars
 local s,id=GetID()
 local CARD_COSMO_QUEEN=38999506
+local SET_COSMOVERSE=0x9995
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
@@ -101,7 +102,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 -- Option 1
 function s.eqfilter(c)
-	return c:IsLevel(1) and c:IsSetCard(0x9995) and not c:IsForbidden()
+	return c:IsLevel(1) and c:IsSetCard(SET_COSMOVERSE) and not c:IsForbidden()
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.eqfilter(chkc) end
@@ -125,7 +126,7 @@ function s.rmfilter(c)
 	return c:IsMonster() and c:IsAbleToRemove() and aux.SpElimFilter(c,false,true)
 end
 function s.tgfilter(c,e,tp)
-	return c:IsSetCard(0x9995) and c:IsAbleToGrave()
+	return c:IsMonster() and c:IsSetCard(SET_COSMOVERSE) and c:IsAbleToGrave()
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and chkc:IsControler(1-tp) and s.rmfilter(chkc) end
