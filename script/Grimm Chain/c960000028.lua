@@ -11,14 +11,14 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_BECOME_TARGET)
 	e1:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
-	e1:SetCondition(s.condition)
+	e1:SetCondition(s.condition1)
 	e1:SetTarget(s.target)
-	e1:SetOperation(s.spop)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCode(EVENT_BE_BATTLE_TARGET)
-	e2:SetCondition(s.condition)
+	e2:SetCondition(s.condition2)
 	c:RegisterEffect(e2)
 	-- (2) turn set
 	local e3=Effect.CreateEffect(c)
@@ -34,17 +34,17 @@ end
 s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
 
 -- (1) draw 1 card and negate effect monster
-function s.spcon1(e,tp,eg,ep,ev,re,r,rp)
+function s.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsContains(e:GetHandler()) and rp~=tp 
 end
-function s.spcon2(e,tp,eg,ep,ev,re,r,rp)
+function s.condition2(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsContains(e:GetHandler()) and Duel.GetAttacker():IsControler(1-tp)
 end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(nil,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,nil,1,1-tp,LOCATION_ONFIELD)
 end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Draw(tp,1,REASON_EFFECT)~=0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
