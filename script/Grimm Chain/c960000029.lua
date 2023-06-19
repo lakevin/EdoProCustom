@@ -3,6 +3,9 @@ local s,id=GetID()
 local SET_CONTRACTOR=0x9998
 local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
+	-- link summon
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_SPELLCASTER),2,2,s.lcheck)
+	c:EnableReviveLimit()
 	-- (1) setcode
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -35,6 +38,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
+
+function s.lcheck(g,lc,sumtype,tp)
+	return g:IsExists(Card.IsSetCard,1,nil,lc,sumtype,tp,SET_GRIMM_CHAIN)
+end
 
 -- (2)
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
