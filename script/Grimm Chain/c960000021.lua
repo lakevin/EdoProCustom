@@ -1,10 +1,15 @@
 -- B-Rabbit The Chain
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
+	--special summon limit
+	c:SetSPSummonOnce(id)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),3,2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),3,2,s.ovfilter,aux.Stringid(id,0),2)
+	--revive condition
 	c:EnableReviveLimit()
-	--indes
+	-- (1) indes
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -13,7 +18,7 @@ function s.initial_effect(c)
 	e1:SetCondition(s.indcon)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
-	--banish
+	-- (2) banish
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -28,15 +33,20 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
 end
 
+function s.ovfilter(c,tp,xyzc)
+	return c:IsFaceup() and c:IsType(TYPE_LINK,xyzc,SUMMON_TYPE_XYZ,tp) and c:IsCode(960000029,xyzc,SUMMON_TYPE_XYZ,tp)
+end
+
+-- (1)
 function s.indcon(e)
 	return e:GetHandler():GetOverlayCount()~=0
 end
 
+-- (2)
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:IsAbleToRemove() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,nil) end
