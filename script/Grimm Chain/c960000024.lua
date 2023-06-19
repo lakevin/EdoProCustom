@@ -1,5 +1,7 @@
 --Owl
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
@@ -14,7 +16,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
 	-- (2) Ritual Summon
-	local e2=Ritual.CreateProc(c,RITPROC_EQUAL,aux.FilterBoolFunction(Card.IsSetCard,0x9999),nil,aux.Stringid(id,1),nil,nil,nil,nil,LOCATION_REMOVED)
+	local e2=Ritual.CreateProc(c,RITPROC_EQUAL,aux.FilterBoolFunction(Card.IsSetCard,SET_GRIMM_CHAIN),nil,aux.Stringid(id,1),nil,nil,nil,nil,LOCATION_REMOVED)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetHintTiming(0,TIMING_MAIN_END)
@@ -25,15 +27,15 @@ end
 
 -- (1)
 function s.rmfilter(c)
-	return c:IsSetCard(0x9999) and c:IsRitualMonster() and c:IsAbleToRemove()
+	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsRitualMonster() and c:IsAbleToRemove()
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
