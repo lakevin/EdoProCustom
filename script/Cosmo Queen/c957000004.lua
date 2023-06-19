@@ -109,7 +109,7 @@ function s.synfilter1(c,tp,mc)
 		and Duel.IsExistingMatchingCard(s.synfilter2,tp,LOCATION_EXTRA,0,1,nil,tp,Group.FromCards(c,mc))
 end
 function s.synfilter2(c,tp,mg)
-	return Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsSynchroSummonable(nil,mg)
+	return c:IsSetCard(SET_COSMOVERSE) and Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsSynchroSummonable(nil,mg)
 end
 function s.syntg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
