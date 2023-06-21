@@ -26,17 +26,14 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
-	-- (4) Protection
+	-- (4) destroy replace
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EFFECT_DESTROY_REPLACE)
 	e4:SetRange(LOCATION_GRAVE)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e4:SetCode(EVENT_FREE_CHAIN)
-	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
-	e4:SetCountLimit(1,id)
-	e4:SetCondition(s.condition)
-	e4:SetCost(aux.bfgcost)
-	e4:SetOperation(s.activate)
+	e4:SetTarget(s.reptg)
+	e4:SetValue(s.repval)
+	e4:SetOperation(s.repop)
 	c:RegisterEffect(e4)
 end
 
@@ -107,27 +104,17 @@ end
 
 
 -- (4) protection
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsMainPhase()
+function s.repfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(0x9990) and c:IsLocation(LOCATION_ONFIELD) and c:IsControler(tp) 
+		and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT+REASON_BATTLE)
 end
-function s.target(e,c)
-	return c:IsSetCard(0x9990) and c:IsType(0x97)
+function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp) end
+	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e1:SetTarget(s.target)
-	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetValue(1)
-	Duel.RegisterEffect(e1,tp)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e2:SetTarget(s.target)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetReset(RESET_PHASE+PHASE_END)
-	e2:SetValue(1)
-	Duel.RegisterEffect(e2,tp)
+function s.repval(e,c)
+	return s.repfilter(c,e:GetHandlerPlayer())
+end
+function s.repop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end

@@ -23,7 +23,8 @@ end
 --xyz summon
 s.listed_series={0x9990}
 function s.ovfilter(c,tp,lc)
-	return c:IsFaceup() and c:IsSetCard(0x9990,lc,SUMMON_TYPE_XYZ,tp) and c:IsType(TYPE_XYZ) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
+	return c:IsFaceup() and c:IsSetCard(0x9990,lc,SUMMON_TYPE_XYZ,tp) and c:IsType(TYPE_XYZ) 
+		and c:GetRank()==4 and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
 end
 function s.xyzop(e,tp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end

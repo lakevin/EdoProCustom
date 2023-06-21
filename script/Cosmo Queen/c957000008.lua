@@ -1,6 +1,7 @@
 --Cosmo Queen - Dark Empress
 local s,id=GetID()
 local CARD_COSMO_QUEEN=38999506
+local CARD_COSMO_DOMINANCE=957000014
 local SET_COSMOVERSE=0x9995
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
@@ -86,6 +87,7 @@ function s.spfilter(c,e,tp)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+		and not (re and re:GetHandler():IsCode(CARD_COSMO_DOMINANCE))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1

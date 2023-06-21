@@ -81,10 +81,8 @@ function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	Duel.NegateEffect(ev)
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+	if Duel.NegateActivation(ev) and re and re:GetHandler():IsRelateToEffect(re) then
+		Duel.Remove(eg,POS_FACEUP,REASON_EFFECT)
 	end
 end
 

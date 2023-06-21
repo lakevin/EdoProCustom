@@ -100,6 +100,7 @@ end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_FUSION)
+		and not (re and re:GetHandler():IsCode(CARD_COSMO_DOMINANCE))
 end
 function s.filter1(c)
 	return c:IsCode(CARD_COSMO_QUEEN) and c:IsAbleToHand()

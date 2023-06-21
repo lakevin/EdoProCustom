@@ -20,32 +20,31 @@ function s.initial_effect(c)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
 	e3:SetValue(300)
 	c:RegisterEffect(e3)
-	-- (1) TODECK && SPECIAL_SUMMON
+	-- (1.1) exchange 1 Level 4 "Draconier" monsters from field and deck
 	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
 	e4:SetDescription(aux.Stringid(id,0))
+	e4:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_FZONE)
 	e4:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e4:SetTarget(s.target1)
 	e4:SetOperation(s.operation1)
 	c:RegisterEffect(e4)
-	-- (2) TOHAND
-	local e5=Effect.CreateEffect(c)
+	-- (1.2) Add 1 Dragon-type "Draconier" Pendulum monster from Extra Deck to your hand
+	local e5=e4:Clone()
 	e5:SetDescription(aux.Stringid(id,1))
-	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e5:SetRange(LOCATION_SZONE)
-	e5:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
-	e5:SetTarget(s.thtg)
-	e5:SetOperation(s.thop)
+	e5:SetTarget(s.target2)
+	e5:SetOperation(s.operation2)
 	c:RegisterEffect(e5)
-	local e6=e5:Clone()
+	-- (1.2) Add 1 Dragon-type "Draconier" Pendulum in your GY or banished to your hand
+	local e6=e4:Clone()
 	e6:SetDescription(aux.Stringid(id,2))
-	e6:SetTarget(s.thtg2)
-	e6:SetOperation(s.thop2)
+	e6:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e6:SetTarget(s.target3)
+	e6:SetOperation(s.operation3)
 	c:RegisterEffect(e6)
-	-- (3) REMOVE && TODECK+DRAW
+	-- (2) REMOVE && TODECK+DRAW
 	local e7=Effect.CreateEffect(c)
 	e7:SetDescription(aux.Stringid(id,3))
 	e7:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
@@ -58,7 +57,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e7)
 end
 
--- (1)
+-- (1.1)
 function s.tdfilter1(c,e,tp)
 	return c:IsFaceup() and c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode())
@@ -71,6 +70,7 @@ function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.tdfilter1(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(s.tdfilter1,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,s.tdfilter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
@@ -88,16 +88,16 @@ function s.operation1(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
--- (2)
+-- (1.2)
 function s.thfilter(c,e,tp)
 	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND+CATEGORY_SEARCH,nil,1,tp,LOCATION_EXTRA)
 end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.operation2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if #g>0 then
@@ -105,14 +105,16 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
+-- (1.3)
 function s.thfilter2(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
 end
-function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target3(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND+CATEGORY_SEARCH,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
 end
-function s.thop2(e,tp,eg,ep,ev,re,r,rp)
+function s.operation3(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
 	if #g>0 then
@@ -121,7 +123,7 @@ function s.thop2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
+-- (2)
 function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
