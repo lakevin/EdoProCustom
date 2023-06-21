@@ -1,6 +1,7 @@
 --Cosmo Queen - Starbust Princess
 local s,id=GetID()
 local CARD_COSMO_QUEEN=38999506
+local CARD_COSMO_DOMINANCE=957000014
 local SET_COSMOVERSE=0x9995
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
