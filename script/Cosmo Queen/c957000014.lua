@@ -62,5 +62,5 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,0,nil)
-	Duel.Destroy(g,REASON_EFFECT)
+	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 end
