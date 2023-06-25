@@ -33,10 +33,8 @@ function s.spcost1(e,c)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
-	if g then
-		e:SetLabelObject(g)
-		Duel.SendtoGrave(g,REASON_COST)
-	end
+	e:SetLabelObject(g:GetFirst())
+	Duel.SendtoGrave(g,REASON_COST)
 end
 function s.sptg1(e,tp,eg,ep,ev,re,r,rp,c)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -45,18 +43,17 @@ function s.sptg1(e,tp,eg,ep,ev,re,r,rp,c)
 end
 function s.spop1(e,tp,eg,ep,ev,re,r,rp,c)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,1,tp,tp,false,false,POS_FACEUP)~=0 then
-		local g=e:GetLabelObject()
-		if not g then return end
-		local lv=g:GetFirst():GetLevel()
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(lv*200)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD+RESET_DISABLE)
-		e:GetHandler():RegisterEffect(e1)
-		g:DeleteGroup()
-	end	
+	if not c:IsRelateToEffect(e) then return end
+	Duel.SpecialSummon(c,1,tp,tp,false,false,POS_FACEUP)
+	local tc=e:GetLabelObject()
+	if not tc then return end
+	local lv=tc:GetLevel()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetValue(lv*200)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD+RESET_DISABLE)
+	e:GetHandler():RegisterEffect(e1)
 end
 function s.costfilter(c,tp)
 	return c:IsType(TYPE_EFFECT) and Duel.GetMZoneCount(tp,c,tp)>0
