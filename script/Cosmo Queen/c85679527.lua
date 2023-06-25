@@ -33,7 +33,7 @@ function s.spcost1(e,c)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
-	e:SetLabelObject(g:GetFirst())
+	e:SetLabel(g:GetFirst():GetLevel())
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function s.sptg1(e,tp,eg,ep,ev,re,r,rp,c)
@@ -45,9 +45,8 @@ function s.spop1(e,tp,eg,ep,ev,re,r,rp,c)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,1,tp,tp,false,false,POS_FACEUP)
-	local tc=e:GetLabelObject()
-	if not tc then return end
-	local lv=tc:GetLevel()
+	--update atk
+	local lv=e:GetLabel()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
