@@ -3,6 +3,7 @@ local s,id=GetID()
 local CARD_COSMO_QUEEN=38999506
 local SET_COSMOVERSE=0x9995
 function s.initial_effect(c)
+	c:SetUniqueOnField(1,0,id)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
