@@ -12,6 +12,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	c:RegisterEffect(e1)
 end
+s.listed_series={SET_DRACONIER,SET_DRACONIER_SUMMONER}
 
 -- Select Option
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

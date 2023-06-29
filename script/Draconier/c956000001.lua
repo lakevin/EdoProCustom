@@ -37,6 +37,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.lvop)
 	c:RegisterEffect(e4)
 end
+s.listed_series={SET_DRACONIER,SET_DRACONIER_SUMMONER}
 
 -- (1)
 function s.thfilter(c,tp)
