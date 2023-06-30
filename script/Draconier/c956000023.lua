@@ -1,5 +1,7 @@
 --Draconier Summoner's Rank-Up-Magic
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
