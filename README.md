@@ -12,10 +12,10 @@ Wiki: https://github.com/lakevin/EdoProCustom/wiki
 
 ### Completed Archetypes
 
-1. Grimm Chain | 29 cards | Finished!
-2. Protectrix | 25 cards | Finished!
-3. Draconier | 24 cards | Support planned
-4. Cosmoverse | 14/14 cards | Finished!
+1. Grimm Chain | 29/29 cards | `Finished`
+2. Protectrix | 25/25 cards | `Finished`
+3. Draconier | 27/27 cards | `Finished`
+4. Cosmoverse | 14/15 cards | `Update planned`
 
 ### Planned Archetypes
 
