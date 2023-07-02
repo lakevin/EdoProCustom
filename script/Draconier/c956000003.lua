@@ -41,7 +41,7 @@ s.listed_series={SET_DRACONIER,SET_DRACONIER_SUMMONER}
 
 -- (1)
 function s.tdfilter1(c,e,tp)
-	return c:IsFaceup() and c:IsLevelBelow(6) and c:IsSetCard(0x9992) and c:IsAbleToDeck()
+	return c:IsLevelBelow(6) and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode())
 end
 function s.spfilter1(c,e,tp,code)
