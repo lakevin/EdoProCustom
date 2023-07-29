@@ -96,7 +96,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	--Indes
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_EQUIP)
-	e4:SetCode(EFFECT_IMMUNE_EFFECT)
+	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e4:SetValue(s.efilter)
 	c:RegisterEffect(e4)
 end

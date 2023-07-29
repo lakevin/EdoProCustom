@@ -45,6 +45,14 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1)
 	c:RegisterEffect(e4)
+	--xyzlv
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_XYZ_LEVEL)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetValue(s.xyzlv)
+	c:RegisterEffect(e3)
 end
 s.listed_series={SET_COSMOVERSE}
 s.listed_names={id,CARD_COSMO_QUEEN}
@@ -86,12 +94,12 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e2)
 	--Indes
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
-	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e3:SetValue(1)
-	e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e3)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_EQUIP)
+	e5:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e5:SetValue(1)
+	e5:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e5)
 end
 function s.eqlimit(e,c)
 	return c==e:GetLabelObject()
@@ -139,4 +147,13 @@ end
 -- (3) Check if a Cosmo Queen is summoned on field
 function s.rtfilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsCode(CARD_COSMO_QUEEN)
+end
+
+-- (4)
+function s.xyzlv(e,c,rc)
+	if rc:IsAttribute(ATTRIBUTE_DARK) then
+		return 8,9,e:GetHandler():GetLevel()
+	else
+		return e:GetHandler():GetLevel()
+	end
 end
