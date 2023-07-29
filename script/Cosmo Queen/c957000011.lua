@@ -79,7 +79,7 @@ end
 
 -- (2)
 function s.cfilter(c,tp)
-	return c:IsLocation(LOCATION_GRAVE) and (c:IsSetCard(SET_COSMOVERSE) or c:IsCode(CARD_COSMO_QUEEN))
+	return c:IsLocation(LOCATION_GRAVE) and c:IsMonster() and (c:IsSetCard(SET_COSMOVERSE) or c:IsCode(CARD_COSMO_QUEEN))
 		and c:IsAbleToRemoveAsCost() and Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,c)
 end
 function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
