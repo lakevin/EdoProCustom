@@ -15,11 +15,11 @@ Wiki: https://github.com/lakevin/EdoProCustom/wiki
 1. Grimm Chain | 29/29 cards | `Finished`
 2. Protectrix | 25/25 cards | `Finished`
 3. Draconier | 27/27 cards | `Finished`
-4. Cosmoverse | 14/15 cards | `Update planned`
+4. Cosmoverse | 16/16 cards | `Finished`
 
 ### Planned Archetypes
 
-1. Holy Grail
+1. Holy Grail `90% Done`
 2. Kniguards
 3. Warflame
 4. Shadowblades
@@ -28,7 +28,5 @@ Wiki: https://github.com/lakevin/EdoProCustom/wiki
 
 ### Late August / Early September 2023
 
-- New archetype "Holy Grail"
-- New archetype "Kniguards"
-- New archetype "Warflame"
-- New archetype "Shadowblades"
+- New archetype "Holy Grail" with sub-archetypes "Kniguards", "Warflame" and "Shadowblades"
+- New Synchro-based archetype
