@@ -20,7 +20,7 @@ Wiki: https://github.com/lakevin/EdoProCustom/wiki
 ### Planned Archetypes
 
 1. Holy Grail `90% Done`
-2. Kniguards `60% Done`
+2. Kniguards `80% Done`
 3. Warflame `0% Done`
 4. Shadowblades `0% Done`
 
