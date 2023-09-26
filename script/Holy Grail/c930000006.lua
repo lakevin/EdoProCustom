@@ -94,8 +94,11 @@ s.listed_series={SET_HOLYGRAIL,SET_KNIGUARD}
 s.counter_place_list={COUNTER_GRAIL}
 
 -- (1)
+function s.cfilter(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(SET_KNIGUARD)
+end
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(aux.FaceupFilter(Card.IsSetCard,SET_KNIGUARD),1,nil) then
+	if eg:IsExists(s.cfilter,1,nil,tp) then
 		e:GetHandler():AddCounter(COUNTER_GRAIL,1)
 	end
 end

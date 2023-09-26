@@ -98,7 +98,7 @@ function s.filter(tc,c,tp)
 	return tc:IsLinked() and  tc:IsFaceup() and tc:IsCanBeLinkMaterial() and Duel.IsExistingMatchingCard(s.lkfilter,tp,LOCATION_EXTRA,0,1,nil,mg)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsMainPhase() and e:GetHandler():GetCounter(COUNTER_GRAIL)>=3
+	return Duel.IsMainPhase() and e:GetHandler():GetCounter(COUNTER_GRAIL)>=2
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc,e:GetHandler(),tp) end

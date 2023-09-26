@@ -138,7 +138,7 @@ end
 function s.distg(e,c)
 	local seq=e:GetLabel()
 	if c:IsControler(1-e:GetHandlerPlayer()) then seq=4-seq end
-	return c:IsSpellTrap() and seq==c:GetSequence() and c:GetFlagEffect(id)==0
+	return c:IsSpellTrap() and seq==c:GetSequence() and c:GetFlagEffect(id)==0 and not c:IsCode(id)
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local cseq=e:GetLabel()
