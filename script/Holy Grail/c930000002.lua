@@ -24,11 +24,44 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(s.acop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetCode(EVENT_ADD_COUNTER+COUNTER_GRAIL)
-	e3:SetOperation(s.ctop)
-	c:RegisterEffect(e3)
+	--[[
+		--avoid battle damage
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_FIELD)
+		e3:SetCode(EVENT_ADD_COUNTER+COUNTER_GRAIL)
+		e3:SetRange(LOCATION_SZONE)
+		e3:SetOperation(s.ctop)
+		c:RegisterEffect(e3)
+	]]--
+	-- 1 or more grail counter
+	local e3_1=Effect.CreateEffect(c)
+	e3_1:SetType(EFFECT_TYPE_FIELD)
+	e3_1:SetRange(LOCATION_SZONE)
+	e3_1:SetTargetRange(LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE)
+	e3_1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+	e3_1:SetCondition(s.attcon)
+	e3_1:SetTarget(s.atttg)
+	e3_1:SetValue(ATTRIBUTE_DARK)
+	c:RegisterEffect(e3_1)
+	-- 3 or more grail counter
+	local e3_2=Effect.CreateEffect(c)
+	e3_2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3_2:SetCode(EVENT_CHAIN_SOLVING)
+	e3_2:SetRange(LOCATION_SZONE)
+	e3_2:SetTargetRange(0,1)
+	e3_2:SetCondition(s.discon)
+	e3_2:SetOperation(s.disop)
+	c:RegisterEffect(e3_2)
+	-- 5 or more grail counter
+	local e3_3=Effect.CreateEffect(c)
+	e3_3:SetType(EFFECT_TYPE_FIELD)
+	e3_3:SetRange(LOCATION_SZONE)
+	e3_3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3_3:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e3_3:SetTargetRange(0,1)
+	e3_3:SetCondition(s.accon)
+	e3_3:SetValue(s.aclimit)
+	c:RegisterEffect(e3_3)
 	-- (2) Link Summon 1 "Holy Grail" Link monster
 	local e4a=Effect.CreateEffect(c)
 	e4a:SetType(EFFECT_TYPE_FIELD)
@@ -71,52 +104,11 @@ function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
-function s.ctop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local cg=c:GetCounter(COUNTER_GRAIL)
-	-- 1 or more grail counter
-	if cg>=1 then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetRange(LOCATION_SZONE)
-		e1:SetTargetRange(LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE)
-		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-		e1:SetTarget(s.tg)
-		e1:SetValue(ATTRIBUTE_DARK)
-		Duel.RegisterEffect(e1,tp)
-	end
-	-- 3 or more grail counter
-	if cg>=3 then
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_FIELD)
-		e2:SetCode(EFFECT_DISABLE)
-		e2:SetTargetRange(0,LOCATION_ONFIELD)
-		e2:SetTarget(s.distg)
-		e2:SetLabel(c:GetSequence())
-		Duel.RegisterEffect(e2,tp)
-		local e3=e2:Clone()
-		e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-		Duel.RegisterEffect(e3,tp)
-		local e4=Effect.CreateEffect(c)
-		e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e4:SetCode(EVENT_CHAIN_SOLVING)
-		e4:SetOperation(s.disop)
-		e4:SetLabel(c:GetSequence())
-		Duel.RegisterEffect(e4,tp)
-	end
-	-- 5 or more grail counter
-	if cg>=5 then
-		local e5=Effect.CreateEffect(c)
-		e5:SetType(EFFECT_TYPE_FIELD)
-		e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e5:SetCode(EFFECT_CANNOT_ACTIVATE)
-		e5:SetTargetRange(0,1)
-		e5:SetValue(s.aclimit)
-		Duel.RegisterEffect(e5,tp)
-	end
-end
 -- 1 or more grail counter
-function s.tg(e,c)
+function s.attcon(e)
+	return e:GetHandler():GetCounter(COUNTER_GRAIL)>=1
+end
+function s.atttg(e,c)
 	if not c:IsSetCard(SET_HOLYGRAIL) then return false end
 	if c:GetFlagEffect(1)==0 then
 		c:RegisterFlagEffect(1,0,0,0)
@@ -135,38 +127,35 @@ function s.tg(e,c)
 	return true
 end
 -- 3 or more grail counter
-function s.distg(e,c)
-	local seq=e:GetLabel()
-	if c:IsControler(1-e:GetHandlerPlayer()) then seq=4-seq end
-	return c:IsSpellTrap() and seq==c:GetSequence() and c:GetFlagEffect(id)==0 and not c:IsCode(id)
+function s.discon(e)
+	return e:GetHandler():GetCounter(COUNTER_GRAIL)>=3
+end
+function s.disfilter(c,seq,p)
+	return c:IsFaceup() and c:IsSetCard(0x10c) and c:IsColumn(seq,p,LOCATION_SZONE)
+end
+function s.discon(e,tp,eg,ep,ev,re,r,rp)
+	if rp==tp or not re:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return false end
+	local rc=re:GetHandler()
+	local p,loc,seq=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_CONTROLER,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TRIGGERING_SEQUENCE)
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and (loc&LOCATION_SZONE==0 or rc:IsControler(1-p)) then
+		if rc:IsLocation(LOCATION_SZONE) and rc:IsControler(p) then
+			seq=rc:GetSequence()
+			loc=LOCATION_SZONE
+		else
+			seq=rc:GetPreviousSequence()
+			loc=rc:GetPreviousLocation()
+		end
+	end
+	return loc&LOCATION_SZONE==LOCATION_SZONE and e:GetHandler():IsColumn(seq,p,LOCATION_SZONE)
+	--Duel.IsExistingMatchingCard(s.disfilter,tp,LOCATION_MZONE,0,1,nil,seq,p)
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	local cseq=e:GetLabel()
-	if not re:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return end
-	local rc=re:GetHandler()
-	if rc:GetFlagEffect(id)>0 then return end
-	local p,loc,seq=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_CONTROLER,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TRIGGERING_SEQUENCE)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) then
-		if loc&LOCATION_SZONE==0 or rc:IsControler(1-p) then
-			if rc:IsLocation(LOCATION_SZONE) and rc:IsControler(p) then
-				seq=rc:GetSequence()
-			else
-				seq=rc:GetPreviousSequence()
-			end
-		end
-		if loc&LOCATION_SZONE==0 then
-			local val=re:GetValue()
-			if val==nil or val==LOCATION_SZONE or val==LOCATION_FZONE or val==LOCATION_PZONE then
-				loc=LOCATION_SZONE
-			end
-		end
-	end
-	if ep~=e:GetHandlerPlayer() then cseq=4-cseq end
-	if loc&LOCATION_SZONE~=0 and cseq==seq then
-		Duel.NegateEffect(ev)
-	end
+	Duel.NegateEffect(ev)
 end
 -- 5 or more grail counter
+function s.accon(e)
+	return e:GetHandler():GetCounter(COUNTER_GRAIL)>=5
+end
 function s.aclimit(e,re,tp)
 	return re:GetActivateLocation()==LOCATION_GRAVE
 end

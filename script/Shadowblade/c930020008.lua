@@ -4,8 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) atkup
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP+EFFECT_TYPE_CONTINUOUS)
 	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
 	-- (2) Flip: Destroy
@@ -34,7 +33,7 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e4:SetCountLimit(1,id)
-	e2:SetCondition(s.spcon)
+	e4:SetCondition(s.spcon)
 	e4:SetTarget(s.sptg)
 	e4:SetOperation(s.spop)
 	c:RegisterEffect(e4)
@@ -104,6 +103,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(SET_SHADOWBLADE) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and not c:IsCode(id)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.spfilter(chkc,e,tp) end

@@ -37,23 +37,26 @@ end
 
 -- (1)
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingTarget(Card.IsLinked,tp,LOCATION_MZONE,0,1,1,nil) end
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingTarget(Card.IsLinked,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,1,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(Card.IsLinked,tp,0,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(Card.IsLinked,tp,LOCATION_MZONE,LOCATION_MZONE,c)
 	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local sg=g:Select(tp,1,1,nil)
-		if Duel.Destroy(sg,REASON_EFFECT)~=0 and c:IsFaceup() and c:IsRelateToEffect(e) then
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetCode(EFFECT_UPDATE_ATTACK)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
-			e1:SetValue(500)
-			c:RegisterEffect(e1)
+		--local sg=g:Select(tp,1,1,nil)
+		for tc in aux.Next(g) do
+			if Duel.Destroy(tc,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) then
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+				e1:SetCode(EFFECT_UPDATE_ATTACK)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
+				e1:SetValue(400)
+				c:RegisterEffect(e1)
+			end
 		end
 	end
 end
