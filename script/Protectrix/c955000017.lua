@@ -18,6 +18,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCountLimit(1,id)
+	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -34,6 +35,9 @@ function s.effcon(e)
 end
 
 -- (2)
+function s.spcon(e)
+	return e:GetHandler():GetSummonType()==SUMMON_TYPE_FUSION
+end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x9990) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsType(TYPE_EXTRA)
 end

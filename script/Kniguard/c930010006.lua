@@ -49,31 +49,39 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	if not g or #g<1 then return end
-	Duel.Release(g,REASON_COST)
-	local sc=g:GetFirst()
-	if sc and sc:IsAttribute(ATTRIBUTE_LIGHT) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(id,0))
-		e1:SetCategory(CATEGORY_LVCHANGE)
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-		e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e1:SetCountLimit(1)
-		e1:SetTarget(s.lvtg)
-		e1:SetOperation(s.lvop)
-		c:RegisterEffect(e1)
+	if Duel.Release(g,REASON_COST)~=0 then
+		local sc=g:GetFirst()
+		if sc and sc:IsAttribute(ATTRIBUTE_LIGHT) then
+			local e1=Effect.CreateEffect(c)
+			e1:SetDescription(aux.Stringid(id,0))
+			e1:SetCategory(CATEGORY_LVCHANGE)
+			e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+			e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+			e1:SetCountLimit(1)
+			e1:SetCondition(s.condition)
+			e1:SetTarget(s.lvtg)
+			e1:SetOperation(s.lvop)
+			c:RegisterEffect(e1)
+		end
+		if sc and sc:IsAttribute(ATTRIBUTE_DARK) then
+			local e2=Effect.CreateEffect(c)
+			e2:SetDescription(aux.Stringid(id,1))
+			e2:SetCategory(CATEGORY_POSITION)
+			e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+			e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+			e2:SetCountLimit(1)
+			e2:SetCondition(s.condition)
+			e2:SetTarget(s.postg)
+			e2:SetOperation(s.posop)
+			c:RegisterEffect(e2)
+		end
+		g:DeleteGroup()
 	end
-	if sc and sc:IsAttribute(ATTRIBUTE_DARK) then
-		local e2=Effect.CreateEffect(c)
-		e2:SetDescription(aux.Stringid(id,1))
-		e2:SetCategory(CATEGORY_POSITION)
-		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-		e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e2:SetCountLimit(1)
-		e2:SetTarget(s.postg)
-		e2:SetOperation(s.posop)
-		c:RegisterEffect(e2)
-	end
-	g:DeleteGroup()
+end
+
+	-- Condition
+function s.condition(e)
+	return e:GetHandler():IsPreviousLocation(LOCATION_HAND)
 end
 	-- LIGHT
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
