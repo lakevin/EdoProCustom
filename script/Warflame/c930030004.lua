@@ -2,12 +2,12 @@
 local SET_WARFLAME=0xBAA1
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) must attack
+	-- must attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_MUST_ATTACK)
 	c:RegisterEffect(e1)
-	-- (2) special summon
+	-- (1) special summon (itself)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
@@ -19,51 +19,50 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spiop)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	-- (3) destroy
+	-- (2) special summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(s.descon)
-	e3:SetTarget(s.destg)
-	e3:SetOperation(s.desop)
+	e3:SetCondition(s.spcon)
+	e3:SetTarget(s.sptg)
+	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	-- (4) special summon
+	-- (3) destroy
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetCode(EVENT_BATTLE_DESTROYING)
-	e4:SetOperation(s.regop)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_DESTROY)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,{id,3})
+	e4:SetTarget(s.destg)
+	e4:SetOperation(s.desop)
 	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,1))
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	local e5=e4:Clone()
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e5:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1,{id,2})
-	e5:SetCondition(s.spcon)
-	e5:SetTarget(s.sptg)
-	e5:SetOperation(s.spop)
+	e5:SetProperty(EFFECT_FLAG_DELAY)
+	e5:SetCode(EVENT_CHAIN_SOLVED)
+	e5:SetCondition(s.rmeffcon)
 	c:RegisterEffect(e5)
 end
 s.listed_series={SET_WARFLAME}
 
--- (2)
+-- (1)
 function s.spifilter(c)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsRace(RACE_WARRIOR)
+	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsRace(RACE_WARRIOR)
 end
 function s.spicon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),s.spifilter,1,false,1,true,c,c:GetControler(),nil,false,nil)
+	return Duel.CheckReleaseGroup(c:GetControler(),s.spifilter,1,true,1,true,c,c:GetControler(),nil,false,e:GetHandler())
 end
 
 function s.spitg(e,tp,eg,ep,ev,re,r,rp,c)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local g=Duel.SelectReleaseGroup(tp,s.spifilter,1,1,false,true,true,c,nil,nil,false,nil)
+	if c==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	local g=Duel.SelectReleaseGroup(tp,s.spifilter,1,1,true,true,true,c,nil,nil,false,e:GetHandler())
 	if g then
 		g:KeepAlive()
 		e:SetLabelObject(g)
@@ -78,51 +77,48 @@ function s.spiop(e,tp,eg,ep,ev,re,r,rp,c)
 	g:DeleteGroup()
 end
 
--- (3)
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
+-- (2)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return re and re:GetHandler():IsSetCard(SET_WARFLAME)
 end
-function s.desfilter(c,atk)
-	return c:IsFaceup() and c:IsAttackBelow(atk-1)
-end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local atk=e:GetHandler():GetAttack()
-	local g=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil,atk)
-	if chk==0 then return #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
-end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	local atk=c:GetAttack()
-	local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,0,LOCATION_MZONE,1,1,nil,atk)
-	local tc=g:GetFirst()
-	if tc then
-		Duel.Destroy(tc,REASON_EFFECT)
-		Duel.Damage(1-tp,atk-tc:GetAttack(),REASON_EFFECT)
-	end
-end
-
--- (4)
-function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE,0,1)
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(id)~=0
-end
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_WARFLAME) and c:IsLevelBelow(8) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.spfilter(c,e,tp,atk)
+	return c:IsSetCard(SET_WARFLAME) and c:IsAttackBelow(atk-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_DECK+LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
+	local atk=e:GetHandler():GetAttack()
+	if chkc then return chkc:IsLocation(LOCATION_DECK) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp,atk) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,atk) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local atk=e:GetHandler():GetAttack()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,atk)
 	if g then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+	end
+end
+	-- or if your opponent activates a monster effect during your Main Phase
+function s.rmeffcon(e,tp,eg,ep,ev,re,r,rp)
+	local ph=Duel.GetCurrentPhase()
+	return ep==1-tp and Duel.IsTurnPlayer(tp) and re:IsActiveType(TYPE_MONSTER) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
+end
+
+-- (3)
+function s.desfilter(c)
+	return c:IsFaceup() and c:IsDestructable()
+end
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and s.desfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.desfilter,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectTarget(tp,s.desfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end

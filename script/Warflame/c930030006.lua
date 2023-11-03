@@ -2,24 +2,24 @@
 local SET_WARFLAME=0xBAA1
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) must attack
+	-- must attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_MUST_ATTACK)
 	c:RegisterEffect(e1)
-	-- (2) banish
+	-- (1) banish
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCountLimit(1,{id,1})
+	e2:SetCountLimit(1,{id,0})
 	e2:SetCondition(s.bancon)
 	e2:SetTarget(s.bantg)
 	e2:SetOperation(s.banop)
 	c:RegisterEffect(e2)
-	-- (3) negate
+	-- (2) negate
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_DISABLE)
 	e3:SetDescription(aux.Stringid(id,1))
@@ -27,32 +27,44 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,{id,2})
+	e3:SetCountLimit(1,{id,1})
 	e3:SetTarget(s.negtg)
 	e3:SetOperation(s.negop)
 	c:RegisterEffect(e3)
-	-- (4) discard
+	-- (3) discard
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetCode(EVENT_BATTLE_DESTROYING)
-	e4:SetOperation(s.regop)
+	e4:SetDescription(aux.Stringid(id,3))
+	e4:SetCategory(CATEGORY_TOGRAVE)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,{id,3})
+	e4:SetTarget(s.distg)
+	e4:SetOperation(s.disop)
 	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,2))
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	local e5=e4:Clone()
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e5:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1,{id,3})
-	e5:SetCondition(s.spcon)
-	e5:SetTarget(s.sptg)
-	e5:SetOperation(s.spop)
+	e5:SetProperty(EFFECT_FLAG_DELAY)
+	e5:SetCode(EVENT_CHAIN_SOLVED)
+	e5:SetCondition(s.rmeffcon)
 	c:RegisterEffect(e5)
+	-- (4) Special Summon this card
+	local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(id,2))
+	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e6:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e6:SetCode(EVENT_LEAVE_FIELD)
+	e6:SetRange(LOCATION_GRAVE)
+	e6:SetCountLimit(1,{id,2})
+	e6:SetCondition(s.spcon2)
+	e6:SetTarget(s.sptg2)
+	e6:SetOperation(s.spop2)
+	c:RegisterEffect(e6)
 end
 s.listed_series={SET_WARFLAME}
 
--- (2)
+-- (1)
 function s.bancon(e,tp,eg,ep,ev,re,r,rp)
 	return re and re:GetHandler():IsSetCard(SET_WARFLAME)
 end
@@ -70,7 +82,10 @@ function s.banop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
+-- (2)
+function s.filter(c,e)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and (not e or c:IsCanBeEffectTarget(e))
+end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_MZONE,1,nil) end
@@ -95,20 +110,48 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 
--- (4)
-function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE,0,1)
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(id)~=0
-end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+-- (3)
+function s.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,0,0,1-tp,1)
 end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0)
 	if #g==0 then return end
 	local sg=g:RandomSelect(1-tp,1)
 	Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)
+end
+	-- or if your opponent activates a monster effect during your Main Phase
+function s.rmeffcon(e,tp,eg,ep,ev,re,r,rp)
+	local ph=Duel.GetCurrentPhase()
+	return ep==1-tp and Duel.IsTurnPlayer(tp) and re:IsActiveType(TYPE_MONSTER) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
+end
+
+-- (4)
+function s.cfilter(c,tp,rp)
+	return c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousControler(tp) and (c:GetPreviousTypeOnField()&TYPE_LINK~=0 or c:GetPreviousTypeOnField()&TYPE_RITUAL~=0) and c:IsPreviousLocation(LOCATION_MZONE)
+		and c:IsPreviousSetCard(SET_WARFLAME) and (c:IsReason(REASON_BATTLE) or (rp==1-tp and c:IsReason(REASON_EFFECT)))
+end
+function s.spcon2(e,tp,eg,ep,ev,re,r,rp)
+	return not eg:IsContains(e:GetHandler()) and eg:IsExists(s.cfilter,1,nil,tp,rp)
+end
+function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+end
+function s.spop2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_BASE_ATTACK)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetValue(1900)
+		e1:SetReset(RESET_EVENT+0xff0000)
+		c:RegisterEffect(e1)
+	end
 end

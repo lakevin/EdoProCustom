@@ -2,7 +2,7 @@
 local SET_WARFLAME=0xBAA1
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) special summon
+	-- (2) special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -20,12 +20,13 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_EXTRA_RITUAL_MATERIAL)
-	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCondition(s.con)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 end
-s.listed_series={SET_WARFLAME}
+function s.con(e)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and not Duel.IsPlayerAffectedByEffect(e:GetHandlerPlayer(),69832741)
+end
 
 -- (1)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -48,11 +49,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 	end
 end
 
--- (2)
-function s.con(e)
-	return not Duel.IsPlayerAffectedByEffect(e:GetHandlerPlayer(),69832741)
-end

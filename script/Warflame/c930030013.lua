@@ -1,4 +1,4 @@
---Grand Warflame Wushu
+--Grand Warflame Tian
 local SET_HOLYGRAIL=0xAD9C
 local SET_WARFLAME=0xBAA1
 local s,id=GetID()
@@ -46,11 +46,13 @@ function s.initial_effect(c)
 	-- (4) destroy
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
-	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e5:SetType(EFFECT_TYPE_IGNITION)
-	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e5:SetCategory(CATEGORY_DESTROY)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e5:SetCode(EVENT_PHASE+PHASE_BATTLE_START)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1,{id,2})
+	e5:SetCondition(s.descon)
 	e5:SetTarget(s.destg)
 	e5:SetOperation(s.desop)
 	c:RegisterEffect(e5)
@@ -69,7 +71,7 @@ end
 
 -- (2)
 function s.mtfilter(c)
-	return c:IsSpell() and c:IsSetCard(SET_WARFLAME)
+	return c:IsSpell() and (c:IsSetCard(SET_WARFLAME) or c:IsSetCard(SET_HOLYGRAIL))
 end
 function s.mtcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsAbleToEnterBP() and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5
@@ -117,23 +119,27 @@ function s.atkdownval(e,c)
 end
 
 -- (4)
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==1-tp
+end
 function s.desfilter(c,atk)
 	return c:IsFaceup() and c:IsAttackBelow(atk-1)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local atk=e:GetHandler():GetAttack()
-	local g=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil,atk)
-	if chk==0 then return #g>0 end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.desfilter(chkc,atk) end
+	if chk==0 then return Duel.IsExistingTarget(s.desfilter,tp,0,LOCATION_MZONE,1,nil,atk) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectTarget(tp,s.desfilter,tp,0,LOCATION_MZONE,1,1,nil,atk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	local atk=c:GetAttack()
-	local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,0,LOCATION_MZONE,1,1,nil,atk)
-	local tc=g:GetFirst()
-	if tc then
+	local atk1=c:GetAttack()
+	local tc=Duel.GetFirstTarget()
+	local atk2=tc:GetAttack()
+	if c:IsFaceup() and c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and s.desfilter(tc,atk1) then
 		Duel.Destroy(tc,REASON_EFFECT)
-		Duel.Damage(1-tp,atk-tc:GetAttack(),REASON_EFFECT)
+		Duel.Damage(1-tp,atk1-atk2,REASON_EFFECT)
 	end
 end

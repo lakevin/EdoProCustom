@@ -32,7 +32,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_WARFLAME,SET_HOLYGRAIL}
 function s.matfilter(c,lc,sumtype,tp)
-	return c:IsLevelBelow(4) and c:IsSetCard(SET_WARFLAME,lc,sumtype,tp)
+	return c:IsLevelBelow(8) and c:IsSetCard(SET_WARFLAME,lc,sumtype,tp)
 end
 
 -- (1)
