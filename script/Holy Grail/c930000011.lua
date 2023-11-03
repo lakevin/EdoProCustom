@@ -26,13 +26,15 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetOperation(s.acop)
 	c:RegisterEffect(e2)
-	-- (3) cannot be link material
+	-- (3) indes
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
-	e3:SetCondition(s.lkcon)
-	e3:SetValue(1)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e3:SetCondition(s.indcon)
+	e3:SetTarget(s.indtg)
+	e3:SetValue(s.indval)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_HOLYGRAIL}
@@ -78,15 +80,20 @@ function s.cfilter(c)
 	return c:IsMonster() and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function s.acop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local ct=eg:FilterCount(s.cfilter,nil)
 	if ct>0 then
-		c:AddCounter(COUNTER_GRAIL,ct,true)
+		e:GetHandler():AddCounter(COUNTER_GRAIL,ct,true)
 	end
 end
 
 -- (3)
-function s.lkcon(e)
+function s.indcon(e)
 	local c=e:GetHandler()
-	return c:GetCounter(COUNTER_GRAIL)>=1
+	return c:GetCounter(COUNTER_GRAIL)==0
+end
+function s.indtg(e,c)
+	return e:GetHandler()==c or (c:IsSetCard(SET_HOLYGRAIL) and e:GetHandler():GetLinkedGroup():IsContains(c))
+end
+function s.indval(e,re,tp)
+	return tp~=e:GetHandlerPlayer()
 end

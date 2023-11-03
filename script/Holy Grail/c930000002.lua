@@ -127,14 +127,9 @@ function s.atttg(e,c)
 	return true
 end
 -- 3 or more grail counter
-function s.discon(e)
-	return e:GetHandler():GetCounter(COUNTER_GRAIL)>=3
-end
-function s.disfilter(c,seq,p)
-	return c:IsFaceup() and c:IsSetCard(0x10c) and c:IsColumn(seq,p,LOCATION_SZONE)
-end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp or not re:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return false end
+	local c=e:GetHandler()
 	local rc=re:GetHandler()
 	local p,loc,seq=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_CONTROLER,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TRIGGERING_SEQUENCE)
 	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and (loc&LOCATION_SZONE==0 or rc:IsControler(1-p)) then
@@ -146,8 +141,7 @@ function s.discon(e,tp,eg,ep,ev,re,r,rp)
 			loc=rc:GetPreviousLocation()
 		end
 	end
-	return loc&LOCATION_SZONE==LOCATION_SZONE and e:GetHandler():IsColumn(seq,p,LOCATION_SZONE)
-	--Duel.IsExistingMatchingCard(s.disfilter,tp,LOCATION_MZONE,0,1,nil,seq,p)
+	return loc&LOCATION_SZONE==LOCATION_SZONE and c:IsColumn(seq,p,LOCATION_SZONE) and c:GetCounter(COUNTER_GRAIL)>=3
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)

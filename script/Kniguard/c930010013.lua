@@ -53,7 +53,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-		e1:SetDescription(aux.Stringid(id,4))
+		e1:SetDescription(aux.Stringid(id,1))
 		e1:SetTargetRange(1,0)
 		e1:SetTarget(s.splimit)
 		e1:SetReset(RESET_PHASE+PHASE_END)
@@ -61,5 +61,5 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.splimit(e,c)
-	return not (c:IsSetCard(SET_KNIGUARD) or c:IsSetCard(SET_HOLYGRAIL))
+	return not c:IsAttribute(ATTRIBUTE_LIGHT)
 end

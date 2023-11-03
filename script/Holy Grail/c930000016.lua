@@ -36,6 +36,9 @@ function s.matfilter(c,lc,sumtype,tp)
 end
 
 -- (1)
+function s.attrfilter(c)
+	return c:IsFaceup() and not c:IsAttribute(ATTRIBUTE_DARK)
+end
 function s.acfilter(c,tp)
 	return c:IsCode(CARD_UNHOLY_GRAIL) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
@@ -45,7 +48,21 @@ end
 function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local tc=Duel.SelectMatchingCard(tp,s.acfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
-	Duel.SSet(tp,tc)
+	if tc and Duel.SSet(tp,tc)~=0 then
+		if Duel.IsExistingTarget(s.attrfilter,tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+			local sg=Duel.SelectTarget(tp,s.attrfilter,tp,LOCATION_MZONE,0,1,1,nil)
+			local sc=Duel.GetFirstTarget()
+			if sc then
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+				e1:SetValue(ATTRIBUTE_DARK)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+				sc:RegisterEffect(e1)
+			end
+		end
+	end
 end
 
 -- (2)
