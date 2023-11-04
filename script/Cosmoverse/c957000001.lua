@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e1:SetValue(CARD_COSMO_QUEEN)
 	c:RegisterEffect(e1)
-	-- (1) Special summon procedure (from hand)
+	-- (1) Special Summon procedure (from hand)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
@@ -25,24 +25,40 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sphtg)
 	e2:SetOperation(s.sphop)
 	c:RegisterEffect(e2)
-	-- (2) remove
+	-- (2) equip
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_LEAVE_GRAVE+CATEGORY_EQUIP)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
-	e3:SetTarget(s.target)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCountLimit(1,{id,0})
+	e3:SetTarget(s.eqtg)
+	e3:SetOperation(s.eqop)
 	c:RegisterEffect(e3)
-	-- (3) SpSummon "Cosmo Queen", when leaves field
+	aux.AddEREquipLimit(c,nil,s.eqval,Card.EquipByEffectAndLimitRegister,e3)
+	-- (3) remove
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetCategory(CATEGORY_DESTROY)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_LEAVE_FIELD)
-	e4:SetCountLimit(1,id)
-	e4:SetCondition(s.spcon)
-	e4:SetTarget(s.sptg)
-	e4:SetOperation(s.spop)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_REMOVE+CATEGORY_TOGRAVE)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetCountLimit(1,{id,0})
+	e4:SetTarget(s.rmtg)
+	e4:SetOperation(s.rmop)
 	c:RegisterEffect(e4)
+	-- (4) Special Summon another "Cosmo Queen"
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,2))
+	e5:SetCategory(CATEGORY_DESTROY)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCode(EVENT_LEAVE_FIELD)
+	e5:SetCountLimit(1,{id,1})
+	e5:SetCondition(s.spcon)
+	e5:SetTarget(s.sptg)
+	e5:SetOperation(s.spop)
+	c:RegisterEffect(e5)
 end
 s.listed_series={SET_COSMOVERSE}
 
@@ -73,35 +89,7 @@ function s.sphop(e,tp,eg,ep,ev,re,r,rp,c)
 	g:DeleteGroup()
 end
 
--- (2) Select Option
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return s.rmtg(e,tp,eg,ep,ev,re,r,rp,0,chkc) end
-	-- (1) Equip 1 "Cosmo-Specian" Monster from GY
-	local b1=s.eqtg(e,tp,eg,ep,ev,re,r,rp,0)
-	-- (2) Add 1 "Protectrix" monster from Deck to hand
-	local b2=s.rmtg(e,tp,eg,ep,ev,re,r,rp,0)
-	if chk==0 then return b1 or b2 end
-	local op=0
-	if b1 and b2 and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
-	elseif b1 and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,1))
-	else
-		op=Duel.SelectOption(tp,aux.Stringid(id,2))+1
-	end
-	if op==0 then
-		e:SetCategory(CATEGORY_LEAVE_GRAVE+CATEGORY_EQUIP)
-		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e:SetOperation(s.eqop)
-		s.eqtg(e,tp,eg,ep,ev,re,r,rp,1)
-	else
-		e:SetCategory(CATEGORY_REMOVE+CATEGORY_TOGRAVE)
-		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e:SetOperation(s.rmop)
-		s.rmtg(e,tp,eg,ep,ev,re,r,rp,1)
-	end
-end
--- Option 1
+-- (2)
 function s.eqfilter(c)
 	return c:IsLevel(1) and c:IsSetCard(SET_COSMOVERSE) and not c:IsForbidden()
 end
@@ -122,7 +110,8 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 		c:EquipByEffectAndLimitRegister(e,tp,tc)
 	end
 end
--- Option 2
+
+-- (3)
 function s.rmfilter(c)
 	return c:IsMonster() and c:IsAbleToRemove() and aux.SpElimFilter(c,false,true)
 end

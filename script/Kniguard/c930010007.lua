@@ -11,14 +11,14 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCountLimit(1,{id,0},EFFECT_COUNT_CODE_OATH)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(s.spcon)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- (3) send cards to deck
+	-- (3) add to hand
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
@@ -35,10 +35,11 @@ function s.attfilter(c)
 	return c:IsRace(RACE_WARRIOR) and (c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsAttribute(ATTRIBUTE_FIRE))
 end
 function s.spcon(e,c)
-	return not c or Duel.CheckReleaseGroup(c:GetControler(),s.attfilter,1,false,1,true,c,c:GetControler(),nil,false,nil)
+	if c==nil then return true end
+	return Duel.CheckReleaseGroup(c:GetControler(),s.attfilter,1,true,1,true,c,c:GetControler(),nil,false,e:GetHandler())
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(tp,s.attfilter,1,1,false,true,true,c,nil,nil,false,nil)
+	local g=Duel.SelectReleaseGroup(tp,s.attfilter,1,1,true,true,true,c,nil,nil,false,e:GetHandler())
 	if g then
 		g:KeepAlive()
 		e:SetLabelObject(g)

@@ -7,34 +7,35 @@ function s.initial_effect(c)
 	--link summon
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_DARK),2,nil,s.lcheck)
 	c:EnableReviveLimit()
-	-- Activate 1 "Kingdom of Shadows" from your Deck
+	-- Set 1 "Kingdom of Shadows" directly from your Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,id)
+	e1:SetCountLimit(1,{id,0})
 	e1:SetCondition(s.accon)
 	e1:SetOperation(s.acop)
 	c:RegisterEffect(e1)
 	-- (2) Change Position
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_POSITION)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetCategory(CATEGORY_POSITION)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
+	e2:SetCountLimit(1,{id,1})
 	e2:SetTarget(s.cptg)
 	e2:SetOperation(s.cpop)
 	c:RegisterEffect(e2)
 	-- (3) add to hand
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e3:SetCountLimit(1,{id,1})
+	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.thcon)
 	e3:SetTarget(s.thtg)
 	e3:SetOperation(s.thop)
@@ -75,11 +76,11 @@ function s.cptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return b1 or b2 end
 	local op=0
 	if b1 and b2 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,3),aux.Stringid(id,4))
+		op=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
 	elseif b1 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,3))
+		op=Duel.SelectOption(tp,aux.Stringid(id,2))
 	else
-		op=Duel.SelectOption(tp,aux.Stringid(id,4))+1
+		op=Duel.SelectOption(tp,aux.Stringid(id,3))+1
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	if op==0 then
@@ -100,6 +101,14 @@ function s.fdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and tc:IsFacedown() then
 		Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(3009)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+		e1:SetValue(1)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
 	end
 end
 
@@ -108,7 +117,7 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function s.tdfilter(c)
-	return c:IsSetCard(SET_SHADOWBLADE) and c:IsAbleToDeck()
+	return c:IsSetCard(SET_SHADOWBLADE) and c:IsAbleToDeck() and not c:IsCode(id)
 end
 function s.thfilter(c)
 	return (c:IsSetCard(SET_SHADOWBLADE) or c:IsSetCard(SET_HOLYGRAIL)) and c:IsAbleToHand()

@@ -3,40 +3,34 @@ local s,id=GetID()
 local CARD_COSMO_QUEEN=38999506
 local SET_COSMOVERSE=0x9995
 function s.initial_effect(c)
-	c:SetUniqueOnField(1,0,id)
-	--Activate
+	-- (1) Activate + Equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCost(aux.RemainFieldCost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--prevent special summon
+	-- (2) Negate Special Summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCategory(CATEGORY_DISABLE_SUMMON+CATEGORY_DESTROY)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_SPSUMMON)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e2:SetTargetRange(1,1)
+	e2:SetCondition(s.negcon)
+	e2:SetCost(s.negcost)
+	e2:SetTarget(s.negtg)
+	e2:SetOperation(s.negop)
 	c:RegisterEffect(e2)
-	-- (2) self destroy
+	-- (3) self destroy
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_EQUIP)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
-	-- (3) destroy when leaving the field
-	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_DESTROY)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_LEAVE_FIELD)
-	e4:SetCondition(s.descon)
-	e4:SetTarget(s.destg)
-	e4:SetOperation(s.desop)
-	c:RegisterEffect(e4)
 end
 s.listed_series={SET_COSMOVERSE}
 s.listed_names={CARD_COSMO_QUEEN}
@@ -72,18 +66,21 @@ function s.eqlimit(e,c)
 	return c:GetControler()==e:GetHandlerPlayer() or e:GetHandler():GetEquipTarget()==c
 end
 
--- (3)
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsPreviousPosition(POS_FACEUP) and not c:IsLocation(LOCATION_DECK)
+-- (2)
+function s.negcon(e,tp,eg,ep,ev,re,r,rp)
+	return tp==1-ep and Duel.GetCurrentChain()==0
 end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+end
+function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,0,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
-	Duel.SetChainLimit(aux.FALSE)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,#eg,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,#eg,0,0)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,0,nil)
-	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
+function s.negop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.NegateSummon(eg)
+	Duel.Destroy(eg,REASON_EFFECT)
+	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
