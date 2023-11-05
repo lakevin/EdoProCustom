@@ -4,9 +4,17 @@ Welcome to my Edopro Custom Card repository. My idea is to create new archetypes
 
 (I do not own all the artworks of the cards.)
 
-## Wiki
+## Links
 
-Wiki: https://github.com/lakevin/EdoProCustom/wiki
+#### Wiki
+Learn more about my cards in the wiki: https://github.com/lakevin/EdoProCustom/wiki
+
+#### Discord
+Join my Discord for feedback and discussions: https://discord.gg/pwye5y8zj2
+
+## How to install?
+
+Coming soon...
 
 ## Details
 
@@ -21,18 +29,22 @@ Wiki: https://github.com/lakevin/EdoProCustom/wiki
 
 1. Holy Grail `95% Done`
 2. Kniguards `95% Done`
+3. Shadowblades `95% Done`
+4. Warflame `95% Done`
 
 ### Planned Archetypes
 
-1. Shadowblades `80% Done`
-2. Warflame `0% Done`
+1. Hi-Tech `0% Done`
+2. Demon Mask `0% Done`
+3. Timekeeper / Time Traveler `0% Done`
 
 ## Planned Updates
 
-### September 2023
+### November / December 2023
 
-- New archetype "Holy Grail" with sub-archetypes "Kniguards", "Warflame" and "Shadowblades"
+- Hi-Tech: Is a new Synchro-based archetype that uses Synchro Monsters from the Extra Deck as material. The Synchro Monsters activate their effect when they are used as Synchro material.
 
-### October 2023
+### Later:
 
-- New Synchro-based archetype
+- Demon Mask: This archetype is based on the "Masks" cards from the first anime season. The new "Demon Mask" cards take control of opponent monsters and use them for Fusion Summons.
+- Timekeeper / Time Traveler: This archetype has cards that work like a lighter version of <a href="https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=12074">PSY-Framelord Omega</a>. It can disrupt your opponent by interrupting effects and banishing cards.
