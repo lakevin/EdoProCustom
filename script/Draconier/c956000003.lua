@@ -41,11 +41,11 @@ s.listed_series={SET_DRACONIER,SET_DRACONIER_SUMMONER}
 
 -- (1)
 function s.tdfilter1(c,e,tp)
-	return c:IsLevelBelow(6) and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToDeck()
+	return c:IsFaceup() and c:IsLevelBelow(6) and c:IsRace(RACE_DRAGON) and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode())
 end
 function s.spfilter1(c,e,tp,code)
-	return c:GetLevel()==6 and c:IsSetCard(0x9992) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6 and c:IsSetCard(SET_DRACONIER) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -79,7 +79,7 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==4 and c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1

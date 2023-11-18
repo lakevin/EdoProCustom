@@ -1,5 +1,7 @@
 -- Draconier Sparkignite
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	c:SetSPSummonOnce(id)
 	--Link summon procedure
@@ -29,12 +31,12 @@ end
 
 -- link summon
 function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(0x9992,lc,sumtype,tp) and c:IsRace(RACE_DRAGON,lc,sumtype,tp)
+	return c:IsSetCard(SET_DRACONIER,lc,sumtype,tp) and c:IsRace(RACE_DRAGON,lc,sumtype,tp)
 end
 
 --- (1)
 function s.thfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
+	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -56,7 +58,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function s.spfilter(c,e,tp)
-	return c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsRace(RACE_DRAGON) and c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)

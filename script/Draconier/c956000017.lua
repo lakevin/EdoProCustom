@@ -1,5 +1,7 @@
 --Draconier Jormungnir
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	--pendulum summon
 	Pendulum.AddProcedure(c)
@@ -19,7 +21,7 @@ function s.initial_effect(c)
 end
 
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),0x9992)
+	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),SET_DRACONIER)
 end
 function s.cfilter(c)
 	return c:IsType(TYPE_PENDULUM) and c:IsDiscardable()

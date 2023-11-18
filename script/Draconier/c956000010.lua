@@ -1,8 +1,10 @@
 --Draconier Fafnir
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),7,3,nil,nil,99)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_DRACONIER),7,3,nil,nil,99)
 	c:EnableReviveLimit()
 	-- Can use Level 6 monsters as Level 7 materials
 	local e0=Effect.CreateEffect(c)
@@ -11,7 +13,7 @@ function s.initial_effect(c)
 	e0:SetCode(EFFECT_XYZ_LEVEL)
 	e0:SetRange(LOCATION_EXTRA)
 	e0:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e0:SetTarget(function(e,c) return c:IsLevel(6) and c:IsSetCard(0x9992) and c:IsType(TYPE_PENDULUM) end)
+	e0:SetTarget(function(e,c) return c:IsLevel(6) and c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_PENDULUM) end)
 	e0:SetValue(7)
 	c:RegisterEffect(e0)
 	-- (1) negate
@@ -19,8 +21,7 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCountLimit(1,id)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetTarget(s.distg)
 	e1:SetOperation(s.disop)
 	c:RegisterEffect(e1)
@@ -53,11 +54,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 
-s.listed_series={0x9992}
+s.listed_series={SET_DRACONIER}
 
 --xyz summon
 function s.ovfilter(c,tp,lc)
-	return c:IsFaceup() and c:IsSetCard(0x9992,lc,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
+	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER,lc,SUMMON_TYPE_XYZ,tp) and c:IsRank(6) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
 end
 function s.xyzop(e,tp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
@@ -67,7 +68,7 @@ end
 
 -- (1)
 function s.dfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsSetCard(0x9992)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsSetCard(SET_DRACONIER)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end

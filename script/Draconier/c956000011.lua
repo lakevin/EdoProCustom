@@ -1,5 +1,7 @@
 --Draconier's Lost World
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -12,12 +14,12 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_DRACONIER))
 	e2:SetValue(300)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_UPDATE_DEFENSE)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
+	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_DRACONIER))
 	e3:SetValue(300)
 	c:RegisterEffect(e3)
 	-- (1.1) exchange 1 Level 4 "Draconier" monsters from field and deck
@@ -30,14 +32,14 @@ function s.initial_effect(c)
 	e4:SetTarget(s.target1)
 	e4:SetOperation(s.operation1)
 	c:RegisterEffect(e4)
-	-- (1.2) Add 1 Dragon-type "Draconier" Pendulum monster from Extra Deck to your hand
+	-- (1.2) Add 1 face-up "Draconier" Pendulum monster from Extra Deck to your hand
 	local e5=e4:Clone()
 	e5:SetDescription(aux.Stringid(id,1))
 	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e5:SetTarget(s.target2)
 	e5:SetOperation(s.operation2)
 	c:RegisterEffect(e5)
-	-- (1.2) Add 1 Dragon-type "Draconier" Pendulum in your GY or banished to your hand
+	-- (1.2) Add 1 Dragon-type "Draconier" in your GY or banished to your hand
 	local e6=e4:Clone()
 	e6:SetDescription(aux.Stringid(id,2))
 	e6:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -59,11 +61,11 @@ end
 
 -- (1.1)
 function s.tdfilter1(c,e,tp)
-	return c:IsFaceup() and c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsAbleToDeck()
+	return c:IsFaceup() and c:GetLevel()==4 and c:IsSetCard(SET_DRACONIER) and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode())
 end
 function s.spfilter1(c,e,tp,code)
-	return c:GetLevel()==4 and c:IsSetCard(0x9992) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==4 and c:IsSetCard(SET_DRACONIER) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -90,7 +92,7 @@ function s.operation1(e,tp,eg,ep,ev,re,r,rp)
 end
 -- (1.2)
 function s.thfilter(c,e,tp)
-	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand()
 end
 function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
@@ -107,7 +109,7 @@ function s.operation2(e,tp,eg,ep,ev,re,r,rp)
 end
 -- (1.3)
 function s.thfilter2(c,e,tp)
-	return c:IsRace(RACE_DRAGON) and c:IsSetCard(0x9992) and c:IsAbleToHand()
+	return c:GetLevel()==4 and c:IsRace(RACE_DRAGON) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand()
 end
 function s.target3(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
@@ -129,7 +131,7 @@ function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function s.drfilter(c,e)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
+	return c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.drfilter(chkc) end

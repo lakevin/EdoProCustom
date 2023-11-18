@@ -1,16 +1,17 @@
 --Draconier Jadeitnir
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9992),6,2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_DRACONIER),6,2)
 	c:EnableReviveLimit()
 	-- (1) face-down
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_POSITION)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.turntg)
 	e1:SetOperation(s.turnop)
 	c:RegisterEffect(e1)
@@ -30,8 +31,9 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_LEAVE_FIELD)
+	e3:SetCountLimit(1,id)
 	e3:SetCondition(s.spcon)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
@@ -69,8 +71,8 @@ function s.thfilter(c)
 	return c:IsFacedown() and c:IsAbleToHand()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
+	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.thfilter(chkc) end
@@ -88,7 +90,7 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_PENDULUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)

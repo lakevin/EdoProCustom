@@ -1,5 +1,7 @@
 --Draconier Incantation Magic
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -15,7 +17,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_PZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9992))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_DRACONIER))
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	-- (1) spsummon
@@ -52,7 +54,8 @@ function s.initial_effect(c)
 	e6:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e6:SetType(EFFECT_TYPE_IGNITION)
 	e6:SetRange(LOCATION_GRAVE)
-	e6:SetCode(EVENT_FREE_CHAIN)
+	e6:SetCountLimit(1)
+	e6:SetCondition(aux.exccon)
 	e6:SetCost(s.drcost)
 	e6:SetTarget(s.drtg)
 	e6:SetOperation(s.drop)
@@ -63,12 +66,12 @@ end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc1=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
 	local tc2=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
-	return (tc1 and tc2 and tc1:IsSetCard(0x9992) and tc2:IsSetCard(0x9992))
+	return (tc1 and tc2 and tc1:IsSetCard(SET_DRACONIER) and tc2:IsSetCard(SET_DRACONIER))
 end
 
 -- (1)
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsType(TYPE_EXTRA)
+	return c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsType(TYPE_EXTRA)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
@@ -86,7 +89,7 @@ end
 
 -- (2)
 function s.thfilter(c)
-	return c:IsSetCard(0x9992) and c:IsType(TYPE_SPELL) and c:IsType(TYPE_QUICKPLAY) and c:IsAbleToHand()
+	return c:IsSetCard(SET_DRACONIER) and c:IsType(TYPE_SPELL) and c:IsType(TYPE_QUICKPLAY) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -114,7 +117,7 @@ function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function s.drfilter(c,e)
-	return c:IsSetCard(0x9992) and c:IsRace(RACE_SPELLCASTER) and c:IsAbleToHand()
+	return c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_SPELLCASTER) and c:IsAbleToHand()
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.drfilter,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,nil) end

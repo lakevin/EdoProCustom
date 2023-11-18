@@ -35,6 +35,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1,id)
+	e4:SetCondition(s.lvcon)
 	e4:SetTarget(s.lvtg)
 	e4:SetOperation(s.lvop)
 	c:RegisterEffect(e4)
@@ -43,10 +44,10 @@ s.listed_series={SET_DRACONIER,SET_DRACONIER_SUMMONER}
 
 -- (1)
 function s.thfilter(c,tp)
-	return c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:GetLevel()==4 and c:IsRace(RACE_DRAGON) and c:IsAbleToHand()
 end
 function s.spfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsSetCard(0x9992) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsType(TYPE_MONSTER) and c:GetLevel()==6 and c:IsSetCard(SET_DRACONIER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
@@ -76,7 +77,7 @@ end
 
 -- (3)
 function s.ssfilter(c)
-	return c:IsSetCard(0x9992) and c:IsFaceup()
+	return c:IsSetCard(SET_DRACONIER) and c:IsFaceup()
 end
 function s.sscon(e,c)
 	if c==nil then return true end
@@ -86,8 +87,11 @@ function s.sscon(e,c)
 end
 
 -- (4)
+function s.lvcon(e,tp,eg,ep,ev,re,r,rp)
+	return re and re:GetHandler():IsCode(id)
+end
 function s.lvfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9992) and not c:IsLevel(3) and c:HasLevel()
+	return c:IsFaceup() and c:IsSetCard(SET_DRACONIER) and not c:IsLevel(3) and c:HasLevel()
 end
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.lvfilter(chkc) end

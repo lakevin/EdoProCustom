@@ -86,9 +86,10 @@ end
 function s.teop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)~=0 then
+	if tc:IsRelateToEffect(e) then
+		Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)
 		--Cannot special summon monsters with the same name
-		local e1=Effect.CreateEffect(e:GetHandler())
+		--[[local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(id,1))
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
@@ -97,7 +98,7 @@ function s.teop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTarget(s.sumlimit)
 		e1:SetLabel(tc:GetCode())
 		e1:SetReset(RESET_PHASE+PHASE_END)
-		Duel.RegisterEffect(e1,tp)
+		Duel.RegisterEffect(e1,tp)]]--
 	end
 end
 --Cannot special summon monsters with the same name

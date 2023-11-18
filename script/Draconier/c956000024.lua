@@ -1,5 +1,6 @@
 --Draconier Avatnir
 local s,id=GetID()
+local SET_DRACONIER=0x9992
 function s.initial_effect(c)
 	--Synchro summon
 	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9992),1,1,Synchro.NonTunerEx(Card.IsRace,RACE_DRAGON),1,99)
@@ -26,10 +27,12 @@ function s.initial_effect(c)
 	-- (2) Change attribute
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_PHASE+PHASE_END)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
+	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e4:SetCountLimit(1,id)
 	e4:SetCondition(s.attcon)
 	e4:SetTarget(s.atttg)
 	e4:SetOperation(s.attop)
@@ -38,13 +41,11 @@ function s.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetCategory(CATEGORY_DESTROY)
-	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e5:SetCode(EVENT_FREE_CHAIN)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e5:SetCountLimit(1,id)
-	e5:SetCondition(s.descon)
+	e5:SetCost(s.descost)
 	e5:SetTarget(s.destg)
 	e5:SetOperation(s.desop)
 	c:RegisterEffect(e5)
@@ -58,7 +59,7 @@ function s.initial_effect(c)
 	e6:SetTarget(s.pentg)
 	e6:SetOperation(s.penop)
 	c:RegisterEffect(e6)
-	-- [ PENDULUM EFFECT ]
+	-- (5) [ PENDULUM EFFECT ]
 	local e7=Effect.CreateEffect(c)
 	e7:SetDescription(aux.Stringid(id,0))
 	e7:SetType(EFFECT_TYPE_IGNITION)
@@ -100,35 +101,29 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.tgfilter(c)
-	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.desfilter,0,0,LOCATION_MZONE,1,nil,c)
+function s.cfilter(c,tp)
+	return c:IsMonster() and Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c,c:GetAttribute())
 end
-function s.desfilter(c,tc)
-	return c:IsFaceup() and c:IsAttribute(tc:GetAttribute())
+function s.desfilter(c,attr)
+	return c:IsFaceup() and c:IsAttribute(attr)
 end
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local ph=Duel.GetCurrentPhase()
-	return ph==PHASE_MAIN1 or ph==PHASE_MAIN2
+function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,true,nil,nil,tp) end
+	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,true,nil,nil,tp)
+	e:SetLabel(g:GetFirst():GetAttribute())
+	Duel.Release(g,REASON_COST)
 end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE+LOCATION_PZONE) and s.tgfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE+LOCATION_PZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local tc=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE+LOCATION_PZONE,0,1,1,nil):GetFirst()
-	local dg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil,tc)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,tp,0)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local attr=e:GetLabel()
+	local dg=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,attr)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,#dg,LOCATION_ONFIELD,LOCATION_ONFIELD)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local tc=Duel.GetFirstTarget()
-	if not (tc:IsFaceup() and tc:IsRelateToEffect(e)) then return end
-	if tc and Duel.Destroy(tc,REASON_EFFECT) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,0,LOCATION_MZONE,1,1,nil,tc)
-		if #g>0 then
-			Duel.HintSelection(g,true)
-			Duel.Destroy(g,REASON_EFFECT)
-		end
+	local attr=e:GetLabel()
+	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,attr)
+	if #g>0 then
+		Duel.Destroy(g,REASON_EFFECT)
 	end
 end
 

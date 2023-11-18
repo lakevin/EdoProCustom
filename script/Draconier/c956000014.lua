@@ -1,5 +1,7 @@
 --Draconier Soulmaster
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	-- (1) to hand or copy effect
 	local e1=Effect.CreateEffect(c)
@@ -14,9 +16,9 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCountLimit(1,id)
 	c:RegisterEffect(e2)
-	-- (2) Inactivate
+	-- (2) Negate grave
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,3))
+	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_DISABLE+CATEGORY_REMOVE)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
@@ -36,6 +38,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e6)
 	-- (3) Return To Hand
 	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -50,7 +53,7 @@ end
 
 -- (1)
 function s.thfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
+	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -89,7 +92,7 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and c:IsAbleToHand()
+	return c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_DRAGON) and c:IsAbleToHand()
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_MZONE

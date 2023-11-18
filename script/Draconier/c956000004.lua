@@ -1,5 +1,7 @@
 --Draconier Snakesnare
 local s,id=GetID()
+local SET_DRACONIER=0x9992
+local SET_DRACONIER_SUMMONER=0x9993
 function s.initial_effect(c)
 	-- (1) search + to hand
 	local e1=Effect.CreateEffect(c)
@@ -42,7 +44,7 @@ end
 
 -- (1)
 function s.thfilter(c,e,tp)
-	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsSetCard(0x9992) and c:IsAbleToHand() 
+	return c:GetLevel()==6 and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsSetCard(SET_DRACONIER) and c:IsAbleToHand() 
 		and not c:IsCode(id) 
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -94,42 +96,12 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 		local e3=e2:Clone()
 		e3:SetCode(EFFECT_CANNOT_ATTACK)
 		c:RegisterEffect(e3)
-		--control
-		--[[local e4=Effect.CreateEffect(c)
-		e4:SetDescription(aux.Stringid(id,1))
-		e4:SetCategory(CATEGORY_CONTROL)
-		e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-		e4:SetCode(EVENT_LEAVE_FIELD)
-		e4:SetCondition(s.ctcon)
-		e4:SetTarget(s.cttg)
-		e4:SetOperation(s.ctop)
-		e4:SetReset(RESET_EVENT+0x1020000)
-		c:RegisterEffect(e4)]]--
 	end
 end
---[[
-function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_LOST_TARGET)
-end
-function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local ec=e:GetHandler():GetPreviousEquipTarget()
-	if ec:IsLocation(LOCATION_MZONE) and ec:IsControlerCanBeChanged() then
-		Duel.SetTargetCard(ec)
-		Duel.SetOperationInfo(0,CATEGORY_CONTROL,ec,1,0,0)
-	end
-end
-function s.ctop(e,tp,eg,ep,ev,re,r,rp)
-	local ec=Duel.GetFirstTarget()
-	if ec and ec:IsRelateToEffect(e) then
-		Duel.GetControl(ec,tp)
-	end
-end
-]]--
 
 -- (3)
 function s.spfilter(c)
-	return c:GetLevel()==4 and c:IsSetCard(0x9992) and c:IsRace(RACE_DRAGON) and not c:IsCode(id)
+	return c:GetLevel()==4 and c:IsSetCard(SET_DRACONIER) and c:IsRace(RACE_DRAGON) and not c:IsCode(id)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_MZONE
