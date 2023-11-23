@@ -34,7 +34,7 @@ function s.initial_effect(c)
 end
 
 function s.ovfilter(c,tp,xyzc)
-	return c:IsFaceup() and c:IsType(TYPE_LINK,xyzc,SUMMON_TYPE_XYZ,tp) and c:IsCode(960000029,xyzc,SUMMON_TYPE_XYZ,tp)
+	return c:IsFaceup() and c:IsType(TYPE_LINK,xyzc,SUMMON_TYPE_XYZ,tp) and c:IsSetCard(SET_GRIMM_CHAIN,xyzc,SUMMON_TYPE_XYZ,tp)
 end
 
 -- (1)
