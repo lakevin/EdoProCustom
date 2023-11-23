@@ -1,5 +1,7 @@
 --Leon, The Chain
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	-- (1) Change ATK/DEF
 	local e1=Effect.CreateEffect(c)
@@ -7,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9999))
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_GRIMM_CHAIN))
 	e1:SetValue(500)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()

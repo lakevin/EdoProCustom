@@ -1,5 +1,7 @@
 -- Contractor Oz Vessalius
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	--add to hand
 	local e1=Effect.CreateEffect(c)
@@ -34,7 +36,7 @@ end
 
 --add to hand
 function s.thfilter(c)
-	return c:IsSetCard(0x9999) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

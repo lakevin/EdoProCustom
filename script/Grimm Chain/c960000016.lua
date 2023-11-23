@@ -1,5 +1,7 @@
 -- Alice, The Chain
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	c:SetSPSummonOnce(id)
 	-- (1) cannot special summon
@@ -51,12 +53,12 @@ function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x9998),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_CONTRACTOR),tp,LOCATION_MZONE,0,1,nil)
 end
 
 -- (2)
 function s.thfilter(c)
-	return c:IsSetCard(0x9998) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(SET_CONTRACTOR) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -71,9 +73,9 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3) Check if a winged beast monster is normal summoned to your field
+-- (3) Check if a "Contractor" monster is normal summoned to your field
 function s.rtfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x9998)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(SET_CONTRACTOR)
 end
 	--Activation legality
 function s.rttg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -1,5 +1,7 @@
 -- Jabberwock
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
@@ -47,16 +49,18 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	local cg=c:GetColumnGroup()
-	if chkc then return s.filter(chkc,cg,c) and chkc:IsLocation(LOCATION_MZONE+LOCATION_SZONE) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE+LOCATION_SZONE,LOCATION_MZONE+LOCATION_SZONE,1,nil,cg,c) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE+LOCATION_SZONE,LOCATION_MZONE+LOCATION_SZONE,1,3,nil,cg,c)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
+	local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil,cg,c)
+	if chkc then return s.filter(chkc,cg,c) and chkc:IsLocation(LOCATION_MZONE) end
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
+	local c=e:GetHandler()
+	local cg=c:GetColumnGroup()
+	local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil,cg,c)
+	if #g>0 then
+		Duel.Destroy(g,REASON_EFFECT)
+	end
 end
 
 -- (2)

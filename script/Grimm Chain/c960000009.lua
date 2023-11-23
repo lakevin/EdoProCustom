@@ -1,27 +1,29 @@
 -- Pact with the Black Winged Chain
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	--Activate
 	local e1=Ritual.AddProcEqual{handler=c,filter=s.ritualfil,location=LOCATION_DECK|LOCATION_HAND,matfilter=s.forcedgroup,extrafil=s.extrafil,extraop=s.extraop,extratg=s.extratg,stage2=s.stage2}
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
 end
-s.listed_series={0x9998,0x9999}
+s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
 
 function s.ritualfil(c)
-	return c:IsSetCard(0x9999) and c:IsRitualMonster()
+	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsRitualMonster()
 end
 function s.forcedgroup(c,e,tp)
 	return c:IsLocation(LOCATION_ONFIELD)
 end
 function s.mfilter(c)
-	return c:HasLevel() and c:IsSetCard(0x9999) and c:IsAbleToDeck()
+	return c:HasLevel() and c:IsSetCard(SET_GRIMM_CHAIN) and c:IsAbleToDeck()
 end
 function s.extrafil(e,tp,eg,ep,ev,re,r,rp,chk)
 	return Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
 end
 function s.extraop(mg,e,tp,eg,ep,ev,re,r,rp)
-	local mat2=mg:Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_REMOVED):Filter(Card.IsSetCard,nil,0x9999)
+	local mat2=mg:Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_REMOVED):Filter(Card.IsSetCard,nil,SET_GRIMM_CHAIN)
 	mg:Sub(mat2)
 	Duel.ReleaseRitualMaterial(mg)
 	Duel.SendtoDeck(mat2,nil,2,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
@@ -31,7 +33,7 @@ function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
 end
 function s.stage2(mat,e,tp,eg,ep,ev,re,r,rp,tc)
-	tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,1))
+	tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,0))
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)

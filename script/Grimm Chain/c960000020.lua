@@ -1,8 +1,11 @@
 -- Doldum
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
-	-- link summon
-	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x9999),2,2)
+	--xyz summon
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_GRIMM_CHAIN),3,2)
+	--revive condition
 	c:EnableReviveLimit()
 	-- (1) Equip
 	local e1=Effect.CreateEffect(c)
@@ -13,6 +16,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCondition(s.eqcon)
+	e1:SetCost(aux.dxmcostgen(2,2,nil))
 	e1:SetTarget(s.eqtg)
 	e1:SetOperation(s.eqop)
 	c:RegisterEffect(e1)
@@ -26,6 +30,14 @@ function s.initial_effect(c)
 	e2:SetCondition(s.adcon)
 	e2:SetValue(s.atkval)
 	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EFFECT_SET_DEFENSE)
+	e3:SetCondition(s.adcon)
+	e3:SetValue(s.defval)
+	c:RegisterEffect(e3)
 	-- (3) damage
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -88,6 +100,16 @@ function s.atkval(e,c)
 		return 0
 	else
 		return atk
+	end
+end
+function s.defval(e,c)
+	local c=e:GetHandler()
+	local g=c:GetEquipGroup():Filter(s.eqfilter,nil)
+	local def=g:GetFirst():GetTextDefense()
+	if g:GetFirst():IsFacedown() or g:GetFirst():GetOriginalType()&TYPE_MONSTER==0 or def<0 then
+		return 0
+	else
+		return def
 	end
 end
 

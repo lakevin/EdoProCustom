@@ -1,5 +1,7 @@
 -- Cheshire, The Chain
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	-- (1) spsummon
 	local e1=Effect.CreateEffect(c)

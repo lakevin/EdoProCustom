@@ -1,5 +1,7 @@
 -- Gryphon
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
@@ -13,6 +15,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	-- (2) remove
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)

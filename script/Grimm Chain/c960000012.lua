@@ -1,5 +1,7 @@
 -- Raven
 local s,id=GetID()
+local SET_CONTRACTOR=0x9998
+local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()

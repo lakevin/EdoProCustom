@@ -82,16 +82,16 @@ end
 function s.efop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	--disable
+	--Attach 1 banished monster to this card
 	local e1=Effect.CreateEffect(rc)
 	e1:SetDescription(aux.Stringid(id,1))
-	e1:SetCategory(CATEGORY_DISABLE)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_REMOVE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
-	rc:RegisterEffect(e1,true)
+	e1:SetCountLimit(1)
+	e1:SetCost(s.ovcost)
+	e1:SetOperation(s.ovop)
+	rc:RegisterEffect(e1, true)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
@@ -101,54 +101,23 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 		rc:RegisterEffect(e2,true)
 	end
 end
-
-function s.rmfilter(c)
-	return c:IsSetCard(SET_GRIMM_CHAIN) and c:IsRitualMonster() and c:IsAbleToRemove()
+	-- effect gain
+function s.ovcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:GetFlagEffect(id)==0 and c:IsType(TYPE_XYZ) end
+	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
 end
-function s.cfilter(c,e)
-	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_EFFECT) and not c:IsPreviousLocation(LOCATION_REMOVED) 
+function s.ovfilter(c,xc,tp,e)
+	return c:IsFaceup() and c:IsMonster() and c:IsCanBeXyzMaterial(xc,tp,REASON_EFFECT) and not c:IsImmuneToEffect(e)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg and eg:IsExists(s.cfilter,1,nil)
-		and Duel.IsExistingTarget(s.rmfilter,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
-end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not eg or #eg<1 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local sg=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	local sc=sg:GetFirst()
-	if sc and Duel.Remove(sc,POS_FACEUP,REASON_EFFECT)~=0 then
-		local g=eg:Filter(s.cfilter,nil)
-		local c=e:GetHandler()
-		for tc in aux.Next(g) do
-			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-			--Negate the effects of the Summoned monster(s)
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e1)
-			local e2=e1:Clone()
-			e2:SetCode(EFFECT_DISABLE_EFFECT)
-			tc:RegisterEffect(e2)
-			--Cannot attack
-			local e3=Effect.CreateEffect(c)
-			e3:SetType(EFFECT_TYPE_SINGLE)
-			e3:SetCode(EFFECT_CANNOT_ATTACK)
-			e3:SetValue(1)
-			e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e3)
-			--Cannot be used as material for a Fusion/Synchro/Xyz/Link Summon
-			local e4=Effect.CreateEffect(c)
-			e4:SetDescription(aux.Stringid(id,1))
-			e4:SetType(EFFECT_TYPE_SINGLE)
-			e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CLIENT_HINT)
-			e4:SetCode(EFFECT_CANNOT_BE_MATERIAL)
-			e4:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK))
-			e4:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e4)
-		end
+function s.ovop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+	local g=Duel.SelectMatchingCard(tp,s.ovfilter,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil,c,tp,e)
+	if #g>0 then
+		Duel.HintSelection(g,true)
+		Duel.Overlay(c,g)
 	end
 end
 
