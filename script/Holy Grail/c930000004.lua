@@ -1,4 +1,4 @@
---Priestess of the Holy Grail
+--Angel of the Holy Grail
 local SET_HOLYGRAIL=0xAD9C
 local s,id=GetID()
 function s.initial_effect(c)

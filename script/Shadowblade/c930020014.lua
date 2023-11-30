@@ -1,21 +1,21 @@
 --Shadowblade Witcher
 local SET_SHADOWBLADE=0xB64A
 local SET_HOLYGRAIL=0xAD9C
-local SET_KINGDOM_SHADOWS=930020009
 local s,id=GetID()
 function s.initial_effect(c)
 	--link summon
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_DARK),2,nil,s.lcheck)
 	c:EnableReviveLimit()
-	-- Set 1 "Kingdom of Shadows" directly from your Deck
+	-- Set 1 "Shadowblade" Spell/Trap directly from your Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,{id,0})
-	e1:SetCondition(s.accon)
-	e1:SetOperation(s.acop)
+	e1:SetCondition(s.sccon)
+	e1:SetTarget(s.sctg)
+	e1:SetOperation(s.scop)
 	c:RegisterEffect(e1)
 	-- (2) Change Position
 	local e2=Effect.CreateEffect(c)
@@ -28,18 +28,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.cptg)
 	e2:SetOperation(s.cpop)
 	c:RegisterEffect(e2)
-	-- (3) add to hand
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e3:SetCountLimit(1,{id,2})
-	e3:SetCondition(s.thcon)
-	e3:SetTarget(s.thtg)
-	e3:SetOperation(s.thop)
-	c:RegisterEffect(e3)
 end
 s.listed_series={SET_SHADOWBLADE}
 
@@ -48,25 +36,40 @@ function s.lcheck(g,lc,sumtype,tp)
 end
 
 -- (1)
-function s.fieldfilter(c,tp)
-	return c:IsCode(SET_KINGDOM_SHADOWS) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
-end
-function s.accon(e,tp,eg,ep,ev,re,r,rp)
+function s.sccon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) and Duel.IsExistingMatchingCard(s.fieldfilter,tp,LOCATION_DECK,0,1,nil,tp)
 end
-function s.acop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.fieldfilter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
-	Duel.SSet(tp,tc)
-	--Duel.ActivateFieldSpell(tc,e,tp,eg,ep,ev,re,r,rp)
+function s.tdfilter(c)
+	return c:IsSetCard(SET_SHADOWBLADE) and c:IsAbleToDeck() and not c:IsCode(id)
+end
+function s.scfilter(c,ignore)
+	return c:IsSetCard(SET_SHADOWBLADE) and c:IsSpellTrap() and c:IsSSetable()
+end
+function s.sctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and s.tdfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) 
+		and Duel.IsExistingMatchingCard(s.scfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
+end
+function s.scop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,1,REASON_EFFECT)~=0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+		local g=Duel.SelectMatchingCard(tp,s.scfilter,tp,LOCATION_DECK,0,1,1,nil)
+		if #g>0 then
+			Duel.SSet(tp,g:GetFirst())
+		end
+	end
 end
 
 -- (2)
 function s.fufilter(c,g)
-	return c:IsFaceup() and g:IsContains(c)
+	return c:IsFaceup() and g:IsContains(c) and c:IsCanTurnSet()
 end
 function s.fdfilter(c,g)
-	return c:IsFacedown() and g:IsContains(c)
+	return c:IsFacedown() and g:IsContains(c) and c:IsCanChangePosition()
 end
 function s.cptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=e:GetHandler():GetLinkedGroup()
@@ -109,36 +112,5 @@ function s.fdop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(1)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
-	end
-end
-
--- (3)
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
-end
-function s.tdfilter(c)
-	return c:IsSetCard(SET_SHADOWBLADE) and c:IsAbleToDeck() and not c:IsCode(id)
-end
-function s.thfilter(c)
-	return (c:IsSetCard(SET_SHADOWBLADE) or c:IsSetCard(SET_HOLYGRAIL)) and c:IsAbleToHand()
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and s.tdfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) 
-		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,1,REASON_EFFECT)~=0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-		if #g>0 then
-			Duel.SendtoHand(g,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,g)
-		end
 	end
 end

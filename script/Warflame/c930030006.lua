@@ -48,19 +48,6 @@ function s.initial_effect(c)
 	e5:SetCode(EVENT_CHAIN_SOLVED)
 	e5:SetCondition(s.rmeffcon)
 	c:RegisterEffect(e5)
-	-- (4) Special Summon this card
-	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,2))
-	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e6:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e6:SetCode(EVENT_LEAVE_FIELD)
-	e6:SetRange(LOCATION_GRAVE)
-	e6:SetCountLimit(1,{id,2})
-	e6:SetCondition(s.spcon2)
-	e6:SetTarget(s.sptg2)
-	e6:SetOperation(s.spop2)
-	c:RegisterEffect(e6)
 end
 s.listed_series={SET_WARFLAME}
 
@@ -125,33 +112,4 @@ end
 function s.rmeffcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return ep==1-tp and Duel.IsTurnPlayer(tp) and re:IsActiveType(TYPE_MONSTER) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
-end
-
--- (4)
-function s.cfilter(c,tp,rp)
-	return c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousControler(tp) and (c:GetPreviousTypeOnField()&TYPE_LINK~=0 or c:GetPreviousTypeOnField()&TYPE_RITUAL~=0) and c:IsPreviousLocation(LOCATION_MZONE)
-		and c:IsPreviousSetCard(SET_WARFLAME) and (c:IsReason(REASON_BATTLE) or (rp==1-tp and c:IsReason(REASON_EFFECT)))
-end
-function s.spcon2(e,tp,eg,ep,ev,re,r,rp)
-	return not eg:IsContains(e:GetHandler()) and eg:IsExists(s.cfilter,1,nil,tp,rp)
-end
-function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-end
-function s.spop2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_BASE_ATTACK)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetValue(1900)
-		e1:SetReset(RESET_EVENT+0xff0000)
-		c:RegisterEffect(e1)
-	end
 end

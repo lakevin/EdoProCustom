@@ -35,8 +35,8 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_KNIGUARD,SET_HOLYGRAIL}
 function s.ovfilter(c,tp,xyzc)
-	return c:IsFaceup() and c:IsType(TYPE_LINK,xyzc,SUMMON_TYPE_XYZ,tp) and (c:GetLink()==2 or c:GetLink()==3)
-		and (c:IsSetCard(SET_HOLYGRAIL,xyzc,SUMMON_TYPE_XYZ,tp) or c:IsSetCard(SET_KNIGUARD,xyzc,SUMMON_TYPE_XYZ,tp))
+	return c:IsFaceup() and c:IsType(TYPE_LINK,xyzc,SUMMON_TYPE_XYZ,tp) and c:GetLink()>=2
+		and c:IsSetCard(SET_KNIGUARD,xyzc,SUMMON_TYPE_XYZ,tp)
 end
 
 -- (1)

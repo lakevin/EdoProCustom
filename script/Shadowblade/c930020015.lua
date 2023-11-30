@@ -40,7 +40,7 @@ s.listed_series={SET_SHADOWBLADE}
 
 -- (1)
 function s.fdfilter(c,lg)
-	return c:IsFaceup() and lg:IsContains(c)
+	return c:IsFaceup() and lg:IsContains(c) and c:IsCanTurnSet()
 end
 function s.fdcon(e,tp,eg,ep,ev,re,r,rp)
 	local lg=e:GetHandler():GetLinkedGroup()
