@@ -82,9 +82,6 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
-function s.splimit(e,c,sump,sumtype,sumpos,targetp)
-	return c:IsLocation(LOCATION_HAND) or c:isLocation(LOCATION_DECK)
-end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
@@ -109,6 +106,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetTargetRange(1,0)
 		Duel.RegisterEffect(e2,tp)
 	end
+end
+function s.splimit(e,c,sump,sumtype,sumpos,targetp)
+	return c:IsLocation(LOCATION_HAND) or c:IsLocation(LOCATION_DECK)
 end
 
 --[[
