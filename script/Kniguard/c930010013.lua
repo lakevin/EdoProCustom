@@ -4,6 +4,9 @@ local SET_KNIGUARD=0xB1F3
 local COUNTER_GRAIL=0x4041
 local s,id=GetID()
 function s.initial_effect(c)
+	--Special Summon Once
+	c:SetSPSummonOnce(id)
+	--Enable Counter
 	c:EnableCounterPermit(COUNTER_GRAIL)
 	--Link Summon
 	c:EnableReviveLimit()

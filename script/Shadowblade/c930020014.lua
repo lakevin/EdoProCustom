@@ -59,7 +59,17 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 		local g=Duel.SelectMatchingCard(tp,s.scfilter,tp,LOCATION_DECK,0,1,1,nil)
 		if #g>0 then
-			Duel.SSet(tp,g:GetFirst())
+			local sc=g:GetFirst()
+			if sc:IsTrap() and Duel.SSet(tp,sc)>0 then
+				--It can be activated this turn
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetDescription(aux.Stringid(id,1))
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+				e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+				e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+				sc:RegisterEffect(e1)
+			end
 		end
 	end
 end
@@ -104,13 +114,5 @@ function s.fdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and tc:IsFacedown() then
 		Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(3009)
-		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-		e1:SetValue(1)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
 	end
 end

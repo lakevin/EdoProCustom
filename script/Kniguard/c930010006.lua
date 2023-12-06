@@ -66,7 +66,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 			e1:SetCategory(CATEGORY_LVCHANGE)
 			e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 			e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-			e1:SetCountLimit(1)
+			e1:SetCountLimit(1,id)
 			e1:SetCondition(s.condition)
 			e1:SetTarget(s.lvtg)
 			e1:SetOperation(s.lvop)
@@ -78,7 +78,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 			e2:SetCategory(CATEGORY_POSITION)
 			e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 			e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-			e2:SetCountLimit(1)
+			e2:SetCountLimit(1,id)
 			e2:SetCondition(s.condition)
 			e2:SetTarget(s.postg)
 			e2:SetOperation(s.posop)
@@ -127,7 +127,11 @@ end
 function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
-		Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
+		if tc:IsFaceup() then
+			Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
+		else
+			Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
+		end
 	end
 end
 

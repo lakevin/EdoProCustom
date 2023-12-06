@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,{id,0})
+	e1:SetCountLimit(1)
 	e1:SetCondition(s.accon)
 	e1:SetOperation(s.acop)
 	c:RegisterEffect(e1)
@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCountLimit(1,{id,1})
+	e2:SetCountLimit(1,{id,0})
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -31,7 +31,7 @@ end
 s.listed_series={SET_SHADOWBLADE}
 
 function s.matfilter(c,xyz,sumtype,tp)
-	return c:IsSetCard(SET_SHADOWBLADE,xyz,sumtype,tp)
+	return c:IsSetCard(SET_SHADOWBLADE,xyz,sumtype,tp) and not c:IsType(TYPE_LINK,lc,sumtype,tp)
 end
 
 -- (1)

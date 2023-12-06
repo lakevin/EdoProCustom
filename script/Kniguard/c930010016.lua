@@ -45,7 +45,7 @@ function s.ffilter(c,fc,sumtype,sump,sub,matg,sg)
 		and not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,sump),fc,sumtype,sump))
 end
 function s.contfilter(c)
-	return c:IsAbleToGraveAsCost() and c:IsSetCard(SET_KNIGUARD) and not c:IsLinkMonster()
+	return c:IsAbleToGraveAsCost() and c:IsSetCard(SET_KNIGUARD) and c:HasLevel()
 end
 function s.contactfil(tp)
 	return Duel.GetMatchingGroup(s.contfilter,tp,LOCATION_MZONE,0,nil)

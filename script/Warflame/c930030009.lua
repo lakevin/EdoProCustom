@@ -41,6 +41,10 @@ s.listed_series={SET_WARFLAME}
 function s.desfilter(c,atk)
 	return c:IsFaceup() and c:IsAttackBelow(atk)
 end
+	-- global function
+function s.damval(e,re,val,r,rp,rc)
+	return math.floor(val/2)
+end
 	-- Tribute 1 "Warflame" monster you control
 function s.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(Card.IsSummonLocation,tp,0,LOCATION_MZONE,1,nil,LOCATION_EXTRA)
@@ -65,6 +69,15 @@ function s.activate1(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and Duel.Release(tc,REASON_COST+REASON_RELEASE)~=0 and tc:IsLocation(LOCATION_GRAVE) then
 		local g=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil,atk)
 		Duel.Destroy(g,REASON_EFFECT)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_CHANGE_DAMAGE)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetTargetRange(0,1)
+		e1:SetValue(s.damval)
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e1,tp)
+		aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,2),nil)
 	end
 end
 	-- Send 1 "Warflame" monster from your Extra Deck to the GY
@@ -93,6 +106,15 @@ function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and Duel.SendtoGrave(tc,REASON_COST+REASON_RELEASE)~=0 and tc:IsLocation(LOCATION_GRAVE) then
 		local g=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil,atk)
 		Duel.Destroy(g,REASON_EFFECT)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_CHANGE_DAMAGE)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetTargetRange(0,1)
+		e1:SetValue(s.damval)
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e1,tp)
+		aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,2),nil)
 	end
 end
 

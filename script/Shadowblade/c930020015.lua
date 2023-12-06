@@ -53,6 +53,16 @@ function s.fdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=aux.zptgroup(eg,Card.IsFaceup,c)
 	local tc=g:GetFirst()
 	for tc in aux.Next(g) do
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e2)
 		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
 	end
 end
