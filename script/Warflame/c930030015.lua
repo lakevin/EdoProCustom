@@ -50,7 +50,7 @@ function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
 end
 function s.tgfilter(c)
-	return c:IsSpellTrap() and c:IsAbleToGrave()
+	return c:IsSpellTrap() and c:IsFacedown() and c:IsAbleToGrave()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,0,LOCATION_ONFIELD,1,nil) end

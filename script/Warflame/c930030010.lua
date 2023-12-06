@@ -62,7 +62,7 @@ function s.activate1(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 	local c=e:GetHandler()
-	-- Cannot Special Summon monsters from the Extra Deck, except Shadowblade monsters
+	-- Cannot Special Summon monsters from the Extra Deck, except Warflame monsters
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -76,7 +76,7 @@ end
 
 -- (2)
 function s.tdfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_WARFLAME) and c:IsAbleToDeck()
+	return c:IsFaceup() and c:IsSetCard(SET_WARFLAME) and c:HasLevel() and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode(),c:GetLevel())
 end
 function s.spfilter(c,e,tp,code,lv)
@@ -105,7 +105,7 @@ function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	local c=e:GetHandler()
-	-- Cannot Special Summon monsters from the Extra Deck, except Shadowblade monsters
+	-- Cannot Special Summon monsters from the Extra Deck, except Warflame monsters
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -125,7 +125,7 @@ function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
 end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_MZONE,0,nil,SET_WARFLAME)
 	local ct=#g
 	local og=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
