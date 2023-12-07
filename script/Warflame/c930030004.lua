@@ -53,7 +53,7 @@ s.listed_series={SET_WARFLAME}
 
 -- (1)
 function s.spifilter(c)
-	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsRace(RACE_WARRIOR)
+	return c:IsSetCard(SET_WARFLAME)
 end
 function s.spicon(e,c)
 	if c==nil then return true end
@@ -95,7 +95,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local atk=e:GetHandler():GetAttack()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,atk)
-	if g then
+	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 	end
 end

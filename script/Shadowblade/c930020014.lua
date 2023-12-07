@@ -60,7 +60,7 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,s.scfilter,tp,LOCATION_DECK,0,1,1,nil)
 		if #g>0 then
 			local sc=g:GetFirst()
-			if sc:IsTrap() and Duel.SSet(tp,sc)>0 then
+			if Duel.SSet(tp,sc)>0 then
 				--It can be activated this turn
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetDescription(aux.Stringid(id,1))

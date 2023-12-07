@@ -33,19 +33,44 @@ s.listed_series={SET_SHADOWBLADE}
 -- (1)
 function s.spfilter1(c,e,tp)
 	local zone = c:GetLinkedZone(tp)&0x1f
-	return c:IsFaceup() and c:IsLinkMonster() and c:IsSetCard(SET_SHADOWBLADE) and zone>0 
-		and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_GRAVE,0,1,c,e,tp,zone)
+	return c:IsFaceup() and c:IsLinkMonster() and zone>0 
+		and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,c,e,tp,zone)
 end
 function s.spfilter2(c,e,tp,zone)
-	return c:IsSetCard(SET_SHADOWBLADE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE,tp,zone)
+	return c:IsSetCard(SET_SHADOWBLADE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return s.spfilter1(chkc,e,tp) and chkc:IsLocation(LOCATION_MZONE) end
-	if chk==0 then return Duel.IsExistingTarget(s.spfilter1,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	if chk == 0 then return Duel.IsExistingTarget(s.spfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,s.spfilter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
+	Duel.SelectTarget(tp,s.spfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
+		local zone = tc:GetLinkedZone(tp)&0x1f
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg = Duel.SelectMatchingCard(tp,s.spfilter2,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,c,e,tp,zone)
+		if #sg>0 then
+			local sc=sg:GetFirst()
+			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP,zone)
+			Duel.ConfirmCards(1-tp,sc)
+			local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_DISABLE)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+				sc:RegisterEffect(e1)
+				local e2=Effect.CreateEffect(c)
+				e2:SetType(EFFECT_TYPE_SINGLE)
+				e2:SetCode(EFFECT_DISABLE_EFFECT)
+				e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+				sc:RegisterEffect(e2)
+		end
+	end
+end
+--[[
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
@@ -72,6 +97,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonComplete()
 	end
 end
+]]--
 
 -- (2)
 function s.drfilter(c,e)

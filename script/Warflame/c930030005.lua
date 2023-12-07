@@ -53,7 +53,7 @@ s.listed_series={SET_WARFLAME}
 
 -- (1)
 function s.spifilter(c)
-	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsRace(RACE_WARRIOR)
+	return c:IsSetCard(SET_WARFLAME)
 end
 function s.spicon(e,c)
 	if c==nil then return true end
