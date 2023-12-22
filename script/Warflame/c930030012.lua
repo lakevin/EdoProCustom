@@ -50,7 +50,7 @@ end
 
 -- (1)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL)
 end
 function s.thfilter(c)
 	return c:IsSetCard(SET_WARFLAME) and (c:IsRitualMonster() or c:IsRitualSpell()) and c:IsAbleToHand()
@@ -101,7 +101,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_WARFLAME) and c:IsType(TYPE_RITUAL) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsMonster() and c:IsSetCard(SET_WARFLAME) and c:IsType(TYPE_RITUAL) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

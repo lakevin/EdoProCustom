@@ -42,18 +42,22 @@ end
 s.listed_series={SET_WARFLAME}
 
 -- (1)
+function s.thcfilter(c,tp)
+	return c:IsFaceup() and c:IsMonster() and Duel.IsExistingTarget(s.indesfilter,tp,LOCATION_MZONE,0,1,c)
+end
+function s.indesfilter(c)
+	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(SET_WARFLAME)
+end
 function s.indescost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.thcfilter,1,true,nil,nil,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 	local g=Duel.SelectReleaseGroupCost(tp,s.thcfilter,1,1,true,nil,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
-function s.indesfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_WARFLAME)
-end
 function s.indestg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingTarget(s.indesfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(s.indesfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,s.indesfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)	
+	Duel.SelectTarget(tp,s.indesfilter,tp,LOCATION_MZONE,0,1,1,nil)	
 end
 function s.indesop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -71,19 +75,29 @@ function s.indesop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_WARFLAME) and c:IsLinkMonster() and c:GetLink()<=2 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.GetLocationCountFromEx(tp,tp,e:GetHandler(),c,0x60)>0
+function s.spfilter(c,e,tp,zone)
+	return c:IsSetCard(SET_WARFLAME) and c:IsLinkMonster() and c:GetLink()<=2 
+		and (
+			c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
+			or (c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,e:GetHandler(),c,0x60)>0)
+		)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+	local zone=Duel.GetZoneWithLinkedCount(1,tp)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,zone) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local zone=Duel.GetZoneWithLinkedCount(1,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,zone)
 	local tc=g:GetFirst()
-	if tc and Duel.SpecialSummonStep(tc,SUMMON_TYPE_LINK,tp,tp,false,false,POS_FACEUP,0x60) then
+	if tc then
+		if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsInExtraMZone),tp,LOCATION_MZONE,0,1,nil) then
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP,zone)
+		else
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP,0x60)
+		end
 		--Cannot attack
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(3206)

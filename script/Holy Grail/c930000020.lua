@@ -40,7 +40,7 @@ end
 
 -- (1)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL)
 end
 function s.thfilter(c)
 	return (c:IsSetCard(SET_WARFLAME) or c:IsSetCard(SET_HOLYGRAIL)) and c:IsSpell() and c:IsAbleToHand()

@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	--Link Summon
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,s.matfilter,1,1)
-    -- (1) Special Summon 1 Level 4 or lower LIGHT Monster from your hand or GY
+    -- (1) Special Summon 1 FIRE Monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -37,7 +37,7 @@ end
 
 -- (1)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL)
 end
 function s.spfilter(c,e,tp,zone,turn)
 	return c:IsReason(REASON_RELEASE) and c:GetTurnID()==turn and c:IsAttribute(ATTRIBUTE_FIRE)
