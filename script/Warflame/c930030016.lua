@@ -43,7 +43,7 @@ s.listed_series={SET_WARFLAME}
 
 -- (1)
 function s.thcfilter(c,tp)
-	return c:IsFaceup() and c:IsMonster() and Duel.IsExistingTarget(s.indesfilter,tp,LOCATION_MZONE,0,1,c)
+	return c:IsMonster() and Duel.IsExistingTarget(s.indesfilter,tp,LOCATION_MZONE,0,1,c)
 end
 function s.indesfilter(c)
 	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(SET_WARFLAME)
