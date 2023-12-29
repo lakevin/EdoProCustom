@@ -24,13 +24,14 @@ Coming soon...
 2. Protectrix | 25/25 cards | `Finished`
 3. Draconier | 27/27 cards | `Finished`
 4. Cosmoverse | 16/16 cards | `Finished`
+5. Holy Grail | `99% Done`
+6. Kniguard | `99% Done`
+7. Shadowblade | `99% Done`
+8. Warflame | `99% Done`
 
 ### Released Archetypes (Testing)
 
-1. Holy Grail `95% Done`
-2. Kniguards `95% Done`
-3. Shadowblades `95% Done`
-4. Warflame `95% Done`
+1.
 
 ### Planned Archetypes
 
