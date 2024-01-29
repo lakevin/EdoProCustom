@@ -10,11 +10,26 @@ Welcome to my Edopro Custom Card repository. My idea is to create new archetypes
 Learn more about my cards in the wiki: https://github.com/lakevin/EdoProCustom/wiki
 
 #### Discord
-Join my Discord for feedback and discussions: https://discord.gg/pwye5y8zj2
+Join my Discord for feedback and discussions: discord.gg/pwye5y8zj2
 
 ## How to install?
 
-Coming soon...
+The easiest way to install the custom card package to your EDOPro Programm is to download this <a href="https://github.com/lakevin/EdoProCustom/blob/assets/assets/user_configs.json">user_configs.json</a>.
+
+Move this file to the config folder of your EDOPro installation (e.g. <YOUR PATH>/ProjectIgnis/config). <b>Attention</b>: If you already have this file in this folder, other configurations will be overwritten.
+
+In this case you can edit the existing file. Search the line that starts with ```"repos": [``` and insert the following code directly below it:
+
+```
+{
+   "url": "https://github.com/lakevin/EdoProCustom",
+   "repo_name": "Reflexxion Cards",
+   "should_update": true,
+   "should_read": true
+},
+```
+
+If you need any help, you can contact me on my Discord server (link above).
 
 ## Details
 
