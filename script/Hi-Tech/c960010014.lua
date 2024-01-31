@@ -1,0 +1,123 @@
+--Hi-Tech Quarantine Magician
+local s,id=GetID()
+local SET_HI_TECH=0x9DD4
+function s.initial_effect(c)
+	--synchro summon
+	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_HI_TECH),1,1,Synchro.NonTuner(nil),1,1)
+	c:EnableReviveLimit()
+	-- (1) special summon
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCondition(s.rmcon)
+	e1:SetTarget(s.rmtg)
+	e1:SetOperation(s.rmop)
+	c:RegisterEffect(e1)
+	-- return
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_LEAVE_FIELD)
+	e2:SetCondition(s.retcon)
+	e2:SetOperation(s.retop)
+	c:RegisterEffect(e2)
+	-- (2) Special Summon
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	--e3:SetCode(EVENT_TO_GRAVE)
+	e3:SetCode(EVENT_BE_MATERIAL)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetCondition(s.spcon)
+	e3:SetTarget(s.sptg)
+	e3:SetOperation(s.spop)
+	c:RegisterEffect(e3)
+end
+s.listed_series={SET_HI_TECH}
+
+-- (1)
+function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
+end
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
+end
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if not c:IsRelateToEffect(e) or not tc then return end
+	local seq=tc:GetSequence()
+	if tc:IsControler(1-tp) then seq=seq+16 end
+	if tc:IsRelateToEffect(e) and Duel.Remove(tc,0,REASON_EFFECT+REASON_TEMPORARY)~=0 and tc:IsLocation(LOCATION_REMOVED) then
+		c:SetCardTarget(tc)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_DISABLE_FIELD)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetLabel(seq)
+		e1:SetCondition(s.discon)
+		e1:SetOperation(s.disop)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		c:RegisterEffect(e1)
+	end
+end
+function s.discon(e)
+	return e:GetHandler():GetCardTargetCount()>0
+end
+function s.disop(e,tp)
+	return 0x1<<e:GetLabel()
+end
+function s.retcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=c:GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_REMOVED) and not c:IsLocation(LOCATION_DECK) then
+		e:SetLabelObject(tc)
+		tc:CreateEffectRelation(e)
+		return true
+	else return false end
+end
+function s.retop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=e:GetLabelObject()
+	if tc and tc:IsRelateToEffect(e) then
+		local seq=tc:GetPreviousSequence()
+		if seq>4 then
+			Duel.SendtoGrave(tc,REASON_RULE+REASON_RETURN)
+		end
+		local zone=0x1<<seq
+		Duel.ReturnToField(tc,tc:GetPreviousPosition(),zone)
+	end
+end
+
+-- (2)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
+		and e:GetHandler():GetReasonCard():IsSetCard(SET_HI_TECH)
+end
+function s.spfilter(c,e,tp)
+	return c:IsMonster() and c:IsSetCard(SET_HI_TECH) and not c:IsCode(id)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.spfilter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	end
+end
