@@ -19,19 +19,30 @@ function s.initial_effect(c)
 	e2:SetValue(s.valcheck)
 	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
-	-- (2) draw
+	-- (2) Synchro Summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	--e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCode(EVENT_BE_MATERIAL)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(s.drcon)
-	e3:SetTarget(s.drtg)
-	e3:SetOperation(s.drop)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e3:SetCondition(s.sccon)
+	e3:SetTarget(s.sctg)
+	e3:SetOperation(s.scop)
 	c:RegisterEffect(e3)
+	-- (3) draw
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_TOHAND)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e4:SetCode(EVENT_BE_MATERIAL)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e4:SetCountLimit(1,{id,2})
+	e4:SetCondition(s.drcon)
+	e4:SetTarget(s.drtg)
+	e4:SetOperation(s.drop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={SET_HI_TECH}
 
@@ -56,24 +67,13 @@ function s.tnop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(TYPE_TUNER)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
-	--synchro effect
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(s.sccon)
-	e2:SetTarget(s.sctarg)
-	e2:SetOperation(s.scop)
-	c:RegisterEffect(e2)
 end
---synchro effect
+
+-- (2) synchro effect
 function s.sccon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
-function s.sctarg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:GetFlagEffect(id)==0
 		and Duel.IsExistingMatchingCard(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil,e:GetHandler()) end
@@ -91,7 +91,7 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (2)
+-- (3)
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
 	-- Debug.Message("Hi-Tech Wyvern")
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
