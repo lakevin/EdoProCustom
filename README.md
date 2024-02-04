@@ -39,28 +39,31 @@ If you need any help, you can contact me on my Discord server (link above).
 2. Protectrix | 25/25 cards | `Finished`
 3. Draconier | 27/27 cards | `Finished`
 4. Cosmoverse | 16/16 cards | `Finished`
-5. Holy Grail | `99% Done`
-6. Kniguard | `99% Done`
-7. Shadowblade | `99% Done`
-8. Warflame | `99% Done`
+5. Holy Grail | 20/22 cards | `Support in progress`
+6. Kniguard | 17/19 cards | `Support in progress`
+7. Shadowblade | 20/20 cards | `Finished`
+8. Warflame | 17/19 cards | `Support in progress`
 
 ### Released Archetypes (Testing)
 
-1.
+1. Hi-Tech `99% Done`
 
 ### Planned Archetypes
 
-1. Hi-Tech `0% Done`
-2. Demon Mask `0% Done`
-3. Timekeeper / Time Traveler `0% Done`
+1. Demon Mask `0% Done`
+2. Timekeeper / Time Traveler `0% Done`
+3. V-EYE-RUS `0% Done`
 
 ## Planned Updates
 
-### November / December 2023
+### February / March 2024
 
-- Hi-Tech: Is a new Synchro-based archetype that uses Synchro Monsters from the Extra Deck as material. The Synchro Monsters activate their effect when they are used as Synchro material.
+- Demon Mask: This archetype is based on the "Masks" cards from the first anime season. The new "Demon Mask" cards take control of opponent monsters and use them for Fusion Summons.
+- Timekeeper / Time Traveler: A archetype that has Psychic Monsters as members. They have the effect of banishing themselves and an opponent's card, like <a href="https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=12074">PSY-Framelord Zeta</a>.
 
 ### Later:
 
-- Demon Mask: This archetype is based on the "Masks" cards from the first anime season. The new "Demon Mask" cards take control of opponent monsters and use them for Fusion Summons.
-- Timekeeper / Time Traveler: This archetype has cards that work like a lighter version of <a href="https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=12074">PSY-Framelord Omega</a>. It can disrupt your opponent by interrupting effects and banishing cards.
+- V-EYE-RUS: Counterpart of the "Hi-Tech" archetype.
+
+
+
