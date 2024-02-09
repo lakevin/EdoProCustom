@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCountLimit(1,{id,0})
+	e3:SetCountLimit(1)
 	e3:SetTarget(s.eqtg)
 	e3:SetOperation(s.eqop)
 	c:RegisterEffect(e3)
@@ -44,7 +44,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e4:SetCountLimit(1,{id,0})
+	e4:SetCountLimit(1)
 	e4:SetTarget(s.rmtg)
 	e4:SetOperation(s.rmop)
 	c:RegisterEffect(e4)
@@ -53,7 +53,7 @@ function s.initial_effect(c)
 	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetCategory(CATEGORY_DESTROY)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e5:SetCode(EVENT_LEAVE_FIELD)
+	e5:SetCode(EVENT_TO_GRAVE)
 	e5:SetCountLimit(1,{id,1})
 	e5:SetCondition(s.spcon)
 	e5:SetTarget(s.sptg)
@@ -69,11 +69,11 @@ end
 function s.sphcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local rg=Duel.GetMatchingGroup(s.sphfilter,tp,LOCATION_DECK,0,nil)
+	local rg=Duel.GetMatchingGroup(s.sphfilter,tp,LOCATION_HAND+LOCATION_DECK,0,nil)
 	return #rg>0 and aux.SelectUnselectGroup(rg,e,tp,1,1,aux.ChkfMMZ(1),0)
 end
 function s.sphtg(e,tp,eg,ep,ev,re,r,rp,c)
-	local rg=Duel.GetMatchingGroup(s.sphfilter,tp,LOCATION_DECK,0,nil)
+	local rg=Duel.GetMatchingGroup(s.sphfilter,tp,LOCATION_HAND+LOCATION_DECK,0,nil)
 	local g=aux.SelectUnselectGroup(rg,e,tp,1,1,aux.ChkfMMZ(1),1,tp,HINTMSG_CONFIRM,nil,nil,true)
 	if #g>0 then
 		g:KeepAlive()
@@ -89,7 +89,7 @@ function s.sphop(e,tp,eg,ep,ev,re,r,rp,c)
 	g:DeleteGroup()
 end
 
--- (2)
+-- (2.1)
 function s.eqfilter(c)
 	return c:IsLevel(1) and c:IsSetCard(SET_COSMOVERSE) and not c:IsForbidden()
 end
@@ -111,7 +111,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
+-- (2.2)
 function s.rmfilter(c)
 	return c:IsMonster() and c:IsAbleToRemove() and aux.SpElimFilter(c,false,true)
 end
@@ -143,8 +143,7 @@ function s.spfilter(c,e,tp)
 	return c:IsCode(CARD_COSMO_QUEEN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
-		and not (re and re:GetHandler():IsCode(CARD_COSMO_DOMINANCE))
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
