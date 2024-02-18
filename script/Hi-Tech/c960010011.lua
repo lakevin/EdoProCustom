@@ -81,5 +81,5 @@ end
 
 -- (2)
 function s.tgtg(e,c)
-	return e:GetHandler():GetLinkedGroup():IsContains(c) and c:IsSetCard(SET_HI_TECH) and c:IsType(TYPE_SYNCHRO)
+	return e:GetHandler():GetLinkedGroup():IsContains(c) and c:IsType(TYPE_SYNCHRO)
 end

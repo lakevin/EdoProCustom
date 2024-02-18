@@ -53,8 +53,8 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
 end
 function s.spfilter(c,e,tp,turn)
-	return (c:IsReason(REASON_RELEASE) or c:IsReason(REASON_MATERIAL+REASON_LINK)) and c:GetTurnID()==turn 
-		and not c:IsType(TYPE_LINK) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsReason(REASON_RELEASE) and c:GetTurnID()==turn and not c:IsType(TYPE_LINK) 
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local turn=Duel.GetTurnCount()
