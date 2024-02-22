@@ -3,7 +3,6 @@ local SET_KNIGUARD=0xB1F3
 local COUNTER_GRAIL=0x4041
 local s,id=GetID()
 function s.initial_effect(c)
-    c:EnableCounterPermit(COUNTER_GRAIL)
 	-- (1) Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

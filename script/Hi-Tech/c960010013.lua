@@ -55,7 +55,6 @@ end
 
 -- (2)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	-- Debug.Message("Hi-Tech Hippogriff")
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 		and e:GetHandler():GetReasonCard():IsSetCard(SET_HI_TECH)
 end

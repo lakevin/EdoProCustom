@@ -5,30 +5,32 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	--Activate
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetCode(EVENT_FREE_CHAIN)
+	c:RegisterEffect(e0)
+	-- (1) Opponent's monsters must attack Link Monster
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_MUST_ATTACK)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetCondition(s.atkcon)
 	c:RegisterEffect(e1)
-	-- (1) "Warflame" monsters become DARK monsters
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_ADD_ATTRIBUTE)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_WARFLAME))
-	e2:SetValue(ATTRIBUTE_DARK)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_MUST_ATTACK_MONSTER)
+	e2:SetValue(s.atlimit)
+	--e2:SetValue(aux.TargetBoolFunction(s.atkfilter))
 	c:RegisterEffect(e2)
-	-- (2) to deck / Special summon
+	-- (2) Prevent activations during battle
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCode(EVENT_BATTLE_DESTROYED)
-	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(s.cond)
-	e3:SetTarget(s.efftg)
-	e3:SetOperation(s.effop)
+	e3:SetTargetRange(0,1)
+	e3:SetCondition(s.actcon)
+	e3:SetValue(1)
 	c:RegisterEffect(e3)
 	-- (3) Can treat "Holy Grail" Spell cards as Link Material
 	local e4a=Effect.CreateEffect(c)
@@ -67,65 +69,23 @@ end
 s.listed_series={SET_HOLYGRAIL,SET_WARFLAME}
 s.counter_place_list={COUNTER_GRAIL}
 
--- (2)
-function s.cfilter(c,tp)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and c:IsPreviousControler(tp)
+-- (1)
+function s.atkfilter(c)
+	return c:IsLinkMonster() and c:IsSetCard(SET_WARFLAME)
 end
-function s.cond(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,1-tp)
+function s.atkcon(e)
+	return Duel.IsExistingMatchingCard(s.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,e)
 end
-	-- (2A)
-function s.filter1(c,e,tp)
-	return c:IsMonster() and c:IsSetCard(SET_WARFLAME) and c:IsAbleToDeck()
-end
-	-- (2B)
-function s.filter2(c,e,tp)
-	return c:IsMonster() and c:IsSetCard(SET_WARFLAME) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.atlimit(e,c)
+	local g=Duel.GetMatchingGroup(s.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)
+	local tg=g:GetMaxGroup(Card.GetAttack)
+	return tg:IsContains(c)
 end
 
-function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
-	--if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.filter1(chkc) end
-	local c=e:GetHandler()
-	local b1=Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingTarget(s.filter1,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil)
-	local b2=Duel.GetMZoneCount(tp,e:GetHandler())>0 and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK,0,1,nil,e,tp)
-	if chk==0 then return b1 or b2 end
-	local op=Duel.SelectEffect(tp,
-		{b1,aux.Stringid(id,0)},
-		{b2,aux.Stringid(id,1)})
-	e:SetLabel(op)
-	if op==1 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		local g=Duel.SelectTarget(tp,s.filter1,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
-		Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
-		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
-	elseif op==2 then
-		Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
-	end
-end
-function s.effop(e,tp,eg,ep,ev,re,r,rp)
-	local op=e:GetLabel()
-	if op==1 then
-		-- Target 1 "Warflame" card that is banished or in your GY, shuffle it into your Deck, then draw 1 card.
-		local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		if not tg or tg:FilterCount(Card.IsRelateToEffect,nil,e)~=1 then return end
-		Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
-		local g=Duel.GetOperatedGroup()
-		if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
-		local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
-		if ct==1 then
-			Duel.BreakEffect()
-			Duel.Draw(tp,1,REASON_EFFECT)
-		end
-	elseif op==2 then
-		--Special Summon 1 "Warflame" monster from your Deck in face-up Attack Position.
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-		if #g>0 then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
-		end
-	end
+-- (2)
+function s.actcon(e)
+	local bc=Duel.GetBattleMonster(e:GetHandlerPlayer())
+	return bc and bc:IsFaceup() and bc:IsSetCard(SET_WARFLAME)
 end
 
 -- (3)

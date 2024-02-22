@@ -13,17 +13,18 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- (2) LP damage
+	-- (2) to deck
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_FZONE)
+	e1:SetCountLimit(1)
 	e2:SetCondition(s.tdcon)
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
 	c:RegisterEffect(e2)
-	-- (3) position change
+	-- (3) place/remove counter
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_COUNTER)
@@ -83,8 +84,6 @@ end
 
 -- (3)
 function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	Debug.Message('IsSummonType '..tostring(eg:GetFirst():IsSummonType(SUMMON_TYPE_LINK)))
-	Debug.Message('IsSetCard '..tostring(eg:GetFirst():IsSetCard(SET_HOLYGRAIL)))
 	return eg:GetFirst():IsSummonType(SUMMON_TYPE_LINK) and eg:GetFirst():IsSetCard(SET_HOLYGRAIL)
 end
 	-- Holy Grail
@@ -93,7 +92,6 @@ function s.ctfilter(c,tp)
 		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_ONFIELD,0,1,c)
 end
 function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	Debug.Message('Holy '..tostring(Duel.IsExistingMatchingCard(s.ctfilter,tp,LOCATION_ONFIELD,0,1,nil,tp)))
 	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingMatchingCard(s.ctfilter,tp,LOCATION_ONFIELD,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,4))
@@ -115,7 +113,6 @@ function s.ctfilter2(c)
 	return c:IsCode(CARD_UNHOLY_GRAIL) and c:IsFaceup()
 end
 function s.cttg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	Debug.Message('Unholy '..tostring(Duel.IsExistingMatchingCard(s.ctfilter2,tp,LOCATION_ONFIELD,0,1,nil)))
 	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingMatchingCard(s.ctfilter2,tp,LOCATION_ONFIELD,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

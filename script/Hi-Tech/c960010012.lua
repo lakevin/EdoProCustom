@@ -93,7 +93,6 @@ end
 
 -- (3)
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
-	-- Debug.Message("Hi-Tech Wyvern")
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 		and e:GetHandler():GetReasonCard():IsSetCard(SET_HI_TECH)
 end

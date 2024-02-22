@@ -4,7 +4,7 @@ local SET_WARFLAME=0xBAA1
 local s,id=GetID()
 function s.initial_effect(c)
 	--link summon
-	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_FIRE),3,nil,s.lcheck)
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_FIRE),2,nil,s.lcheck)
 	c:EnableReviveLimit()
 	-- (1) act limit
 	local e1=Effect.CreateEffect(c)
@@ -18,12 +18,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
     -- (2) multi attack
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCountLimit(1)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(s.mtcon)
-	e2:SetOperation(s.mtop)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_ATTACK_ALL)
+	e2:SetValue(s.atkfilter)
 	c:RegisterEffect(e2)
 	-- (3) atk gain
 	local e3=Effect.CreateEffect(c)
@@ -45,7 +42,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 	-- (4) destroy
 	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,1))
+	e5:SetDescription(aux.Stringid(id,0))
 	e5:SetCategory(CATEGORY_DESTROY)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -70,34 +67,9 @@ function s.actcon(e)
 end
 
 -- (2)
-function s.mtfilter(c)
-	return c:IsSpell() and (c:IsSetCard(SET_WARFLAME) or c:IsSetCard(SET_HOLYGRAIL))
-end
-function s.mtcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsAbleToEnterBP() and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5
-end
-function s.mtop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	Duel.ConfirmDecktop(tp,5)
-	local g=Duel.GetDecktopGroup(tp,5)
-	local ct=g:FilterCount(s.mtfilter,nil)
-	Duel.ShuffleDeck(tp)
-	if ct>1 then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_EXTRA_ATTACK)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(ct-1)
-		c:RegisterEffect(e1)
-	elseif ct==0 then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CANNOT_ATTACK)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e1)
-	end
+function s.atkfilter(e,c)
+	local g=e:GetHandler():GetLinkedGroup():Filter(Card.IsFaceup,nil)
+	return g:IsContains(c)
 end
 
 -- (3)

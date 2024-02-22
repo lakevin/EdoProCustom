@@ -59,7 +59,6 @@ function s.spicon(e,c)
 	if c==nil then return true end
 	return Duel.CheckReleaseGroup(c:GetControler(),s.spifilter,1,true,1,true,c,c:GetControler(),nil,false,e:GetHandler())
 end
-
 function s.spitg(e,tp,eg,ep,ev,re,r,rp,c)
 	if c==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	local g=Duel.SelectReleaseGroup(tp,s.spifilter,1,1,true,true,true,c,nil,nil,false,e:GetHandler())

@@ -50,9 +50,7 @@ function s.lzcon(e,tp,eg,ep,ev,re,r,rp)
 		and e:GetHandler():GetReasonCard():IsSetCard(SET_HI_TECH)
 end
 function s.lztg(e,tp,eg,ep,ev,re,r,rp,chk)
-	Debug.Message("10007"..Duel.GetLocationCount(1-tp,LOCATION_MZONE))
 	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 end
-	Debug.Message("10007: Passed!")
 end
 function s.lzop(e,tp,eg,ep,ev,re,r,rp)
 	local zone=Duel.SelectDisableField(tp,1,0,LOCATION_MZONE,0)

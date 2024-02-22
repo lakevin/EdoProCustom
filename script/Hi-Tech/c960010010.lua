@@ -69,7 +69,7 @@ end
 -- (2)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	--return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL or e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
+	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL and re and re:GetHandler():IsCode(id)
 end
 function s.spfilter(c,e,tp)
 	return c:IsMonster() and c:IsLevelBelow(3) and c:IsSetCard(SET_HI_TECH) and not c:IsType(TYPE_TUNER)

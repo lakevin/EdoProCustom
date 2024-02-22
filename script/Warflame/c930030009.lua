@@ -127,7 +127,7 @@ function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local g=Duel.GetMatchingGroup(s.drfilter,tp,LOCATION_GRAVE,0,e:GetHandler(),e)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1)
-		and g:GetClassCount(Card.GetCode)>4 end
+		and g:GetClassCount(Card.GetCode)>2 end
 	local sg=aux.SelectUnselectGroup(g,e,tp,3,3,aux.dncheck,1,tp,HINTMSG_TODECK)
 	Duel.SetTargetCard(sg)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,3,0,0)

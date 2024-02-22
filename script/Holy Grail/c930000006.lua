@@ -105,9 +105,9 @@ end
 
 -- (2A)
 function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,1,REASON_COST) end
+	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,2,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,1,REASON_COST)
+	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,2,REASON_COST)
 end
 function s.filter1(c,e,tp)
 	return c:IsMonster() and c:IsSetCard(SET_KNIGUARD) and c:IsAbleToDeck()
@@ -135,9 +135,9 @@ end
 
 -- (2B)
 function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,2,REASON_COST) end
+	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,4,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,2,REASON_COST)
+	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,4,REASON_COST)
 end
 function s.filter2(c)
 	return c:IsMonster() and c:IsSetCard(SET_KNIGUARD) and c:IsAbleToHand()
@@ -158,9 +158,9 @@ end
 
 -- (2C)
 function s.cost3(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,4,REASON_COST) end
+	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,6,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,4,REASON_COST)
+	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,6,REASON_COST)
 end
 function s.filter3(c,e,tp)
 	return c:IsMonster() and c:IsSetCard(SET_KNIGUARD) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

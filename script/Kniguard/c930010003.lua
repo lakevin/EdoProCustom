@@ -66,7 +66,7 @@ function s.repfilter(c,tp)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return eg:IsExists(s.repfilter,1,c,tp)
+	if chk==0 then return eg:IsExists(s.repfilter,1,c,tp) and #eg==1
 		and Duel.IsCanRemoveCounter(tp,1,1,COUNTER_GRAIL,2,REASON_EFFECT) end
 	return Duel.SelectEffectYesNo(tp,c,96)
 end
