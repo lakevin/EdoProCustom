@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableCounterPermit(COUNTER_GRAIL)
 	--xyz summon
-	Xyz.AddProcedure(c,nil,6,2,s.ovfilter,aux.Stringid(id,0),2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_LIGHT),6,2,s.ovfilter,aux.Stringid(id,0),2,s.xyzop)
 	c:EnableReviveLimit()
     -- (1) Banish
 	local e1=Effect.CreateEffect(c)
@@ -37,6 +37,11 @@ s.listed_series={SET_KNIGUARD,SET_HOLYGRAIL}
 function s.ovfilter(c,tp,xyzc)
 	return c:IsFaceup() and c:IsType(TYPE_LINK,xyzc,SUMMON_TYPE_XYZ,tp) and c:GetLink()>=2
 		and c:IsSetCard(SET_KNIGUARD,xyzc,SUMMON_TYPE_XYZ,tp)
+end
+function s.xyzop(e,tp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+	return true
 end
 
 -- (1)
