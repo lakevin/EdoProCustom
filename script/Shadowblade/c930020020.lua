@@ -74,6 +74,7 @@ end
 -- (3)
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(SET_SHADOWBLADE) and c:IsLevelBelow(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and not c:IsCode(id)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsLocation(LOCATION_DECK) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
