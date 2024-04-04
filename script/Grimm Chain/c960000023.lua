@@ -18,19 +18,17 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	e2:SetValue(s.defval)
 	c:RegisterEffect(e2)
-	-- (2) Negate
+	-- (2) Cannot be targeted
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetCountLimit(1)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(s.discon)
-	e3:SetCost(s.discost)
-	e3:SetTarget(s.distg)
-	e3:SetOperation(s.disop)
+	e3:SetCondition(s.condition)
+	e3:SetCost(s.cost)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3,false,REGISTER_FLAG_DETACH_XMAT)
 	-- (3.A) Attach
 	local e4=Effect.CreateEffect(c)
@@ -85,31 +83,28 @@ function s.defval(e,c)
 	return g:GetSum(Card.GetDefense)/2
 end
 
--- (2) Negate targeting effect
-function s.tfilter(c,tp)
-	return c:IsOnField() and c:IsSetCard(SET_GRIMM_CHAIN) and c:IsControler(tp)
+-- (2) Cannot be targeted
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
+	return Duel.GetTurnPlayer()~=tp
 end
-function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	if rp==tp or e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
-	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg and tg:IsExists(s.tfilter,1,nil,tp) and Duel.IsChainNegatable(ev)
-end
-function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
-	end
-end
-function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
-		Duel.Destroy(eg,REASON_EFFECT)
-	end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	--Your "Grimm Chain" monsters cannot be targeted by opponent's card effects
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,4))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_GRIMM_CHAIN))
+	e1:SetValue(aux.tgoval)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 end
 
 -- (3.A) Attach material

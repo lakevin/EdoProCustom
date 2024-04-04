@@ -34,8 +34,9 @@ function s.filter(c,e)
 	return c:IsFacedown() and c:IsRelateToEffect(e)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local ct=Duel.GetMatchingGroupCount(Card.IsOnField,tp,0,LOCATION_ONFIELD,nil)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFacedown() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,LOCATION_MZONE,0,1,nil) and ct>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEDOWN)
 	local g=Duel.SelectTarget(tp,Card.IsFacedown,tp,LOCATION_MZONE,0,1,99,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,#g,0,0)
@@ -57,11 +58,11 @@ end
 
 -- (2)
 function s.spfilter1(c,e,tp)
-	return c:IsSetCard(SET_SHADOWBLADE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) 
+	return c:IsSetCard(SET_SHADOWBLADE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE,tp) 
 		and Duel.IsExistingTarget(s.spfilter2,tp,LOCATION_GRAVE,0,1,nil,e,tp,c:GetCode())
 end
 function s.spfilter2(c,e,tp,code)
-	return c:IsSetCard(SET_SHADOWBLADE) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_SHADOWBLADE) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE,1-tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
@@ -69,27 +70,28 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 			and Duel.GetLocationCount(1-tp,LOCATION_MZONE,1-tp)>0
 	end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	-- Special Summon to your field
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=Duel.SelectMatchingCard(tp,s.spfilter1,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	local sc=sg:GetFirst()
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
-	local og=Duel.SelectTarget(tp,s.spfilter2,tp,LOCATION_GRAVE,0,1,1,nil,e,1-tp,sc:GetCode())
-	local oc=og:GetFirst()
-	local g=Group.FromCards(sc,oc)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,0,0)
-	e:SetLabelObject(sc)
-end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local sc=e:GetLabelObject()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local oc=g:GetFirst()
-	if oc==sc then oc=g:GetNext() end
 	if sc then
 		Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
 	end
-	if oc:IsRelateToEffect(e) then
+	if Duel.SpecialSummonComplete()==0 then return end
+	-- Special Summon to opponent field
+	if Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
+	local og=Duel.SelectTarget(tp,s.spfilter2,tp,LOCATION_GRAVE,0,1,1,nil,e,1-tp,sc:GetCode())
+	local oc=og:GetFirst()
+	if oc and oc:IsRelateToEffect(e) then
 		Duel.SpecialSummonStep(oc,0,tp,1-tp,false,false,POS_FACEDOWN_DEFENSE)
 	end
+	if Duel.SpecialSummonComplete()==0 then return end
 	Duel.SpecialSummonComplete()
 end
 

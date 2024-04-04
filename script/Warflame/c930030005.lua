@@ -42,12 +42,12 @@ function s.initial_effect(c)
 	e3:SetTarget(s.thtg)
 	e3:SetOperation(s.thop)
 	c:RegisterEffect(e3)
-	local e4=e3:Clone()
+	--[[local e4=e3:Clone()
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetProperty(EFFECT_FLAG_DELAY)
 	e4:SetCode(EVENT_CHAIN_SOLVED)
 	e4:SetCondition(s.rmeffcon)
-	c:RegisterEffect(e4)
+	c:RegisterEffect(e4)]]--
 end
 s.listed_series={SET_WARFLAME}
 

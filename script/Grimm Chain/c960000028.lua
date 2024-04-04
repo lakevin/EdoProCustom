@@ -3,7 +3,7 @@ local s,id=GetID()
 local SET_CONTRACTOR=0x9998
 local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
-	-- (1) spsummon
+	-- (1) Special summon itself from hand, then negate the attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -14,34 +14,17 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- (2) draw 1 card and negate effect monster
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_BECOME_TARGET)
-	e2:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
-	e2:SetCondition(s.condition1)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCode(EVENT_BE_BATTLE_TARGET)
-	e3:SetCondition(s.condition2)
-	c:RegisterEffect(e3)
 	-- (3) turn set
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetCategory(CATEGORY_POSITION)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_REMOVE)
-	e4:SetProperty(EFFECT_FLAG_DELAY)
-	e4:SetCountLimit(1,{id,1})
-	e4:SetTarget(s.settg)
-	e4:SetOperation(s.setop)
-	c:RegisterEffect(e4)
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_POSITION)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_REMOVE)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCountLimit(1,{id,1})
+	e2:SetTarget(s.settg)
+	e2:SetOperation(s.setop)
+	c:RegisterEffect(e2)
 end
 s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
 
@@ -59,48 +42,38 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-end
-
--- (2) draw 1 card and negate effect monster
-function s.condition1(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsContains(e:GetHandler()) and rp~=tp 
-end
-function s.condition2(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsContains(e:GetHandler()) and Duel.GetAttacker():IsControler(1-tp)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(nil,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,nil,1,1-tp,LOCATION_MZONE)
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.Draw(tp,1,REASON_EFFECT)~=0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
-		local g=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_MZONE,1,1,nil)
-		if #g>0 then
-			local tc=g:GetFirst()
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_DISABLE)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_PHASE+PHASE_END,2)
-			tc:RegisterEffect(e2)
-			local e3=Effect.CreateEffect(c)
-			e3:SetType(EFFECT_TYPE_SINGLE)
-			e3:SetCode(EFFECT_DISABLE_EFFECT)
-			e3:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_PHASE+PHASE_END,2)
-			tc:RegisterEffect(e3)
-			local e4=Effect.CreateEffect(c)
-			e4:SetType(EFFECT_TYPE_SINGLE)
-			e4:SetCode(EFFECT_CANNOT_ATTACK)
-			e4:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_PHASE+PHASE_END,2)
-			tc:RegisterEffect(e4)
-		end
+	local at=Duel.GetAttacker()
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE)>0 then
+		Duel.NegateRelatedChain(at,RESET_TURN_SET)
+		--Negate the effects of the Summoned monster(s)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		at:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		at:RegisterEffect(e2)
+		--Cannot attack
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_CANNOT_ATTACK)
+		e3:SetValue(1)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		at:RegisterEffect(e3)
+		--Cannot be used as material for a Fusion/Synchro/Xyz/Link Summon
+		local e4=Effect.CreateEffect(c)
+		e4:SetDescription(aux.Stringid(id,2))
+		e4:SetType(EFFECT_TYPE_SINGLE)
+		e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CLIENT_HINT)
+		e4:SetCode(EFFECT_CANNOT_BE_MATERIAL)
+		e4:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK))
+		e4:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		at:RegisterEffect(e4)
 	end
 end
 
--- (3)
+-- (2)
 function s.filter(c)
 	return c:IsFaceup() and c:IsCanTurnSet()
 end
@@ -113,7 +86,7 @@ function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() then
+	if tc and at:IsRelateToEffect(e) and at:IsLocation(LOCATION_MZONE) and at:IsFaceup() then
 		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
 	end
 end

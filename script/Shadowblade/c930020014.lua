@@ -13,9 +13,9 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,{id,0})
-	e1:SetCondition(s.sccon)
-	e1:SetTarget(s.sctg)
-	e1:SetOperation(s.scop)
+	e1:SetCondition(s.setcon)
+	e1:SetTarget(s.settg)
+	e1:SetOperation(s.setop)
 	c:RegisterEffect(e1)
 	-- (2) Change Position
 	local e2=Effect.CreateEffect(c)
@@ -36,40 +36,28 @@ function s.lcheck(g,lc,sumtype,tp)
 end
 
 -- (1)
-function s.sccon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) and Duel.IsExistingMatchingCard(s.fieldfilter,tp,LOCATION_DECK,0,1,nil,tp)
+function s.setcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
-function s.tdfilter(c)
-	return c:IsSetCard(SET_SHADOWBLADE) and c:IsAbleToDeck() and not c:IsCode(id)
-end
-function s.scfilter(c,ignore)
+function s.setfilter(c)
 	return c:IsSetCard(SET_SHADOWBLADE) and c:IsSpellTrap() and c:IsSSetable()
 end
-function s.sctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and s.tdfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) 
-		and Duel.IsExistingMatchingCard(s.scfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) end
 end
-function s.scop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,1,REASON_EFFECT)~=0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-		local g=Duel.SelectMatchingCard(tp,s.scfilter,tp,LOCATION_DECK,0,1,1,nil)
-		if #g>0 then
-			local sc=g:GetFirst()
-			if Duel.SSet(tp,sc)>0 then
-				--It can be activated this turn
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetDescription(aux.Stringid(id,1))
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-				e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-				e1:SetReset(RESET_EVENT|RESETS_STANDARD)
-				sc:RegisterEffect(e1)
-			end
+function s.setop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
+		if Duel.SSet(tp,g)>0 then
+			--It can be activated this turn
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetDescription(aux.Stringid(id,1))
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+			e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+			sc:RegisterEffect(e1)
 		end
 	end
 end

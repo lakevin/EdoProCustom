@@ -48,8 +48,8 @@ function s.filter1(c,e,tp,lv)
 		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,sumlv-lv)
 end
 function s.filter2(c,difflv)
-	return c:GetLevel()==difflv and not c:IsType(TYPE_TUNER) and c:IsSetCard(SET_HI_TECH) 
-		and c:IsType(TYPE_SYNCHRO) and c:IsAbleToGraveAsCost()
+	return c:GetLevel()==difflv  and c:IsSetCard(SET_HI_TECH) and c:IsType(TYPE_SYNCHRO)
+		and c:IsAbleToGraveAsCost() and (not c:IsType(TYPE_TUNER) or c:IsHasEffect(EFFECT_NONTUNER))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -68,26 +68,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local lv=tc:GetLevel()-c:GetLevel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-	
 	local mg=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_EXTRA,0,nil,lv)
 	if not c or #mg==0 then return end
 	mg:Merge(c)
-
-	--local sg=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_EXTRA,0,1,1,nil,lv)
-	--local sc=sg:GetFirst()
-	--if not c or not sc then return end
-	--local mg=Group.FromCards(c,sc)
-	--Duel.HintSelection(mg)
-
 	Duel.SynchroSummon(tp,tc,c,mg)
-
-	--[[if tc then 
-		for mc in aux.Next(g) do
-			mc:SetReasonCard(tc)
-		end
-		if Duel.SendtoGrave(g,REASON_SYNCHRO)==2 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			Duel.SpecialSummon(tc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
-		end
-	end]]--
 end
