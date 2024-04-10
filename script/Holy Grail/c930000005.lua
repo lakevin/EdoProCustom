@@ -54,20 +54,21 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.tffilter(c,e,tp,rc,att)
-	return c:IsRace(rc) and c:IsAttribute(att) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.cfilter(c,e,tp)
 	local rc=c:GetOriginalRace()
 	local att=c:GetOriginalAttribute()
+	local code=c:GetCode()
 	local eff4064256={Duel.GetPlayerEffect(tp,4064256)}
 	for _,te in ipairs(eff4064256) do
 		local val=te:GetValue()
 		if val and val(te,c,e,0) then rc=val(te,c,e,1) end
 	end
 	return (c:IsSetCard(SET_KNIGUARD) or c:IsSetCard(SET_SHADOWBLADE) or c:IsSetCard(SET_WARFLAME))
-		and Duel.IsExistingMatchingCard(s.tffilter,tp,LOCATION_DECK,0,1,nil,e,tp,rc,att)	
+		and Duel.IsExistingMatchingCard(s.tffilter,tp,LOCATION_DECK,0,1,nil,e,tp,rc,att,code)	
 		and c:IsMonster() and not c:IsType(TYPE_TOKEN) and c:IsReleasable() 
+end
+function s.tffilter(c,e,tp,rc,att,code)
+	return c:IsRace(rc) and c:IsAttribute(att) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
@@ -82,7 +83,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc or not tc:IsLocation(LOCATION_GRAVE) or not tc:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.tffilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,tc:GetRace(),tc:GetAttribute())
+	local g=Duel.SelectMatchingCard(tp,s.tffilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,tc:GetRace(),tc:GetAttribute(),tc:GetCode())
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end

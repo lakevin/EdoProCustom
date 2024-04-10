@@ -43,11 +43,11 @@ function s.initial_effect(c)
 	e4:SetOperation(s.ctop2)
 	c:RegisterEffect(e4)
 end
-s.listed_series={SET_SHADOWBLADE}
+s.listed_series={SET_HOLYGRAIL}
 
 -- (1)
 function s.thfilter(c)
-	return c:IsMonster() and c:IsSetCard(SET_HOLYGRAIL) and c:IsAbleToHand()
+	return (c:IsCode(CARD_HOLY_GRAIL) or c:IsCode(CARD_UNHOLY_GRAIL)) and c:IsAbleToHand()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
