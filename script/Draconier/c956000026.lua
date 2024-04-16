@@ -116,6 +116,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tc)
 		end
 	end
 end

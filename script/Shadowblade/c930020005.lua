@@ -2,7 +2,7 @@
 local SET_SHADOWBLADE=0xB64A
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) Flip: Token
+	-- (1) Flip: special summon token
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
@@ -14,17 +14,15 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	-- (2) special summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCountLimit(1,{id,1})
+	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.spcon)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	-- (2) special summon
-	local e3=e2:Clone()
-	e3:SetCondition(s.spcon2)
-	c:RegisterEffect(e3)
 	-- (3) return
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
@@ -73,18 +71,28 @@ function s.tkop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.spfilter(c)
-	return (c:IsFaceup() or c:IsFacedown()) and c:IsSetCard(SET_SHADOWBLADE)
+function s.cfilter(c)
+	return not c:IsSetCard(SET_SHADOWBLADE)
 end
-function s.spcon(e,c)
-	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-		and	Duel.IsExistingMatchingCard(s.spfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
-function s.spcon2(e,c)
-	if c==nil then return true end
-	local tp=e:GetHandlerPlayer()
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		local g=Duel.GetMatchingGroup(Card.IsFacedown,tp,LOCATION_MZONE,0,nil)
+		--if #g>0 then
+		--	Duel.ChangePosition(g,POS_FACEUP_DEFENSE,true)
+		--	Duel.ConfirmCards(1-tp,g)
+		--	Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
+		--end
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
 
 -- (3)

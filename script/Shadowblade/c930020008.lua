@@ -2,10 +2,12 @@
 local SET_SHADOWBLADE=0xB64A
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) atkup
+	-- (1) cannot special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP+EFFECT_TYPE_CONTINUOUS)
-	e1:SetOperation(s.atkop)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetRange(LOCATION_DECK)
+	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e1)
 	-- (2) Flip: Destroy
 	local e2=Effect.CreateEffect(c)
@@ -45,16 +47,6 @@ end
 s.listed_series={SET_SHADOWBLADE}
 
 -- (1)
-function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(2500)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
-	e:GetHandler():RegisterEffect(e1)
-end
-
--- (2)
 function s.filter(c,e)
 	return not e or c:IsRelateToEffect(e) and c:IsFaceup()
 end
@@ -68,11 +60,19 @@ end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(s.filter,nil,e)
 	if #g>0 then
-		Duel.Destroy(g,REASON_EFFECT)
+		local ct=Duel.Destroy(g,REASON_EFFECT)
+		if ct>0 then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_UPDATE_ATTACK)
+			e1:SetValue(500*ct)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
+			e:GetHandler():RegisterEffect(e1)
+		end
 	end
 end
 
--- (3)
+-- (2)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_ONFIELD)
@@ -105,7 +105,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (4)
+-- (3)
 function s.poscon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end

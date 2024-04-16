@@ -56,7 +56,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		if #sg>0 then
 			local sc=sg:GetFirst()
 			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP,zone)
-			Duel.ConfirmCards(1-tp,sc)
 			local e1=Effect.CreateEffect(c)
 				e1:SetType(EFFECT_TYPE_SINGLE)
 				e1:SetCode(EFFECT_DISABLE)

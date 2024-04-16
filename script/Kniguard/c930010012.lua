@@ -77,7 +77,7 @@ end
 
 
 -- (2)
-	--Check if "Salamangreat" is reborn link summoned
+	--Check if "Kniguard" is reborn link summoned
 function s.lkfilter(c,tp)
 	return c:IsSetCard(SET_KNIGUARD) and c:IsLinkMonster() and c:GetControler()==tp
 end

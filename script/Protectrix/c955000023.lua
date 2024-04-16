@@ -74,6 +74,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		local tc=tg:GetFirst()
 		if tc:IsAbleToHand() then
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tc)
 			cg:RemoveCard(tc)
 		end
 		Duel.SendtoGrave(cg,REASON_EFFECT)

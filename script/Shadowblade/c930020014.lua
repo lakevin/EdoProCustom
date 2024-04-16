@@ -25,6 +25,7 @@ function s.initial_effect(c)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,1})
+	e2:SetCondition(s.cpcon)
 	e2:SetTarget(s.cptg)
 	e2:SetOperation(s.cpop)
 	c:RegisterEffect(e2)
@@ -51,6 +52,7 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		if Duel.SSet(tp,g)>0 then
 			--It can be activated this turn
+			local sc = g:GetFirst()
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetDescription(aux.Stringid(id,1))
 			e1:SetType(EFFECT_TYPE_SINGLE)
@@ -63,6 +65,9 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
+function s.cpcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsMainPhase()
+end
 function s.fufilter(c,g)
 	return c:IsFaceup() and g:IsContains(c) and c:IsCanTurnSet()
 end

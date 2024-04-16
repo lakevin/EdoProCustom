@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- (3) special summon to the opponent's field
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
@@ -31,18 +31,6 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	-- (4) return
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,2))
-	e4:SetCategory(CATEGORY_POSITION)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
-	e4:SetCode(EVENT_PHASE+PHASE_END)
-	e4:SetCondition(s.poscon)
-	e4:SetTarget(s.postg)
-	e4:SetOperation(s.posop)
-	c:RegisterEffect(e4)
 end
 s.listed_series={SET_SHADOWBLADE}
 
@@ -64,7 +52,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,nil,0,tp,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local c=e:GetHandler()
+	--cannot xyz summon
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
@@ -73,7 +63,18 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(s.splimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,1),nil)
+	aux.RegisterClientHint(c,nil,tp,1,0,aux.Stringid(id,2),nil)
+	--destroy this card during the end phase
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetCode(EVENT_PHASE+PHASE_END)
+	e2:SetTarget(s.destg)
+	e2:SetOperation(s.desop)
+	c:RegisterEffect(e2)
 end
 function s.splimit(e,c,tp,sumtp,sumpos)
 	return (sumtp&SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ
@@ -98,16 +99,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (4)
-function s.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
-end
-function s.postg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 end
-function s.posop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.ChangePosition(c,POS_FACEDOWN_DEFENSE)
+	if c:IsRelateToEffect(e) and c:IsFaceup() then
+		Duel.Destroy(c,REASON_EFFECT)
 	end
 end

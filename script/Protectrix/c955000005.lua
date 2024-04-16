@@ -33,7 +33,6 @@ function s.xyzop(e,tp,chk)
 end
 
 -- (1)
---isFaceup -> isOnField
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

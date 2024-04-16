@@ -55,14 +55,14 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_MZONE,c)
+	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,c)
 	if chk==0 then return c:IsDestructable() and #g>0 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,c,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and Duel.Destroy(e:GetHandler(),REASON_EFFECT)>0 then
-		local g=Duel.GetFieldGroup(tp,0,LOCATION_MZONE)
+		local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
 		if #g==0 then return end
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)

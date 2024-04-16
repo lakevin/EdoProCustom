@@ -10,9 +10,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
-	--e1:SetCost(s.spcost)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
@@ -36,10 +34,6 @@ s.counter_place_list={COUNTER_GRAIL}
 -- (1)
 function s.disfilter(c,e,tp)
 	return c:IsSetCard(SET_KNIGUARD) and c:IsDiscardable()
-end
-function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.disfilter,tp,LOCATION_HAND,0,1,nil) end
-	Duel.DiscardHand(tp,s.disfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(SET_KNIGUARD) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
