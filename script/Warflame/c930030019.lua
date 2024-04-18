@@ -34,7 +34,7 @@ function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ)
 end
 function s.filter(c)
-	return c:IsSetCard(SET_WARFLAME) and c:IsSpell() and c:IsSSetable()
+	return c:IsSetCard(SET_WARFLAME) and c:IsSpell() and c:IsType(TYPE_QUICKPLAY) and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end

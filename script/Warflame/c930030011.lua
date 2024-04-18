@@ -32,7 +32,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_WARFLAME,SET_HOLYGRAIL}
 function s.matfilter(c,lc,sumtype,tp)
-	return c:IsLevelBelow(8) and c:IsSetCard(SET_WARFLAME,lc,sumtype,tp)
+	return c:HasLevel() and c:IsSetCard(SET_WARFLAME,lc,sumtype,tp)
 end
 
 -- (1)
@@ -61,12 +61,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTarget(s.splimit)
 	Duel.RegisterEffect(e1,tp)
-	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,2),nil)
+	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,2),RESET_PHASE+PHASE_END,1)
 end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsAttribute(ATTRIBUTE_FIRE)
