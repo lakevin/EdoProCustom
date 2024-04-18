@@ -50,7 +50,7 @@ function s.atkfilter(c)
 	return c:IsSetCard(SET_TIME_TRAVEL) and c:IsMonster()
 end
 function s.atkval(e,c)
-	return Duel.GetMatchingGroup(s.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil):GetClassCount(Card.GetCode)*400
+	return Duel.GetMatchingGroup(s.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil):GetClassCount(Card.GetCode)*300
 end
 
 -- (2)
@@ -70,15 +70,15 @@ end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,SET_TIME_TRAVEL),tp,LOCATION_MZONE,0,nil)
 	if chk==0 then return #g~=0
-		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_GRAVE)
+		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_MZONE)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local cg=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,SET_TIME_TRAVEL),tp,LOCATION_MZONE,0,nil)
 	local ct=cg:GetClassCount(Card.GetCode)
 	if ct==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,ct,nil)
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,ct,nil)
 	if #g>0 then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
