@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetHintTiming(0,TIMING_MAIN_END)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.condition)
 	e2:SetCost(s.cost)
@@ -54,11 +54,11 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.filter(c)
-	return c:IsTrap() and not c:IsType(TYPE_CONTINUOUS|TYPE_COUNTER) and c:IsSetCard(0x9990) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x9990) and c:IsTrap() and not c:IsType(TYPE_CONTINUOUS|TYPE_COUNTER) and c:IsAbleToGraveAsCost()
 		and c:CheckActivateEffect(false,true,false)~=nil and c:CheckActivateEffect(false,true,false):GetOperation()~=nil
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp and Duel.GetCurrentPhase()&PHASE_MAIN1+PHASE_MAIN2~=0 and e:GetHandler():IsAbleToGrave(tp)
+	return Duel.GetCurrentPhase()&PHASE_MAIN1+PHASE_MAIN2~=0 and e:GetHandler():IsAbleToGrave(tp)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
