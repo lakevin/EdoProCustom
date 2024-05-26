@@ -50,18 +50,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(s.splimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	--lizard check
-	aux.addTempLizardCheck(e:GetHandler(),tp,s.lizfilter)
-	local e2=Effect.CreateEffect(c)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_OATH)
-	e2:SetDescription(aux.Stringid(id,2))
-	e2:SetReset(RESET_PHASE+PHASE_END)
-	e2:SetTargetRange(1,0)
-	Duel.RegisterEffect(e2,tp)
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(SET_DRACONIER) and c:IsLocation(LOCATION_EXTRA)
-end
-function s.lizfilter(e,c)
-	return not c:IsOriginalType(TYPE_XYZ)
+	return not c:IsSetCard(SET_DRACONIER)
 end

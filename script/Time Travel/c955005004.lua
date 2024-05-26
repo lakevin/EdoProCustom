@@ -33,6 +33,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e3:SetCountLimit(1,id)
 	e3:SetCondition(s.rmcon)
 	e3:SetTarget(s.rmtg)
@@ -63,22 +64,26 @@ function s.efilter(e,te)
 end
 
 -- (3)
+function s.costfilter(c,g)
+	return c:IsFaceup() and c:IsSetCard(SET_TIME_TRAVEL) and g:IsContains(c)
+end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_TT_CHRONO),c:GetControler(),LOCATION_MZONE,0,1,nil)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,SET_TIME_TRAVEL),tp,LOCATION_MZONE,0,nil)
-	if chk==0 then return #g~=0
-		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_MZONE)
+	local lg=e:GetHandler():GetLinkedGroup()
+	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_MZONE,0,1,nil,lg)
+		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_MZONE+LOCATION_GRAVE,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_MZONE+LOCATION_GRAVE)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local cg=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,SET_TIME_TRAVEL),tp,LOCATION_MZONE,0,nil)
-	local ct=cg:GetClassCount(Card.GetCode)
+	local lg=e:GetHandler():GetLinkedGroup()
+	local cg=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_MZONE,0,nil,lg)
+	local ct=#cg
 	if ct==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,ct,nil)
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_MZONE+LOCATION_GRAVE,1,ct,nil)
 	if #g>0 then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
