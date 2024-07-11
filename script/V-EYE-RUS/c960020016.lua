@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- (2) Reset Rank to its original Rank
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
@@ -101,7 +101,7 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rank=c:GetRank()
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_CONTROL)
-	local g=Duel.SelectMatchingCard(1-tp,s.ctfilter,1-tp,LOCATION_MZONE,0,1,1,nil,rank)
+	local g=Duel.SelectMatchingCard(tp,s.ctfilter,tp,0,LOCATION_MZONE,1,1,nil,rank)
 	local tc=g:GetFirst()
 	if not tc then return end
 	local reduce=0

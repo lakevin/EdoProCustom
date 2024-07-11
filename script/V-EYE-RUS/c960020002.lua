@@ -89,7 +89,6 @@ function s.lvop1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFirstTarget()
 	local ct=Duel.GetMatchingGroupCount(s.lvfilter1,tp,LOCATION_MZONE,0,nil)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		--Debug.Message(ct)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_LEVEL)
@@ -111,7 +110,6 @@ function s.lvop2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFirstTarget()
 	local ct=Duel.GetMatchingGroupCount(s.lvfilter2,tp,LOCATION_MZONE,0,nil)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		--Debug.Message(ct)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_RANK)
@@ -123,7 +121,8 @@ end
 
 -- (3)
 function s.thfilter(c,turn)
-	return c:IsSetCard(SET_VEYERUS) and c:IsReason(0x4040) and c:IsAbleToHand() --and c:GetTurnID()==turn
+	return c:IsSetCard(SET_VEYERUS) and c:IsReason(0x4040) and c:GetTurnID()==turn
+		and c:IsPreviousLocation(LOCATION_HAND) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local turn=Duel.GetTurnCount()

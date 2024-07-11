@@ -55,7 +55,6 @@ function s.exop(e,tp,eg,ep,ev,re,r,rp)
 		if tc:IsType(TYPE_XYZ) then
 			e1:SetCode(EFFECT_UPDATE_RANK)
 		else
-			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetCode(EFFECT_UPDATE_LEVEL)
 		end
 		e1:SetValue(1)

@@ -2,13 +2,13 @@
 local s,id=GetID()
 local SET_VEYERUS=0x9DD0
 function s.initial_effect(c)
-	-- (1) Add to Hand
+	-- (1) Token
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	--e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	--e1:SetTarget(s.tkntg)
+	e1:SetTarget(s.tkntg)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	-- (3) Send to GY
@@ -42,9 +42,14 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		ft=Duel.AnnounceNumberRange(tp,1,ft)
 	end
 	Duel.BreakEffect()
+	--
+	local fid=e:GetHandler():GetFieldID()
+	local g=Group.CreateGroup()
 	for i=1,ft do
 		local token=Duel.CreateToken(tp,id+1)
 		Duel.SpecialSummonStep(token,0,tp,1-tp,false,false,POS_FACEUP_DEFENSE)
+		token:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,0,1,fid)
+		g:AddCard(token)
 		--Cannot be used as Link Material
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(3312)
@@ -65,10 +70,71 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		token:RegisterEffect(e2)
 	end
 	Duel.SpecialSummonComplete()
+	g:KeepAlive()
+	-- Destroy
+	local e3=Effect.CreateEffect(e:GetHandler())
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetCountLimit(1)
+	e3:SetLabel(fid)
+	e3:SetCondition(s.descon)
+	e3:SetOperation(s.desop)
+	e3:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	Duel.RegisterEffect(e3,tp)
 	-- discard the same number of cards
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g1=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_HAND,0,ft,ft,nil)
 	Duel.SendtoGrave(g1,REASON_EFFECT+REASON_DISCARD)
+end
+function s.group(seq,tp)
+	local g=Group.CreateGroup()
+	local function optadd(loc,seq,player)
+		if not player then player=tp end
+		local c=Duel.GetFieldCard(player,loc,seq)
+		if c then g:AddCard(c) end
+	end
+	if seq+1<=4 then optadd(LOCATION_MZONE,seq+1) end
+	if seq-1>=0 then optadd(LOCATION_MZONE,seq-1) end
+	if seq<5 then
+		optadd(LOCATION_SZONE,seq)
+		if seq==1 then
+			optadd(LOCATION_MZONE,5)
+			optadd(LOCATION_MZONE,6,1-tp)
+		end
+		if seq==3 then
+			optadd(LOCATION_MZONE,6)
+			optadd(LOCATION_MZONE,5,1-tp)
+		end
+	elseif seq==5 then
+		optadd(LOCATION_MZONE,1)
+		optadd(LOCATION_MZONE,3,1-tp)
+	elseif seq==6 then
+		optadd(LOCATION_MZONE,3)
+		optadd(LOCATION_MZONE,1,1-tp)
+	end
+	return g
+end
+function s.desfilter(c,fid)
+	return c:GetFlagEffectLabel(id)==fid
+end
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetTurnPlayer()==tp then return false end
+	local tg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,0,nil)
+	if #tg==0 then
+		e:Reset()
+		return false
+	else return true end
+end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local tg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,0,nil)
+	local desgroup=Group.CreateGroup()
+	for tc in aux.Next(tg) do
+		local ag=s.group(tc:GetSequence(),1-tp)
+		ag:Merge(tc)
+		desgroup:Merge(ag)
+	end
+	Duel.Destroy(desgroup,REASON_EFFECT)
 end
 
 -- (2)
