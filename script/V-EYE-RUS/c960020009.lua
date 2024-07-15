@@ -9,32 +9,41 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SUMMON_PROC)
 	e1:SetCondition(s.ntcon)
-	e1:SetOperation(s.ntop)
 	c:RegisterEffect(e1)
-	-- (2) Negate monster effect activation
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_LVCHANGE)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e2:SetCode(EVENT_CHAINING)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(2,id)
-	e2:SetCondition(s.negcon)
-	e2:SetTarget(s.negtg)
-	e2:SetOperation(s.negop)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_SUMMON_COST)
+	e2:SetOperation(s.lvop)
 	c:RegisterEffect(e2)
-	-- (3) add to hand
-    local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCondition(s.thcon)
-	e3:SetTarget(s.thtg)
-	e3:SetOperation(s.thop)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_SPSUMMON_COST)
+	e3:SetOperation(s.lvop2)
 	c:RegisterEffect(e3)
+	-- (2) Negate monster effect activation
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_LVCHANGE)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e4:SetCode(EVENT_CHAINING)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(2,id)
+	e4:SetCondition(s.negcon)
+	e4:SetTarget(s.negtg)
+	e4:SetOperation(s.negop)
+	c:RegisterEffect(e4)
+	-- (3) Add to hand
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,2))
+	e5:SetCategory(CATEGORY_DESTROY)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e5:SetCode(EVENT_TO_GRAVE)
+	e5:SetCondition(s.tgcon)
+	e5:SetTarget(s.tgtg)
+	e5:SetOperation(s.tgop)
+	c:RegisterEffect(e5)
 end
 s.listed_series={SET_VEYERUS}
 
@@ -43,25 +52,49 @@ function s.ntcon(e,c,minc)
 	if c==nil then return true end
 	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
-function s.ntop(e,tp,eg,ep,ev,re,r,rp,c)
+function s.lvcon(e)
+	return e:GetHandler():GetMaterialCount()==0
+end
+function s.lvop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	--change base attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE&~RESET_TOFIELD)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD+RESET_DISABLE)
+	e1:SetCode(EFFECT_SET_BASE_ATTACK)
+	e1:SetCondition(s.lvcon)
+	e1:SetValue(1200)
+	c:RegisterEffect(e1)
+	--change base defense
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_SET_BASE_DEFENSE)
+	e2:SetValue(600)
+	c:RegisterEffect(e2)
+	--change level
+	local e3=e1:Clone()
+	e3:SetCode(EFFECT_CHANGE_LEVEL)
+	e3:SetValue(4)
+	c:RegisterEffect(e3)
+end
+function s.lvop2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	--change base attack
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetReset(RESET_EVENT|(RESETS_STANDARD|RESET_DISABLE)&~(RESET_TOFIELD|RESET_LEAVE))
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
 	e1:SetValue(1200)
 	c:RegisterEffect(e1)
 	--change base defense
 	local e2=e1:Clone()
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE&~RESET_TOFIELD)
 	e2:SetCode(EFFECT_SET_BASE_DEFENSE)
 	e2:SetValue(600)
 	c:RegisterEffect(e2)
+	--change level
 	local e3=e1:Clone()
 	e3:SetCode(EFFECT_CHANGE_LEVEL)
 	e3:SetValue(4)
@@ -99,22 +132,20 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
+function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
     -- 0x4040 => REASON_EFFECT+REASON_DISCARD
 	return e:GetHandler():GetPreviousLocation()==LOCATION_HAND and (r&0x4040)==0x4040
 end
-function s.thfilter(c)
-	return c:IsSetCard(SET_VEYERUS) and c:IsSpellTrap() and c:IsAbleToHand()
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsAbleToGrave() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND+CATEGORY_SEARCH,nil,1,tp,LOCATION_DECK)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
-        Duel.SendtoHand(g,nil,REASON_EFFECT)
-	    Duel.ConfirmCards(1-tp,g)
-    end
+function s.tgop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SendtoGrave(tc,REASON_EFFECT)
+	end
 end

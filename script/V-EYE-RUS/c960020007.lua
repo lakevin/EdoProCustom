@@ -13,17 +13,31 @@ function s.initial_effect(c)
 	e1:SetTarget(s.chtg)
 	e1:SetOperation(s.chop)
 	c:RegisterEffect(e1)
-	-- (3) spsummon
+	-- (2) level reduce
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetCategory(CATEGORY_LVCHANGE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.spcon)
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
+	e2:SetCountLimit(1)
+	e2:SetCondition(s.lvcon)
+	e2:SetOperation(s.lvop)
 	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e3)
+	-- (3) spsummon
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_TO_GRAVE)
+	e4:SetCountLimit(1,id)
+	e4:SetCondition(s.spcon)
+	e4:SetTarget(s.sptg)
+	e4:SetOperation(s.spop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={SET_VEYERUS}
 
@@ -56,16 +70,23 @@ function s.chop(e,tp,eg,ep,ev,re,r,rp)
 		local sc=Duel.SelectMatchingCard(tp,s.chfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 		if #sc>0 and Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP) then
 			Duel.Draw(tp,1,REASON_EFFECT)
-			if Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-				local e1=Effect.CreateEffect(c)
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_CHANGE_LEVEL)
-				e1:SetValue(1)
-				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-				c:RegisterEffect(e1)
-			end
 		end
 	end
+end
+
+-- (2)
+function s.lvcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsLevelAbove(3)
+end
+function s.lvop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:GetLevel()<3 then return end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_LEVEL)
+	e1:SetValue(-2)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e1)
 end
 
 -- (3)

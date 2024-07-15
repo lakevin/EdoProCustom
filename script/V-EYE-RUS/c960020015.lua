@@ -40,11 +40,12 @@ function s.lvcon(e,tp,eg,ep,ev,re,r,rp)
 	--Debug.Message("IsHasCategory: " .. tostring(re:IsHasCategory(CATEGORY_LVCHANGE)))
 	--Debug.Message("IsSetCard: " .. tostring(re:GetHandler():IsSetCard(SET_VEYERUS)))
 	return re and re:IsHasCategory(CATEGORY_LVCHANGE) and re:GetHandler():IsSetCard(SET_VEYERUS)
-		and not re:GetHandler():IsCode(id) and e:GetHandler():IsRankAbove(1) and e:GetHandler():IsRankBelow(10)
+		and not re:GetHandler():IsCode(id) and not re:GetHandler():IsStatus(STATUS_DISABLED)
+		and e:GetHandler():IsRankAbove(1) and e:GetHandler():IsRankBelow(10)
 end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFacedown() or c:IsRankAbove(12) then return end
+	if c:IsFacedown() or c:GetLevel()>=11 then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_RANK)

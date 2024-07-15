@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	--e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e1:SetTarget(s.tkntg)
+	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	-- (3) Send to GY
@@ -25,7 +25,7 @@ end
 s.listed_series={SET_VEYERUS}
 
 -- (1)
-function s.tkntg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,0,0,1,RACE_CYBERSE,ATTRIBUTE_DARK,POS_FACEUP_DEFENSE,1-tp) end
 	local ct=math.min(Duel.GetFieldGroupCount(tp,LOCATION_HAND,0),3)
@@ -87,33 +87,22 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_HAND,0,ft,ft,nil)
 	Duel.SendtoGrave(g1,REASON_EFFECT+REASON_DISCARD)
 end
-function s.group(seq,tp)
-	local g=Group.CreateGroup()
-	local function optadd(loc,seq,player)
-		if not player then player=tp end
-		local c=Duel.GetFieldCard(player,loc,seq)
-		if c then g:AddCard(c) end
-	end
-	if seq+1<=4 then optadd(LOCATION_MZONE,seq+1) end
-	if seq-1>=0 then optadd(LOCATION_MZONE,seq-1) end
-	if seq<5 then
-		optadd(LOCATION_SZONE,seq)
-		if seq==1 then
-			optadd(LOCATION_MZONE,5)
-			optadd(LOCATION_MZONE,6,1-tp)
+function s.cfilter(c,tc,seq)
+	if tc:IsLocation(LOCATION_SZONE) and c:IsControler(tc:GetControler()) then
+		if c:IsLocation(LOCATION_MZONE) then return c:IsSequence(seq) end
+		return true
+	elseif tc:IsLocation(LOCATION_MZONE) then
+		if c:IsLocation(LOCATION_SZONE) then
+			return tc:IsInMainMZone() and tc:GetColumnGroup():IsContains(c) and c:IsControler(tc:GetControler())
+		elseif c:IsLocation(LOCATION_MZONE) then
+			if c:IsInExtraMZone() or tc:IsInExtraMZone() then
+				return tc:GetColumnGroup():IsContains(c)
+			else
+				return c:IsSequence(seq-1,seq+1) and c:IsControler(tc:GetControler())
+			end
 		end
-		if seq==3 then
-			optadd(LOCATION_MZONE,6)
-			optadd(LOCATION_MZONE,5,1-tp)
-		end
-	elseif seq==5 then
-		optadd(LOCATION_MZONE,1)
-		optadd(LOCATION_MZONE,3,1-tp)
-	elseif seq==6 then
-		optadd(LOCATION_MZONE,3)
-		optadd(LOCATION_MZONE,1,1-tp)
 	end
-	return g
+	return false
 end
 function s.desfilter(c,fid)
 	return c:GetFlagEffectLabel(id)==fid
@@ -127,14 +116,13 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	else return true end
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,0,nil)
-	local desgroup=Group.CreateGroup()
-	for tc in aux.Next(tg) do
-		local ag=s.group(tc:GetSequence(),1-tp)
-		ag:Merge(tc)
-		desgroup:Merge(ag)
+	local g=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,0,nil)
+	local dg=g:Clone()
+	for token in aux.Next(g) do
+		local tg=token:GetColumnGroup(1,1):Filter(s.cfilter,nil,token,token:GetSequence())
+		dg:Merge(tg)
 	end
-	Duel.Destroy(desgroup,REASON_EFFECT)
+	Duel.Destroy(dg,REASON_EFFECT)
 end
 
 -- (2)
