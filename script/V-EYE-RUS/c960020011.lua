@@ -110,7 +110,7 @@ end
 -- (2)
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(SET_VEYERUS) 
-		and re:GetHandler():IsType(TYPE_XYZ) and c:IsLevelAbove(5)
+		and re:GetHandler():IsType(TYPE_XYZ) and e:GetHandler():IsLevelAbove(5)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
