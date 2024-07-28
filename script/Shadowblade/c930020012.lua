@@ -28,7 +28,7 @@ s.listed_series={SET_SHADOWBLADE}
 -- (1)
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_DECK)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function s.filter(c,e,sp)
 	return c:IsMonster() and c:IsSetCard(SET_SHADOWBLADE) and not c:IsType(TYPE_LINK)
@@ -36,7 +36,7 @@ function s.filter(c,e,sp)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local cg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE+LOCATION_DECK,0,nil,e,tp)
+	local cg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_HAND+LOCATION_DECK,0,nil,e,tp)
 	if #cg>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		if Duel.SelectYesNo(tp, aux.Stringid(id,0)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

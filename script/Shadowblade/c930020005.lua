@@ -2,10 +2,10 @@
 local SET_SHADOWBLADE=0xB64A
 local s,id=GetID()
 function s.initial_effect(c)
-	-- (1) Flip: special summon token
+	-- (1) flip: special summon tokens
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,{id,0})
@@ -14,11 +14,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	-- (2) special summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCountLimit(1,id)
+	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
@@ -39,9 +39,6 @@ end
 s.listed_series={SET_SHADOWBLADE}
 
 -- (1)
-function s.exfilter(c)
-	return c:IsSetCard(SET_SHADOWBLADE)
-end
 function s.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
@@ -59,7 +56,7 @@ function s.tkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	-- Cannot Special Summon monsters from the Extra Deck, except Shadowblade monsters
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetDescription(aux.Stringid(id,3))
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
@@ -68,6 +65,9 @@ function s.tkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(function(_,c) return c:IsLocation(LOCATION_EXTRA) and not s.exfilter(c) end)
 	Duel.RegisterEffect(e1,tp)
 	Duel.SpecialSummonComplete()
+end
+function s.exfilter(c)
+	return c:IsAttribute(ATTRIBUTE_DARK)
 end
 
 -- (2)
