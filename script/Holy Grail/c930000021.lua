@@ -2,7 +2,6 @@
 local SET_HOLYGRAIL=0xAD9C
 local COUNTER_GRAIL=0x4041
 local CARD_HOLY_GRAIL=930000001
-local CARD_UNHOLY_GRAIL=930000002
 local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) Activate
@@ -44,10 +43,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_series={SET_HOLYGRAIL}
+s.listed_names={CARD_HOLY_GRAIL}
 
 -- (1)
 function s.thfilter(c)
-	return (c:IsCode(CARD_HOLY_GRAIL) or c:IsCode(CARD_UNHOLY_GRAIL)) and c:IsAbleToHand()
+	return (c:IsCode(CARD_HOLY_GRAIL) or (c:ListsCode(CARD_HOLY_GRAIL) and c:IsMonster())) and c:IsAbleToHand()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
@@ -110,7 +110,7 @@ end
 
 	--Unholy Grail
 function s.ctfilter2(c) 
-	return c:IsCode(CARD_UNHOLY_GRAIL) and c:IsFaceup()
+	return c:IsCode(CARD_HOLY_GRAIL) and c:IsFaceup()
 end
 function s.cttg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and chkc:IsFaceup() end

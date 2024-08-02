@@ -12,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,{id,0})
-	e1:SetCondition(s.tdcon)
 	e1:SetTarget(s.tdtg)
 	e1:SetOperation(s.tdop)
 	c:RegisterEffect(e1)
@@ -51,9 +50,6 @@ function s.lcheck(g,lc,sumtype,tp)
 end
 
 -- (1)
-function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
-end
 function s.tdfilter(c)
 	return c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsAbleToDeck()
 end

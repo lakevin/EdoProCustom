@@ -26,7 +26,7 @@ s.listed_series={SET_VEYERUS}
 
 -- (1)
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>1 and Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,0,0,1,RACE_CYBERSE,ATTRIBUTE_DARK,POS_FACEUP_DEFENSE,1-tp) end
 	local ct=math.min(Duel.GetFieldGroupCount(tp,LOCATION_HAND,0),3)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ct,0,0)

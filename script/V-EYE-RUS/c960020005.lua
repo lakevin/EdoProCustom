@@ -26,9 +26,9 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCondition(s.drcon)
-	e3:SetTarget(s.drtg)
-	e3:SetOperation(s.drop)
+	e3:SetCondition(s.setcon)
+	e3:SetTarget(s.settg)
+	e3:SetOperation(s.setop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_VEYERUS}
@@ -71,19 +71,21 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.drcon(e,tp,eg,ep,ev,re,r,rp)
+function s.setcon(e,tp,eg,ep,ev,re,r,rp)
     -- 0x4040 => REASON_EFFECT+REASON_DISCARD
 	return e:GetHandler():GetPreviousLocation()==LOCATION_HAND and (r&0x4040)==0x4040
 end
-function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsSSetable() and Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,tp,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function s.drop(e,tp,eg,ep,ev,re,r,rp,chk)
-	if Duel.Draw(tp,1,REASON_EFFECT)>0 then
-		Duel.BreakEffect()
-		Duel.ShuffleHand(tp)
-		Duel.DiscardHand(tp,aux.TRUE,1,1,REASON_EFFECT+REASON_DISCARD)
+function s.setop(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and c:IsSSetable() then
+		if Duel.SSet(tp,c)>0 then
+			Duel.Draw(tp,1,REASON_EFFECT)
+		end
 	end
 end

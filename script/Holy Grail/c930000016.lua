@@ -49,9 +49,9 @@ function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local tc=Duel.SelectMatchingCard(tp,s.acfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
 	if tc and Duel.SSet(tp,tc)~=0 then
-		if Duel.IsExistingTarget(s.attrfilter,tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		if Duel.IsExistingTarget(s.attrfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-			local sg=Duel.SelectTarget(tp,s.attrfilter,tp,LOCATION_MZONE,0,1,1,nil)
+			local sg=Duel.SelectTarget(tp,s.attrfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 			local sc=Duel.GetFirstTarget()
 			if sc then
 				local e1=Effect.CreateEffect(e:GetHandler())

@@ -1,5 +1,6 @@
 --Priestess of the Holy Grail
 local SET_HOLYGRAIL=0xAD9C
+local CARD_HOLY_GRAIL=930000001
 local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) special summon
@@ -28,10 +29,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_HOLYGRAIL}
+s.listed_names={CARD_HOLY_GRAIL}
 
 -- (1)
 function s.filter(c)
-	return c:IsFaceup() and c:IsSpell() and c:IsSetCard(SET_HOLYGRAIL)
+	return c:IsFaceup() and c:IsSpell() and c:IsCode(CARD_HOLY_GRAIL)
 end
 function s.spcon(e,c)
 	if c==nil then return true end

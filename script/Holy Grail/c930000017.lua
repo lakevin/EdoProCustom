@@ -1,5 +1,6 @@
 --Emissary of the Holy Grail
 local SET_HOLYGRAIL=0xAD9C
+local CARD_HOLY_GRAIL=930000001
 local s,id=GetID()
 function s.initial_effect(c)
 	-- (1) Extra Material
@@ -47,6 +48,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_HOLYGRAIL}
+s.listed_names={CARD_HOLY_GRAIL}
 
 -- (1)
 function s.extrafilter(c,tp)
@@ -102,7 +104,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(Card.IsNegatableMonster,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0
-		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_HOLYGRAIL),tp,LOCATION_SZONE+LOCATION_FZONE,0,1,e:GetHandler())
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_HOLY_GRAIL),tp,LOCATION_SZONE,0,1,e:GetHandler())
 		and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

@@ -105,7 +105,7 @@ function s.lvcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_HAND and (r&0x4040)==0x4040
 end
 function s.lvfilter(c)
-	return c:IsFaceup() and c:HasLevel()
+	return c:IsFaceup() and c:HasLevel() and c:IsLevelAbove(2)
 end
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.lvfilter(chkc) end
@@ -116,21 +116,12 @@ end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		local op=0
-		if tc:IsLevel(1) then
-			op=Duel.SelectOption(tp,aux.Stringid(id,2))
-		else
-			op=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
-		end
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_LEVEL)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		if op==0 then
-			e1:SetValue(1)
-		else
-			e1:SetValue(-1)
-		end
+		e1:SetValue(-1)
 		tc:RegisterEffect(e1)
+		Duel.Draw(tp,1,REASON_EFFECT)
 	end
 end

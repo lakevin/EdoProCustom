@@ -82,7 +82,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummonComplete()
 end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not c:GetOriginalRace()==RACE_CYBERSE and c:IsOriginalAttribute(ATTRIBUTE_DARK)
+	return not (c:GetOriginalRace()==RACE_CYBERSE and c:IsOriginalAttribute(ATTRIBUTE_DARK))
 end
 function s.lizfilter(e,c)
 	return not (c:GetOriginalRace()==RACE_CYBERSE and c:IsOriginalAttribute(ATTRIBUTE_DARK))

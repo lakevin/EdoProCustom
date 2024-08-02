@@ -92,7 +92,7 @@ function s.indcon(e)
 	return c:GetCounter(COUNTER_GRAIL)==0
 end
 function s.indtg(e,c)
-	return e:GetHandler()==c or (c:IsSetCard(SET_HOLYGRAIL) and e:GetHandler():GetLinkedGroup():IsContains(c))
+	return e:GetHandler()==c or (c:IsAttribute(ATTRIBUTE_LIGHT) and e:GetHandler():GetLinkedGroup():IsContains(c))
 end
 function s.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()

@@ -84,17 +84,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetLabel(Duel.GetTurnCount())
 		e1:SetLabelObject(tc)
 		Duel.RegisterEffect(e1,tp)
-		--Negate effects
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e2)
-		local e3=Effect.CreateEffect(e:GetHandler())
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetCode(EFFECT_DISABLE_EFFECT)
-		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e3)
 	end
 	Duel.SpecialSummonComplete()
 end
@@ -109,8 +98,7 @@ end
 
 -- (2)
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(SET_VEYERUS) 
-		and re:GetHandler():IsType(TYPE_XYZ) and e:GetHandler():IsLevelAbove(5)
+	return e:GetHandler():IsLevelAbove(5)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)

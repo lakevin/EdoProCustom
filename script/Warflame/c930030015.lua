@@ -12,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,{id,0})
-	e1:SetCondition(s.tgcon)
 	e1:SetTarget(s.tgtg)
 	e1:SetOperation(s.tgop)
 	c:RegisterEffect(e1)
@@ -47,9 +46,6 @@ function s.lcheck(g,lc,sumtype,tp)
 end
 
 -- (1)
-function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
-end
 function s.tgfilter(c)
 	return c:IsSpellTrap() and c:IsDestructable()
 end

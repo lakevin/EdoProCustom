@@ -77,7 +77,11 @@ function s.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 end
 function s.hdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DiscardHand(1-tp,aux.TRUE,1,1,REASON_EFFECT+REASON_DISCARD,nil)
+	if Duel.Draw(1-tp,1,REASON_EFFECT)>0 then
+		Duel.BreakEffect()
+		Duel.ShuffleHand(1-tp)
+		Duel.DiscardHand(1-tp,aux.TRUE,1,1,REASON_EFFECT+REASON_DISCARD)
+	end
 end
 
 -- (3)
