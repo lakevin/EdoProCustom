@@ -27,32 +27,6 @@ function s.initial_effect(c)
 	e3:SetCondition(s.sdescon)
 	e3:SetOperation(s.sdesop)
 	c:RegisterEffect(e3)
-	-- (3) Can treat "Kniguard" Spell cards as Link Material
-	local e4a=Effect.CreateEffect(c)
-	e4a:SetType(EFFECT_TYPE_FIELD)
-	e4a:SetCode(EFFECT_EXTRA_MATERIAL)
-	e4a:SetProperty(EFFECT_FLAG_PLAYER_TARGET|EFFECT_FLAG_SET_AVAILABLE)
-	e4a:SetRange(LOCATION_SZONE)
-	e4a:SetTargetRange(1,0)
-	e4a:SetCountLimit(1,id)
-	e4a:SetOperation(aux.TRUE)
-	e4a:SetValue(s.extraval)
-	c:RegisterEffect(e4a)
-	local e4b=Effect.CreateEffect(c)
-	e4b:SetType(EFFECT_TYPE_SINGLE)
-	e4b:SetCode(EFFECT_ADD_TYPE)
-	e4b:SetRange(LOCATION_SZONE)
-	e4b:SetTargetRange(LOCATION_SZONE,0)
-	e4b:SetCondition(s.addtypecon)
-	e4b:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_KNIGUARD))
-	e4b:SetValue(TYPE_MONSTER)
-	c:RegisterEffect(e4b)
-	local e4c=Effect.CreateEffect(c)
-	e4c:SetType(EFFECT_TYPE_SINGLE)
-	e4c:SetCode(EFFECT_ADD_ATTRIBUTE)
-    e4c:SetRange(LOCATION_SZONE)
-	e4c:SetValue(ATTRIBUTE_LIGHT)
-	c:RegisterEffect(e4c)
 end
 s.listed_series={SET_KNIGUARD}
 
@@ -90,25 +64,4 @@ function s.sdesop(e,tp,eg,ep,ev,re,r,rp)
 	if ct==2 then
 		Duel.Destroy(c,REASON_RULE)
 	end
-end
-
--- (3)
-function s.matfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_KNIGUARD) and c:IsType(TYPE_CONTINUOUS) and c:IsCode(id)
-end
-function s.extraval(chk,summon_type,e,...)
-	if chk==0 then
-		local tp,sc=...
-		if summon_type~=SUMMON_TYPE_LINK or not (sc and sc:IsSetCard(SET_KNIGUARD)) then
-			return Group.CreateGroup()
-		else
-			Duel.RegisterFlagEffect(tp,id,0,0,1)
-			return Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_SZONE,0,nil)
-		end
-	elseif chk==2 then
-		Duel.ResetFlagEffect(e:GetHandlerPlayer(),id)
-	end
-end
-function s.addtypecon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)>0
 end

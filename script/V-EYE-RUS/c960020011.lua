@@ -18,17 +18,15 @@ function s.initial_effect(c)
 	-- (2) destroy
     local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_NO_TURN_RESET)
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_LVCHANGE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_CHAINING)
 	e2:SetCountLimit(2,id)
 	e2:SetCondition(s.descon)
 	e2:SetTarget(s.destg)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
-	-- (3) Send to GY
+	-- (3) Add to hand
     local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_DESTROY)
@@ -46,18 +44,18 @@ s.listed_series={SET_VEYERUS}
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_VEYERUS) and c:IsType(TYPE_XYZ)
 end
-function s.spcfilter(c,tp)
+function s.tgfilter(c,tp)
 	return c:IsMonster() and c:IsControler(1-tp)
 end
-function s.spfilter(c,e,tp)
-	return c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.spcfilter,1,nil,tp) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return eg:IsExists(s.tgfilter,1,nil,tp) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+end
+function s.spfilter(c,e,tp)
+	return c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)	
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and s.spfilter(chkc,e,tp) end
