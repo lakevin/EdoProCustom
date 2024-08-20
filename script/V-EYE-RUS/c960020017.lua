@@ -1,77 +1,81 @@
---V-EYE-RUS Dropper
+--V-EYE-RUS - Denial of Service
 local s,id=GetID()
 local SET_VEYERUS=0x9DD0
 function s.initial_effect(c)
-	-- (1) change control
+	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_HANDES+CATEGORY_CONTROL)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_HAND)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
-	e1:SetCost(s.chcost)
-	e1:SetTarget(s.chtg)
-	e1:SetOperation(s.chop)
 	c:RegisterEffect(e1)
+	-- (1) atk/def
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetRange(LOCATION_FZONE)
+	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e2:SetTarget(s.atktg)
+	e2:SetValue(s.atkval)
+	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e3)
+	-- (2) cannot be target
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e4:SetRange(LOCATION_FZONE)
+	e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e4:SetTargetRange(LOCATION_MZONE,0)
+	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_VEYERUS))
+	e4:SetValue(aux.tgoval)
+	c:RegisterEffect(e4)
+	-- (3) --Attach 1 card from the GY to a "V-EYE-RUS" Xyz Monster you control
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,0))
+	e5:SetType(EFFECT_TYPE_IGNITION)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e5:SetRange(LOCATION_FZONE)
+	e5:SetCountLimit(1,{id,1})
+	e5:SetTarget(s.mattg)
+	e5:SetOperation(s.matop)
+	c:RegisterEffect(e5)
 end
 s.listed_series={SET_VEYERUS}
 
 -- (1)
-function s.chcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return not c:IsPublic() and c:GetFlagEffect(id)==0 end
-	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
+function s.atktg(e,c)
+	return c:IsType(TYPE_XYZ) and c:IsSetCard(SET_VEYERUS)
 end
-function s.chfilter(c,e,tp)
-	return c:IsCode(id) and c:IsAbleToHand()
-end
-function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
-end
-function s.chop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
-	if #g<1 then return end
-	Duel.ShuffleHand(tp)
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_DISCARD)
-	local tc=g:RandomSelect(1-tp,1,1,nil):GetFirst()
-	Duel.BreakEffect()
-	if not tc:IsCode(id) then
-		Duel.SendtoGrave(tc,REASON_EFFECT+REASON_DISCARD)
-	else
-		Duel.SendtoHand(tc,1-tp,REASON_EFFECT)
-		local e1=Effect.CreateEffect(tc)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e1:SetCountLimit(1)
-		e1:SetRange(LOCATION_HAND)
-		e1:SetCondition(s.mtcon)
-		e1:SetOperation(s.mtop)
-		tc:RegisterEffect(e1)
-	end
+function s.atkval(e,c)
+	return c:GetOverlayCount()*200
 end
 
 -- (2)
-function s.mtcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
+
+
+-- (3)
+function s.xyzfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(SET_VEYERUS)
 end
-function s.cfilter(c)
-	return c:IsSetCard(SET_VEYERUS) and c:IsAbleToGraveAsCost()
+function s.atchfilter(c,tp)
+	return c:IsControler(tp) or c:IsAbleToChangeControler()
 end
-function s.mtop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,c) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-		local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,c)
-		Duel.ConfirmCards(1-tp,g)
-		Duel.ShuffleHand(tp)
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local g=Duel.GetMatchingGroup(Card.IsDiscardable,tp,LOCATION_HAND,0,c)
-		local tg=g:RandomSelect(tp,1)
-		Duel.SendtoGrave(tg,REASON_COST)
-	end
+function s.mattg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.xyzfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.xyzfilter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingTarget(s.atchfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,e:GetHandler(),tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local xyzc=Duel.SelectTarget(tp,s.xyzfilter,tp,LOCATION_MZONE,0,1,1,nil,tp):GetFirst()
+	e:SetLabelObject(xyzc)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTACH)
+	local tc=Duel.SelectTarget(tp,s.atchfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,tp)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,tc,1,0,0)
+end
+function s.matop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetTargetCards(e)
+	if #g~=2 then return end
+	local tc=g:GetFirst()
+	local xyzc=g:GetNext()
+	if tc==e:GetLabelObject() then tc,xyzc=xyzc,tc end
+	Duel.Overlay(xyzc,tc)
 end

@@ -7,13 +7,13 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	--e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	-- (2) Destroy 1 "V-EYE-RUS" and cards adjacent to it
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
@@ -26,16 +26,23 @@ function s.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	-- (4) discard effect
-    local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_DESTROY)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCondition(s.spcon)
-	e4:SetTarget(s.sptg)
-	e4:SetOperation(s.spop)
+	-- (3) Destroy "V-EYE-RUS Token"
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetCondition(s.sdescon)
+	e4:SetOperation(s.sdesop)
 	c:RegisterEffect(e4)
+	-- (4) discard effect
+    --[[local e5=Effect.CreateEffect(c)
+	e5:SetCategory(CATEGORY_DESTROY)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e5:SetCode(EVENT_TO_GRAVE)
+	e5:SetCondition(s.spcon)
+	e5:SetTarget(s.sptg)
+	e5:SetOperation(s.spop)
+	c:RegisterEffect(e5)]]--
 end
 local VYRUS_TOKEN=id+1
 s.listed_series={SET_VEYERUS}
@@ -55,7 +62,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetCondition(s.sdescon)
 	e1:SetOperation(s.sdesop)
 	e:GetHandler():RegisterEffect(e1)
-	local ct=math.min(Duel.GetFieldGroupCount(tp,LOCATION_HAND,0),3)
+	local ct=math.min(Duel.GetFieldGroupCount(tp,LOCATION_HAND,0),2)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ct,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ct,tp,0)
 end
@@ -63,7 +70,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
 	if ct==0 or ft==0 or not Duel.IsPlayerCanSpecialSummonMonster(tp,VYRUS_TOKEN,0,TYPES_TOKEN,0,0,1,RACE_CYBERSE,ATTRIBUTE_DARK,POS_FACEUP_DEFENSE,1-tp) then return end
-	ct=math.min(ct,3)
+	ct=math.min(ct,2)
 	ft=math.min(ft,ct)
 	if ft>1 then
 		ft=Duel.AnnounceNumberRange(tp,1,ft)
@@ -110,10 +117,7 @@ function s.sdescon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp and Duel.GetTurnCount()~=e:GetLabel()
 end
 function s.sdesop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.Destroy(e:GetHandler(),REASON_EFFECT)>0 then
-		local g=Duel.GetMatchingGroup(s.sdesfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-		Duel.Destroy(g,REASON_EFFECT)
-	end
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 
 -- (2)
@@ -151,6 +155,18 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsType(TYPE_TOKEN) then
 		local g=tc:GetColumnGroup(1,1):Filter(s.cfilter,nil,tc,tc:GetSequence())
 		g:Merge(tc)
+		Duel.Destroy(g,REASON_EFFECT)
+	end
+end
+
+-- (3)
+function s.sdescon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_ONFIELD)
+end
+function s.sdesop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsCode,id+1),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,0,nil)
+	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)
 	end
 end

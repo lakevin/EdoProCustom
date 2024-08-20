@@ -109,13 +109,12 @@ function s.lvtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.lvop2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFirstTarget()
-	local ct=Duel.GetMatchingGroupCount(s.lvfilter2,tp,LOCATION_MZONE,0,nil)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_RANK)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e1:SetValue(ct)
+		e1:SetValue(tc:GetOverlayCount())
 		tc:RegisterEffect(e1)
 	end
 end
