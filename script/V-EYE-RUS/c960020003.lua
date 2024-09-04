@@ -90,7 +90,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
-		e1:SetValue(1)
+		e1:SetValue(s.lnklimit)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		token:RegisterEffect(e1)
 		--Cannot be used as Synchro Material
@@ -109,6 +109,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g1=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_HAND,0,ft,ft,nil)
 	Duel.SendtoGrave(g1,REASON_EFFECT+REASON_DISCARD)
+end
+function s.lnklimit(e,c)
+	if not c then return false end
+	return not (c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_CYBERSE))
 end
 function s.sdesfilter(c)
 	return c:IsType(TYPE_TOKEN) and c:IsCode(VYRUS_TOKEN)

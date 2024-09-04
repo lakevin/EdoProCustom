@@ -7,13 +7,12 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	-- (1) atk/def
+	-- (1) Reduce ATK/DEF
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_FZONE)
-	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(s.atktg)
+	e2:SetTargetRange(0,LOCATION_MZONE)
 	e2:SetValue(s.atkval)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -29,7 +28,7 @@ function s.initial_effect(c)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_VEYERUS))
 	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
-	-- (3) --Attach 1 card from the GY to a "V-EYE-RUS" Xyz Monster you control
+	-- (3) Attach 1 card from the GY to a "V-EYE-RUS" Xyz Monster you control
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,0))
 	e5:SetType(EFFECT_TYPE_IGNITION)
@@ -43,11 +42,12 @@ end
 s.listed_series={SET_VEYERUS}
 
 -- (1)
-function s.atktg(e,c)
-	return c:IsType(TYPE_XYZ) and c:IsSetCard(SET_VEYERUS)
-end
 function s.atkval(e,c)
-	return c:GetOverlayCount()*200
+	local diff=0
+	if c:GetLevel()<c:GetOriginalLevel() then
+		diff=c:GetOriginalLevel()-c:GetLevel()
+	end
+	return diff*-100
 end
 
 -- (2)

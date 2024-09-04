@@ -29,7 +29,7 @@ s.listed_series={SET_VEYERUS}
 
 -- (1)
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsLevelAbove(2) and c:IsSetCard(SET_VEYERUS)
+	return c:IsFaceup() and c:IsLevelAbove(2) and c:IsRace(RACE_CYBERSE)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.cfilter(chkc) end

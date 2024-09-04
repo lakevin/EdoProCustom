@@ -119,7 +119,7 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(reduce)
 	c:RegisterEffect(e1)
 	-- take control
-	if Duel.GetControl(tc,tp,nil,nil,nil,1-tp)~=0 then
+	if Duel.GetControl(tc,tp)~=0 then
 		--Negate effect(s)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
