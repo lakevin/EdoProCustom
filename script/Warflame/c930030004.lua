@@ -83,6 +83,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spfilter(c,e,tp,atk)
 	return c:IsSetCard(SET_WARFLAME) and c:IsAttackBelow(atk-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and not c:IsCode(930030004)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local atk=e:GetHandler():GetAttack()
