@@ -27,11 +27,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	-- (3) disable
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetCode(EVENT_CHAIN_ACTIVATING)
-	e4:SetOperation(s.disop)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_IMMUNE_EFFECT)
 	e4:SetLabelObject(e2)
+	e4:SetTarget(s.unatg)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetTargetRange(LOCATION_MZONE,0)
+	e4:SetValue(s.unaval)
 	c:RegisterEffect(e4)
 	-- (3) Can treat "Holy Grail" Spell cards as Link Material
 	local e5a=Effect.CreateEffect(c)
@@ -114,18 +116,17 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetLabelObject():GetLabel()~=0 then return end
+function s.unatg(e,c)
+	if e:GetLabelObject():GetLabel()~=0 then return false end
 	local tc=e:GetHandler():GetFirstCardTarget()
-	if tc then
-		local race=tc:GetRace()
-		local attribute=tc:GetAttribute()
-		local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-		if re:IsActiveType(TYPE_MONSTER) and loc==LOCATION_MZONE and 
-			re:GetHandler():GetAttribute()~=attribute and re:GetHandler():GetRace()~=race then
-			Duel.NegateEffect(ev)
-		end
-	end
+	if not tc then return false end
+	local race=tc:GetRace()
+	local attribute=tc:GetAttribute()
+	return c:GetOriginalRace()==race and c:GetOriginalAttribute()==attribute
+end
+function s.unaval(e,te)
+	return te:GetOwnerPlayer()~=e:GetHandlerPlayer() and te:IsActiveType(TYPE_MONSTER) and te:IsActivated()
+		and te:GetActivateLocation()==LOCATION_MZONE
 end
 
 -- (4)
