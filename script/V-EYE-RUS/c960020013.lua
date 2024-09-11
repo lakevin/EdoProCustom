@@ -91,5 +91,5 @@ end
 -- (2)
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:GetOriginalRace()==RACE_MACHINE and c:IsType(TYPE_XYZ)
+	return c:GetOriginalRace()==RACE_CYBERSE and c:IsType(TYPE_XYZ)
 end

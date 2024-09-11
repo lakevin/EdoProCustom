@@ -3,7 +3,7 @@ local s,id=GetID()
 local SET_VEYERUS=0x9DD0
 function s.initial_effect(c)
 	--Xyz Summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_CYBERSE),6,2,s.ovfilter,aux.Stringid(id,0),2)
+	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_CYBERSE),7,2,s.ovfilter,aux.Stringid(id,0),2)
 	c:EnableReviveLimit()
 	-- (1) level up
 	local e1=Effect.CreateEffect(c)
@@ -31,8 +31,9 @@ s.listed_series={SET_VEYERUS}
 --Xyz Summon
 function s.ovfilter(c,tp,xyzc)
 	local rk=c:GetRank()
-	return c:IsFaceup() and c:IsSetCard(SET_VEYERUS,xyzc,SUMMON_TYPE_XYZ,tp)
-	       and c:IsType(TYPE_XYZ,xyzc,SUMMON_TYPE_XYZ,tp) and (rk==5 or rk==6)
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_DARK,xyzc,SUMMON_TYPE_XYZ,tp)
+		and c:IsRace(RACE_CYBERSE,xyzc,SUMMON_TYPE_XYZ,tp) and (rk==6 or rk==7)
+		and c:IsType(TYPE_XYZ,xyzc,SUMMON_TYPE_XYZ,tp)
 end
 
 -- (1)

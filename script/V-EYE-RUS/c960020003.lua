@@ -30,8 +30,8 @@ function s.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e4:SetCode(EVENT_LEAVE_FIELD)
-	e4:SetCondition(s.sdescon)
-	e4:SetOperation(s.sdesop)
+	e4:SetCondition(s.tkdescon)
+	e4:SetOperation(s.tkdesop)
 	c:RegisterEffect(e4)
 	-- (4) discard effect
     --[[local e5=Effect.CreateEffect(c)
@@ -164,11 +164,11 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.sdescon(e,tp,eg,ep,ev,re,r,rp)
+function s.tkdescon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
-function s.sdesop(e,tp,eg,ep,ev,re,r,rp)
+function s.tkdesop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsCode,id+1),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,0,nil)
 	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)

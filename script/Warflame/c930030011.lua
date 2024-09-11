@@ -74,16 +74,15 @@ function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 end
 
 -- (2)
-function s.atkfilter(c,g)
-	return c:IsFaceup() and g:IsContains(c)
+function s.atkfilter(c)
+	return c:IsFaceup()
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	local g=e:GetHandler():GetLinkedGroup()
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and g:IsContains(chkc) end
-	if chk==0 then return c:IsAttackAbove(1000) and Duel.IsExistingTarget(s.atkfilter,tp,LOCATION_MZONE,0,1,nil,g) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) end
+	if chk==0 then return c:IsAttackAbove(1000) and Duel.IsExistingTarget(s.atkfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
-	local g=Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,nil,g)
+	local g=Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,g,1,0,0)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)

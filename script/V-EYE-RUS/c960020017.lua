@@ -1,4 +1,4 @@
---V-EYE-RUS - Denial of Service
+--V-EYE-RUS - Domain
 local s,id=GetID()
 local SET_VEYERUS=0x9DD0
 function s.initial_effect(c)
@@ -47,7 +47,7 @@ function s.atkval(e,c)
 	if c:GetLevel()<c:GetOriginalLevel() then
 		diff=c:GetOriginalLevel()-c:GetLevel()
 	end
-	return diff*-100
+	return diff*-200
 end
 
 -- (2)
