@@ -62,7 +62,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetCondition(s.sdescon)
 	e1:SetOperation(s.sdesop)
 	e:GetHandler():RegisterEffect(e1)
-	local ct=math.min(Duel.GetFieldGroupCount(tp,LOCATION_HAND,0),2)
+	local ct=math.min(Duel.GetFieldGroupCount(tp,LOCATION_HAND,0),3)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ct,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ct,tp,0)
 end
@@ -70,7 +70,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
 	if ct==0 or ft==0 or not Duel.IsPlayerCanSpecialSummonMonster(tp,VYRUS_TOKEN,0,TYPES_TOKEN,0,0,1,RACE_CYBERSE,ATTRIBUTE_DARK,POS_FACEUP_DEFENSE,1-tp) then return end
-	ct=math.min(ct,2)
+	ct=math.min(ct,3)
 	ft=math.min(ft,ct)
 	if ft>1 then
 		ft=Duel.AnnounceNumberRange(tp,1,ft)

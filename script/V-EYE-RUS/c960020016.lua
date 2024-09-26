@@ -45,7 +45,7 @@ s.listed_series={SET_VEYERUS}
 --Xyz Summon
 function s.ovfilter(c,tp,xyzc)
 	local rk=c:GetRank()
-	return c:IsFaceup() and c:IsSetCard(SET_VEYERUS,xyzc,SUMMON_TYPE_XYZ,tp)
+	return c:IsFaceup() and c:IsSetCard(SET_VEYERUS,xyzc,SUMMON_TYPE_XYZ,tp) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
 	       and c:IsType(TYPE_XYZ,xyzc,SUMMON_TYPE_XYZ,tp) and (rk==10 or rk==11)
 end
 

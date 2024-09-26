@@ -1,4 +1,4 @@
---V-EYE-RUS Infiltrator
+--V-EYE-RUS - Spider Drake
 local s,id=GetID()
 local SET_VEYERUS=0x9DD0
 function s.initial_effect(c)
@@ -31,9 +31,8 @@ s.listed_series={SET_VEYERUS}
 --Xyz Summon
 function s.ovfilter(c,tp,xyzc)
 	local rk=c:GetRank()
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_DARK,xyzc,SUMMON_TYPE_XYZ,tp)
-		and c:IsRace(RACE_CYBERSE,xyzc,SUMMON_TYPE_XYZ,tp) and (rk==6 or rk==7)
-		and c:IsType(TYPE_XYZ,xyzc,SUMMON_TYPE_XYZ,tp)
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_DARK,xyzc,SUMMON_TYPE_XYZ,tp) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
+		and c:IsRace(RACE_CYBERSE,xyzc,SUMMON_TYPE_XYZ,tp) and (rk==6 or rk==7)	and c:IsType(TYPE_XYZ,xyzc,SUMMON_TYPE_XYZ,tp)
 end
 
 -- (1)
