@@ -82,7 +82,7 @@ function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) end
 	if chk==0 then return c:IsAttackAbove(1000) and Duel.IsExistingTarget(s.atkfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
-	local g=Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,c)
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,g,1,0,0)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
@@ -90,7 +90,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsAttackAbove(1000) and c:UpdateAttack(-1000)==-1000 then
 		local tc=Duel.GetFirstTarget()
 		if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
-			tc:UpdateAttack(1000)
+			tc:UpdateAttack(1000,nil,c)
 		end
 	end
 end

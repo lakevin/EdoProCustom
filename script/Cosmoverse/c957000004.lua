@@ -1,7 +1,7 @@
 --Cosmoverse Aura
 local s,id=GetID()
-local CARD_COSMO_QUEEN=38999506
 local SET_COSMOVERSE=0x9995
+local SET_COSMO_QUEEN=0x9996
 function s.initial_effect(c)
 	-- (1) equip
 	local e1=Effect.CreateEffect(c)
@@ -28,29 +28,20 @@ function s.initial_effect(c)
 	e2:SetTarget(s.syntg)
 	e2:SetOperation(s.synop)
 	c:RegisterEffect(e2)
-	-- (3) equip (graveyard)
+	--destroy sub
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_EQUIP)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
-	e3:SetCountLimit(1,{id,2})
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(s.rtfilter,1,nil,tp) end)
-	e3:SetTarget(s.eqtg)
-	e3:SetOperation(s.eqop)
+	e3:SetType(EFFECT_TYPE_EQUIP)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
+	e3:SetValue(s.repval)
 	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e4)
 end
-s.listed_series={SET_COSMOVERSE}
-s.listed_names={id,CARD_COSMO_QUEEN}
+s.listed_series={SET_COSMOVERSE,SET_COSMO_QUEEN}
+s.listed_names={id}
 
 -- (1)
 function s.filter(c)
-	return c:IsFaceup() and c:IsCode(CARD_COSMO_QUEEN)
+	return c:IsFaceup() and c:IsSetCard(SET_COSMO_QUEEN)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -84,18 +75,9 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetValue(500)
 	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e2)
-	--Indes
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
-	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetValue(s.efilter)
-	c:RegisterEffect(e3)
 end
 function s.eqlimit(e,c)
 	return c==e:GetLabelObject()
-end
-function s.efilter(e,te)
-	return e:GetOwnerPlayer()~=te:GetOwnerPlayer() and te:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
 
 -- (2)
@@ -108,7 +90,7 @@ function s.synfilter1(c,tp,mc)
 		and Duel.IsExistingMatchingCard(s.synfilter2,tp,LOCATION_EXTRA,0,1,nil,tp,Group.FromCards(c,mc))
 end
 function s.synfilter2(c,tp,mg)
-	return c:IsSetCard(SET_COSMOVERSE) and Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsSynchroSummonable(nil,mg)
+	return c:IsSetCard(SET_COSMO_QUEEN) and Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsSynchroSummonable(nil,mg)
 end
 function s.syntg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -137,7 +119,7 @@ function s.synop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3) Check if a Cosmo Queen is summoned on field
-function s.rtfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsCode(CARD_COSMO_QUEEN)
+-- (3)
+function s.repval(e,re,r,rp)
+	return (r&REASON_EFFECT)~=0
 end

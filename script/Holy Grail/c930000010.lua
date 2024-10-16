@@ -18,6 +18,11 @@ function s.tdfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_HOLYGRAIL) and c:IsAbleToDeck()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local b1=Duel.IsPlayerCanDraw(tp,2)
+	local b2=Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_REMOVED,0,1,1,nil)
+	local g3=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
+	local b3=#g3>0
+	if not (b1 or b2 or b3) then return end
 	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

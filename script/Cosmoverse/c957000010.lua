@@ -1,56 +1,57 @@
 --Cosmoverse Planet Conqueror
 local s,id=GetID()
-local CARD_COSMO_QUEEN=38999506
 local SET_COSMOVERSE=0x9995
+local SET_COSMO_QUEEN=0x9996
 function s.initial_effect(c)
-	--Must be properly summoned before reviving
-	Xyz.AddProcedure(c,s.mfilter,9,2,s.ovfilter,aux.Stringid(id,0),2,s.xyzop)
+	--Fusion procedure
 	c:EnableReviveLimit()
-	-- (1) attack all
+	Fusion.AddProcMixN(c,true,true,s.ffilter,2)
+	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit)
+	-- (2) atk/def reduce
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_PIERCE)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetValue(s.atkval)
 	c:RegisterEffect(e1)
-	-- (2) atk down
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(0,LOCATION_MZONE)
-	e2:SetValue(s.atkval)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_UPDATE_DEFENSE)
+	-- (3) increase attack of "cosmoverse" or "cosmo queen" monster
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_ATKCHANGE)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetHintTiming(TIMING_DAMAGE_STEP)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1,id)
+	e3:SetCondition(s.atkcon)
+	e3:SetCost(s.atkcost)
+	e3:SetOperation(s.atkop)
 	c:RegisterEffect(e3)
-	-- (3) boost attack of "cosmoverse" monster
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetCategory(CATEGORY_ATKCHANGE)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_FREE_CHAIN)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e4:SetHintTiming(TIMING_DAMAGE_STEP)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1,id)
-	e4:SetCondition(s.atkcon)
-	e4:SetCost(s.atkcost)
-	e4:SetOperation(s.atkop)
-	c:RegisterEffect(e4,false,REGISTER_FLAG_DETACH_XMAT)
 end
-s.listed_series={SET_COSMOVERSE}
-s.listed_names={id,CARD_COSMO_QUEEN}
+s.listed_series={SET_COSMOVERSE,SET_COSMO_QUEEN}
+s.listed_names={id}
+s.material_setcode=SET_COSMO_QUEEN
 
--- xyz
-function s.mfilter(c,xyz,sumtype,tp)
-	return c:IsAttribute(ATTRIBUTE_DARK,xyz,sumtype,tp)
+-- fusion
+function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
+	return c:IsSetCard(SET_COSMO_QUEEN,fc,sumtype,tp) and (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,sumtype,tp))
 end
-function s.ovfilter(c,tp,lc)
-	return c:IsFaceup() and c:IsCode(CARD_COSMO_QUEEN) and c:IsType(TYPE_XYZ) and not c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,id)
+function s.contactfil(tp)
+	return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost,tp,LOCATION_ONFIELD,0,nil)
 end
-function s.xyzop(e,tp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
-	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
-	return true
+function s.contactop(g)
+	Duel.SendtoGrave(g,REASON_COST+REASON_MATERIAL)
+end
+function s.fusfilter(c,attr,fc,sumtype,tp)
+	return c:IsAttribute(attr,fc,sumtype,tp) and not c:IsHasEffect(511002961)
+end
+function s.splimit(e,se,sp,st)
+	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 
 -- (2)
@@ -63,11 +64,17 @@ function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	if ph~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
 	local tc=Duel.GetAttacker()
-	return tc:IsControler(tp) and tc:IsRelateToBattle() and tc:IsSetCard(SET_COSMOVERSE) and Duel.GetAttackTarget()~=nil
+	return tc:IsControler(tp) and tc:IsRelateToBattle() and Duel.GetAttackTarget()~=nil
+		and (tc:IsSetCard(SET_COSMO_QUEEN) or tc:IsSetCard(SET_COSMOVERSE))
+end
+function s.cfilter(c)
+	return c:IsAbleToGraveAsCost() and Duel.GetMZoneCount(c:GetControler(),c)>0
 end
 function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_ONFIELD,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
+	Duel.SendtoGrave(g,REASON_COST)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()

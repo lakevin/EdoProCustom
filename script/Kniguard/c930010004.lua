@@ -24,9 +24,9 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCost(s.spicost)
-	e3:SetTarget(s.spitg)
-	e3:SetOperation(s.spiop)
+	e3:SetCost(s.hspcost)
+	e3:SetTarget(s.hsptg)
+	e3:SetOperation(s.hspop)
 	c:RegisterEffect(e3)
 	-- (3) add to hand
 	local e4=Effect.CreateEffect(c)
@@ -64,26 +64,24 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.spifilter(c)
-	return c:IsSetCard(SET_KNIGUARD) and c:IsMonster() and c:IsAbleToRemoveAsCost() 
-		and (c:IsLocation(LOCATION_HAND) or aux.SpElimFilter(c,true))
+function s.hspcostfilter(c)
+	return c:IsSetCard(SET_KNIGUARD) and c:IsMonster() and c:IsAbleToRemoveAsCost()
 end
-function s.spicost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local rg=Duel.GetMatchingGroup(s.spifilter,tp,LOCATION_HAND+LOCATION_MZONE,0,e:GetHandler())
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and #rg>=1 
-		and aux.SelectUnselectGroup(rg,e,tp,1,1,aux.ChkfMMZ(1),0) end
-	local g=aux.SelectUnselectGroup(rg,e,tp,1,1,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE)
+function s.hspcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.hspcostfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectMatchingCard(tp,s.hspcostfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
-function s.spitg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
-function s.spiop(e,tp,eg,ep,ev,re,r,rp)
+function s.hspop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then 
+	if c:IsRelateToEffect(e) then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

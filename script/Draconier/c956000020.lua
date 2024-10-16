@@ -6,14 +6,6 @@ function s.initial_effect(c)
 	--Link summon procedure
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,s.matfilter,2,3,s.lcheck)
-	--Cannot be Link Material the turn it's Link Summoned
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
-	e3:SetCondition(s.lkcon)
-	e3:SetValue(1)
-	c:RegisterEffect(e3)
 	--Cards this points to cannot be targeted
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
@@ -53,10 +45,6 @@ function s.matfilter(c,lc,sumtype,tp)
 end
 function s.lcheck(g,lc,sumtype,tp)
 	return g:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER,lc,sumtype,tp)
-end
-function s.lkcon(e)
-	local c=e:GetHandler()
-	return c:IsStatus(STATUS_SPSUMMON_TURN) and c:IsSummonType(SUMMON_TYPE_LINK)
 end
 
 -- (1)

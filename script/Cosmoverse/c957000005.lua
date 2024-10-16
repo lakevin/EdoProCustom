@@ -1,7 +1,7 @@
 --Arrival of the Cosmo Queen
 local s,id=GetID()
-local CARD_COSMO_QUEEN=38999506
 local SET_COSMOVERSE=0x9995
+local SET_COSMO_QUEEN=0x9996
 function s.initial_effect(c)
 	-- (1) search
 	local e1=Effect.CreateEffect(c)
@@ -28,12 +28,12 @@ function s.initial_effect(c)
 	e2:SetHintTiming(TIMING_STANDBY_PHASE+TIMING_END_PHASE)
 	c:RegisterEffect(e2)
 end
-s.listed_series={SET_COSMOVERSE}
-s.listed_names={id,CARD_COSMO_QUEEN}
+s.listed_series={SET_COSMOVERSE,SET_COSMO_QUEEN}
+s.listed_names={id}
 
 -- (1)
 function s.filter(c)
-	return (c:IsCode(CARD_COSMO_QUEEN) or c:IsSetCard(SET_COSMOVERSE)) and c:IsMonster() and c:IsAbleToHand()
+	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsSetCard(SET_COSMOVERSE)) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -50,13 +50,13 @@ end
 
 -- (2)
 function s.tdfilter(c)
-	return (c:IsCode(CARD_COSMO_QUEEN) or c:IsSetCard(SET_COSMOVERSE)) and c:IsMonster() and c:IsAbleToDeck()
+	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsSetCard(SET_COSMOVERSE)) and c:IsAbleToDeck()
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.tdfilter(chkc) end
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE,0,3,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.tdfilter(chkc) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE,0,3,3,nil)
+	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,3,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end

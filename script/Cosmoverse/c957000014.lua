@@ -1,7 +1,7 @@
 --Cosmoverse Dominance
 local s,id=GetID()
-local CARD_COSMO_QUEEN=38999506
 local SET_COSMOVERSE=0x9995
+local SET_COSMO_QUEEN=0x9996
 function s.initial_effect(c)
 	-- (1) Activate + Equip
 	local e1=Effect.CreateEffect(c)
@@ -24,20 +24,13 @@ function s.initial_effect(c)
 	e2:SetTarget(s.negtg)
 	e2:SetOperation(s.negop)
 	c:RegisterEffect(e2)
-	-- (3) self destroy
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
-	e3:SetValue(1)
-	c:RegisterEffect(e3)
 end
-s.listed_series={SET_COSMOVERSE}
-s.listed_names={CARD_COSMO_QUEEN}
+s.listed_series={SET_COSMOVERSE,SET_COSMO_QUEEN}
+s.listed_names={id}
 
 -- (1)
 function s.filter(c)
-	return c:IsFaceup() and c:IsCode(CARD_COSMO_QUEEN)
+	return c:IsFaceup() and c:IsSetCard(SET_COSMO_QUEEN)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end
