@@ -56,7 +56,8 @@ end
 
 -- (2)
 function s.atkval(e,c)
-	return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,SET_COSMOVERSE),e:GetHandlerPlayer(),LOCATION_SZONE,0,nil)*-500
+	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,SET_COSMOVERSE),e:GetHandlerPlayer(),LOCATION_SZONE,0,nil)
+	return ct*-300
 end
 
 -- (3)

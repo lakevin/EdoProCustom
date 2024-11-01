@@ -58,7 +58,7 @@ end
 -- (2)
 function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return tc~=e:GetHandler() and tc:IsSetCard(SET_SHADOWBLADE)
+	return tc~=e:GetHandler() --and tc:IsSetCard(SET_SHADOWBLADE)
 end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
