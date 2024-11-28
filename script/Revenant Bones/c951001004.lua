@@ -4,25 +4,28 @@ local SET_REVENTANTS=0x9616
 function s.initial_effect(c)
 	--pendulum summon
 	Pendulum.AddProcedure(c)
-	-- (1) Cannot be destroyed
+	-- (P1) Xyz Summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_PZONE)
-	e1:SetCondition(s.indcon)
-	e1:SetValue(aux.indoval)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCountLimit(1)
+	e1:SetTarget(s.xyztg)
+	e1:SetOperation(s.xyzop)
 	c:RegisterEffect(e1)
-	-- (2) Xyz Summon
+	-- (1) spsummon proc
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_PZONE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1)
-	e2:SetTarget(s.xyztg)
-	e2:SetOperation(s.xyzop)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_TO_HAND)
+	e2:SetCountLimit(1,id)
+	e2:SetCondition(s.spcon)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	-- (3) add to hand
 	local e3=Effect.CreateEffect(c)
@@ -43,7 +46,7 @@ function s.initial_effect(c)
 	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetRange(LOCATION_GRAVE)
-	e5:SetCountLimit(1,id)
+	e5:SetCountLimit(1,{id,2})
 	e5:SetCondition(s.pencon)
 	e5:SetTarget(s.pentg)
 	e5:SetOperation(s.penop)
@@ -51,15 +54,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_REVENTANTS}
 
--- (1)
-function s.indfilter(c)
-	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsSetCard(SET_REVENTANTS)
-end
-function s.indcon(e)
-	return Duel.IsExistingMatchingCard(s.indfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
-end
-
--- (2)
+-- PENDULUM
 function s.filter(c,e,tp)
 	return c:IsRace(RACE_ZOMBIE) and c:IsCanBeEffectTarget(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -101,20 +96,20 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	local tc2=g:GetNext()
 	Duel.SpecialSummonStep(tc1,0,tp,tp,false,false,POS_FACEUP)
 	Duel.SpecialSummonStep(tc2,0,tp,tp,false,false,POS_FACEUP)
-		--[[local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc1:RegisterEffect(e1)
-		local e2=e1:Clone()
-		tc2:RegisterEffect(e2)
-		local e3=Effect.CreateEffect(e:GetHandler())
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetCode(EFFECT_DISABLE_EFFECT)
-		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc1:RegisterEffect(e3)
-		local e4=e3:Clone()
-		tc2:RegisterEffect(e4)]]--
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_DISABLE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	tc1:RegisterEffect(e1)
+	local e1=e1:Clone()
+	tc2:RegisterEffect(e1)
+	local e3=Effect.CreateEffect(e:GetHandler())
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_DISABLE_EFFECT)
+	e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+	tc1:RegisterEffect(e3)
+	local e4=e3:Clone()
+	tc2:RegisterEffect(e4)
 	Duel.SpecialSummonComplete()
 	Duel.BreakEffect()
 	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,tp,g)
@@ -125,7 +120,23 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
+-- (1) spsummon proc
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_DRAW)
+end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+end
+
+-- (2)
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
@@ -146,12 +157,12 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (4)
-function s.penconfilter(c)
-	return c:IsFaceup() and c:IsCode(id+1)
+-- (3)
+function s.penfilter(c)
+	return c:IsFaceup() and c:IsSetCard(SET_REVENTANTS) and c:IsType(TYPE_PENDULUM)
 end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.penconfilter,tp,LOCATION_ONFIELD,0,1,nil) 
+	return Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_ONFIELD,0,1,nil) 
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckPendulumZones(tp) end

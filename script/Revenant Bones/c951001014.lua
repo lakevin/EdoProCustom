@@ -1,18 +1,19 @@
--- The Revenant Bones' Rebone
+-- The Revenant Bones' Storm
 local s,id=GetID()
 local SET_REVENTANTS=0x9616
 function s.initial_effect(c)
 	-- (1) Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetCountLimit(1,id)
-	e1:SetLabel(0)
-	e1:SetCost(s.cost)
+	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	-- (2) Attach this card to an Xyz monster you control
 	local e2=Effect.CreateEffect(c)
@@ -29,46 +30,45 @@ function s.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetCondition(s.condition)
+	e3:SetCondition(s.econ)
 	e3:SetValue(s.evalue)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_REVENTANTS}
 
 -- (1)
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(100)
-	return true
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
-function s.filter1(c,e,tp,ft)
-	local code=c:GetCode()
-	return c:IsFaceup() and (c:IsRace(RACE_ZOMBIE) and c:IsAttribute(ATTRIBUTE_DARK))
-		and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
-		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_GRAVE,0,1,nil,code,e,tp)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
 end
-function s.filter2(c,code,e,tp)
-	return (c:IsRace(RACE_ZOMBIE) and c:IsAttribute(ATTRIBUTE_DARK)) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then
-		if e:GetLabel()~=100 then return false end
-		e:SetLabel(0)
-		return ft>-1 and Duel.CheckReleaseGroup(tp,s.filter1,1,nil,e,tp,ft)
-	end
-	local rg=Duel.SelectReleaseGroup(tp,s.filter1,1,1,nil,e,tp,ft)
-	e:SetLabel(rg:GetFirst():GetCode())
-	Duel.Release(rg,REASON_COST)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
-end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local code=e:GetLabel()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_GRAVE,0,1,1,nil,code,e,tp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
+	local ct=Duel.GetMatchingGroupCount(Card.IsRace,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,RACE_ZOMBIE)
+	Debug.Message("Count: " .. ct)
 	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+		g:ForEach(s.op,e:GetHandler(),-100*ct)
 	end
+	local dg = g:Filter(s.filter,nil)
+	if #dg>0 then
+		Duel.BreakEffect()
+		Duel.Destroy(dg,REASON_EFFECT)
+	end
+end
+function s.filter(c)
+	return c:GetBaseAttack()~=0 and c:GetAttack()==0
+end
+function s.op(tc,c,atk)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetValue(atk)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	tc:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_UPDATE_DEFENSE)
+	tc:RegisterEffect(e2)
 end
 
 -- (2)
@@ -92,10 +92,10 @@ function s.attachop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.econ(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:GetOriginalRace()==RACE_ZOMBIE and c:IsType(TYPE_XYZ)
 end
 function s.evalue(e,re,rp)
-	return aux.tgoval(e,re,rp) and re:IsActiveType(TYPE_SPELL)
+	return aux.tgoval(e,re,rp) and re:IsActiveType(TYPE_TRAP)
 end

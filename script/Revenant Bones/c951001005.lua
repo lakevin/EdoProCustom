@@ -4,26 +4,37 @@ local SET_REVENTANTS=0x9616
 function s.initial_effect(c)
 	--pendulum summon
 	Pendulum.AddProcedure(c)
-	-- (1) Cannot be destroyed
+	-- (P1) Special Summon monster from GY
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_PZONE)
-	e1:SetCondition(s.indcon)
-	e1:SetValue(aux.indoval)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCountLimit(1)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- (2) Special Summon monster from GY
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_PZONE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1)
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
-	c:RegisterEffect(e2)
-	-- (3) send to grave
+	-- (1 )spsummon proc
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetCode(EFFECT_SPSUMMON_PROC)
+	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e0:SetRange(LOCATION_HAND)
+	e0:SetCondition(s.spcon)
+	c:RegisterEffect(e0)
+		--[[local e0=Effect.CreateEffect(c)
+		e0:SetDescription(aux.Stringid(id,0))
+		e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
+		e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+		e0:SetProperty(EFFECT_FLAG_DELAY)
+		e0:SetCode(EVENT_TO_GRAVE)
+		e0:SetRange(LOCATION_HAND)
+		e0:SetCountLimit(1,id)
+		e0:SetCondition(s.spcon)
+		e0:SetTarget(s.sptg)
+		e0:SetOperation(s.spop)
+		c:RegisterEffect(e0)]]
+	-- (2) send to grave
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_TOGRAVE)
@@ -37,7 +48,7 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1,{id,1})
 	c:RegisterEffect(e4)
-	-- (4) Place in Pendulum Zone
+	-- (3) Place in Pendulum Zone
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetType(EFFECT_TYPE_IGNITION)
@@ -50,15 +61,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_REVENTANTS}
 
--- (1)
-function s.indfilter(c)
-	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsSetCard(SET_REVENTANTS)
-end
-function s.indcon(e)
-	return Duel.IsExistingMatchingCard(s.indfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
-end
-
--- (2)
+-- PENDULUM
 function s.filter(c,e,tp)
 	return c:IsSetCard(SET_REVENTANTS) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -102,7 +105,31 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummonComplete()
 end
 
--- (3)
+-- (1) spsummon proc
+function s.spcon(e,c)
+	if c==nil then return true end
+	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
+		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+end
+	--[[function s.cfilter(c,tp)
+		return c:IsSetCard(SET_REVENTANTS) and c:IsPreviousControler(tp)
+			and c:IsPreviousLocation(LOCATION_HAND+LOCATION_ONFIELD)
+	end
+	function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+		return Duel.IsMainPhase() and eg:IsExists(s.cfilter,1,nil,tp)
+	end
+	function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+			and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,LOCATION_HAND)
+	end
+	function s.spop(e,tp,eg,ep,ev,re,r,rp)
+		local c=e:GetHandler()
+		if not c:IsRelateToEffect(e) then return end
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end]]
+
+-- (2)
 function s.tgfilter(c)
 	return c:IsMonster() and c:IsSetCard(SET_REVENTANTS) and not c:IsCode(id) and c:IsAbleToGrave()
 end
@@ -118,9 +145,9 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (4)
+-- (3)
 function s.penconfilter(c)
-	return c:IsFaceup() and c:IsCode(id-1)
+	return c:IsFaceup() and c:IsSetCard(SET_REVENTANTS) and c:IsType(TYPE_PENDULUM)
 end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.penconfilter,tp,LOCATION_ONFIELD,0,1,nil) 
