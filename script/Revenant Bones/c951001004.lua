@@ -159,7 +159,7 @@ end
 
 -- (3)
 function s.penfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_REVENTANTS) and c:IsType(TYPE_PENDULUM)
+	return c:IsFaceup() and c:IsSetCard(SET_REVENTANTS) and c:IsType(TYPE_PENDULUM) and not c:IsCode(id)
 end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_ONFIELD,0,1,nil) 
