@@ -6,16 +6,16 @@ function s.initial_effect(c)
 	--xyz summon
 	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_DRACONIER),6,2)
 	c:EnableReviveLimit()
-	-- (1) face-down
+	-- (1) Flip all opponent monsters face-down
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_POSITION)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetRange(LOCATION_MZONE)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetTarget(s.turntg)
 	e1:SetOperation(s.turnop)
 	c:RegisterEffect(e1)
-	-- (2) return hand
+	-- (2) Return to hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	-- (3) LEAVE FIELD + SPSUMMON
+	-- (3) Special Summon if leaving field
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_DESTROY)
