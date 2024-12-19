@@ -1,3 +1,4 @@
+-- Majestal Tedragon
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
@@ -65,7 +66,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 		e1:SetOperation(s.penop)
 		c:RegisterEffect(e1)
 	else
-		-- (2) Place 1 Monster from your Deck in Spell & Trap Zone as Continuous Spell
+		-- (2) Place as Continuous Spell/Trap
 		local e2=Effect.CreateEffect(c)
 		e2:SetDescription(aux.Stringid(id,1))
 		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -73,20 +74,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 		e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		e2:SetLabelObject(tc)
 		e2:SetCountLimit(1,{id,1})
-		e2:SetTarget(s.plstg)
-		e2:SetOperation(s.plsop)
+		e2:SetTarget(s.settg)
+		e2:SetOperation(s.setop)
 		c:RegisterEffect(e2)
-		-- (3) Place 1 Monster from your Deck in Spell & Trap Zone as Continuous Trap
-		local e3=Effect.CreateEffect(c)
-		e3:SetDescription(aux.Stringid(id,2))
-		e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-		e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e3:SetLabelObject(tc)
-		e3:SetCountLimit(1,{id,1})
-		e3:SetTarget(s.plttg)
-		e3:SetOperation(s.pltop)
-		c:RegisterEffect(e3)
 	end
 end
 
@@ -122,60 +112,37 @@ function s.penop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2-2)
-function s.plsfilter(c)
+function s.setfilter(c)
 	return c:IsMonster() and c:IsSummonableCard() and not (c:IsType(TYPE_PENDULUM) or c:IsForbidden())
 end
-function s.plstg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	if chk==0 then return Duel.IsExistingMatchingCard(s.plsfilter,tp,LOCATION_DECK,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 end
-function s.plsop(e,tp,eg,ep,ev,re,r,rp)
+function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.plsfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	local op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
 	if tc and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetCode(EFFECT_CHANGE_TYPE)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-		e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
-		tc:RegisterEffect(e1)
-		--Cannot Special Summon that monster this turn
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetDescription(aux.Stringid(id,3))
-		e2:SetType(EFFECT_TYPE_FIELD)
-		e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-		e2:SetTargetRange(1,0)
-		e2:SetTarget(aux.TargetBoolFunction(Card.IsCode,tc:GetCode()))
-		e2:SetReset(RESET_PHASE+PHASE_END)
-		Duel.RegisterEffect(e2,tp)
-	end
-end
-
--- (2-3)
-function s.pltfilter(c)
-	return c:IsMonster() and c:IsSummonableCard() and not (c:IsType(TYPE_PENDULUM) or c:IsForbidden())
-end
-function s.plttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	if chk==0 then return Duel.IsExistingMatchingCard(s.pltfilter,tp,LOCATION_DECK,0,1,nil)
-		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
-end
-function s.pltop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.pltfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	if tc and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetCode(EFFECT_CHANGE_TYPE)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-		e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
-		tc:RegisterEffect(e1)
+		if op==0 then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetCode(EFFECT_CHANGE_TYPE)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+			e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
+			tc:RegisterEffect(e1)
+		else
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetCode(EFFECT_CHANGE_TYPE)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+			e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
+			tc:RegisterEffect(e1)
+		end
 		--Cannot Special Summon that monster this turn
 		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetDescription(aux.Stringid(id,3))
