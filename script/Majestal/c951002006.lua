@@ -116,7 +116,7 @@ end
 -- (3)
 function s.repcon(e)
 	local c=e:GetHandler()
-	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE)
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsReason(REASON_DESTROY)
 end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
