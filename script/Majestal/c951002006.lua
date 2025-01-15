@@ -97,19 +97,19 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local typ=e:GetLabelObject():GetLabel()
 	local b1=Duel.GetMatchingGroup(nil,tp,0,LOCATION_MZONE,nil)
 	local b2=Duel.GetMatchingGroup(nil,tp,0,LOCATION_SZONE,nil)
-	if typ&TYPE_MONSTER~=0 and #b1>0 then
-		Duel.BreakEffect()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local t1=b1:Select(tp,1,1,nil)
-		Duel.HintSelection(t1)
-		Duel.Destroy(t1,REASON_EFFECT)
-	end
 	if typ&TYPE_SPELL~=0  and #b2>0 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local t2=b2:Select(tp,1,1,nil)
 		Duel.HintSelection(t2)
 		Duel.Destroy(t2,REASON_EFFECT)
+	end
+	if typ&TYPE_MONSTER~=0 and #b1>0 then
+		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		local t1=b1:Select(tp,1,1,nil)
+		Duel.HintSelection(t1)
+		Duel.Destroy(t1,REASON_EFFECT)
 	end
 end
 

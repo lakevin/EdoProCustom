@@ -4,10 +4,10 @@ local COUNTER_GRAIL=0x4041
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableCounterPermit(COUNTER_GRAIL)
-	--xyz summon
+	-- Fusion summon
 	c:EnableReviveLimit()
-	Fusion.AddProcMixN(c,true,true,s.ffilter,2)
-	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit)
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_KNIGUARD),s.matfilter)
+	Fusion.AddContactProc(c,s.contactfil,s.contactop,true)
     -- (1) counter
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	-- (3) Add to hand
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
@@ -43,24 +43,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_KNIGUARD}
-function s.ffilter(c,fc,sumtype,sump,sub,matg,sg)
-	return not sg or sg:FilterCount(aux.TRUE,c)==0 or (sg:IsExists(Card.IsLevel,1,c,c:GetLevel())
-		and not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,sump),fc,sumtype,sump))
-end
-function s.contfilter(c)
-	return c:IsAbleToGraveAsCost() and c:IsSetCard(SET_KNIGUARD) and c:HasLevel()
+function s.matfilter(c)
+	return c:IsRace(RACE_WARRIOR) and c:IsDefenseAbove(2000)
 end
 function s.contactfil(tp)
-	return Duel.GetMatchingGroup(s.contfilter,tp,LOCATION_MZONE,0,nil)
+	return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost,tp,LOCATION_MZONE,0,nil)
 end
 function s.contactop(g)
 	Duel.SendtoGrave(g,REASON_COST+REASON_MATERIAL)
-end
-function s.fusfilter(c,code,fc,sumtype,sump)
-	return c:IsSummonCode(fc,sumtype,sump,code) and not c:IsHasEffect(511002961)
-end
-function s.splimit(e,se,sp,st)
-	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 
 -- (1)
@@ -106,38 +96,28 @@ end
 
 -- (4)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_MZONE)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
-function s.thfilter1(c,e,tp)
-	return c:HasLevel() and c:IsSetCard(SET_KNIGUARD) and c:IsAbleToHand()
-		and Duel.IsExistingTarget(s.thfilter2,tp,LOCATION_GRAVE,0,1,c,c:GetLevel(),e,tp)
+function s.thfilter(c)
+	return c:IsSetCard(SET_KNIGUARD) and c:HasLevel() and c:IsAbleToHand()
 end
-function s.thfilter2(c,lv,e,tp)
-	return c:GetLevel()==lv and c:IsSetCard(SET_KNIGUARD) and c:IsAbleToHand()
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
-	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
-		and Duel.IsExistingTarget(s.thfilter1,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g1=Duel.SelectTarget(tp,s.thfilter1,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	local tc1=g1:GetFirst()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g2=Duel.SelectTarget(tp,s.thfilter2,tp,LOCATION_GRAVE,0,1,1,tc1,tc1:GetLevel(),e,tp)
-	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,2,0,0)
+function s.rescon(lv)
+	return function(sg,e,tp,mg)
+		return sg:GetSum(Card.GetLevel)<=lv
+	end
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local g=tg:Filter(Card.IsRelateToEffect,nil,e)
-	local ct=#g
-	if ct==1 or not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
-		local tc=g:GetFirst()
-		for tc in aux.Next(g) do
-			Duel.SendtoHand(tc,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,tc)
-		end
+	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_GRAVE,0,nil)
+	if #g==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local sg=aux.SelectUnselectGroup(g,e,tp,1,2,s.rescon(8),1,tp,HINTMSG_ATOHAND)
+	if sg and #sg>0 then
+		Duel.SendtoHand(sg,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sg)
 	end
 end
 

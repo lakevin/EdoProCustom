@@ -1,4 +1,4 @@
--- Majestal Aurorion
+-- Majestal Terracite
 local s,id=GetID()
 local SET_MAJESTAL=0x9615
 function s.initial_effect(c)

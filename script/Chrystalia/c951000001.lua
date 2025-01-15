@@ -91,21 +91,21 @@ function s.zones(e,tp,eg,ep,ev,re,r,rp)
 	if p1 then zone=zone-0x10 end
 	return zone
 end
-function s.penfilter(c,code)
-	return c:IsType(TYPE_PENDULUM) and (c:IsFaceup() or c:IsLocation(LOCATION_DECK)) 
+function s.penfilter(c,code,att,race)
+	return c:IsType(TYPE_PENDULUM) and (c:IsFaceup() or c:IsLocation(LOCATION_DECK)) and c:IsAttribute(att) and c:IsRace(race)
 		and not (c:IsForbidden() or c:IsCode(code))
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	local tc=e:GetLabelObject()
 	if chk==0 then return Duel.CheckPendulumZones(tp)
-		and Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,nil,tc:GetCode()) end
+		and Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,nil,tc:GetCode(),tc:GetAttribute(),tc:GetRace()) end
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if not Duel.CheckPendulumZones(tp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.penfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,1,nil,tc:GetCode()):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.penfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,1,nil,tc:GetCode(),tc:GetAttribute(),tc:GetRace()):GetFirst()
 	if tc then
 		Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	end

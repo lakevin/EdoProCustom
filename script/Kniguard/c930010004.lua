@@ -68,9 +68,10 @@ function s.hspcostfilter(c)
 	return c:IsSetCard(SET_KNIGUARD) and c:IsMonster() and c:IsAbleToRemoveAsCost()
 end
 function s.hspcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.hspcostfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.hspcostfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
+	local rg=Duel.GetMatchingGroup(s.hspcostfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,e:GetHandler())
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and #rg>0
+		and aux.SelectUnselectGroup(rg,e,tp,1,1,aux.ChkfMMZ(1),0) end
+	local g=aux.SelectUnselectGroup(rg,e,tp,1,1,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
