@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetCode(EFFECT_ADD_EXTRA_TRIBUTE)
 	e2:SetTargetRange(LOCATION_SZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_SPELL+TYPE_CONTINUOUS))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsContinuousSpell,true))
 	e2:SetValue(POS_FACEUP)
 	c:RegisterEffect(e2)
 	--tribute check
