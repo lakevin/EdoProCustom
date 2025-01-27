@@ -1,4 +1,4 @@
---Hi-Tech Data Center
+--Hi-Tech Security Center
 local s,id=GetID()
 local SET_HI_TECH=0x9DD4
 function s.initial_effect(c)
@@ -70,11 +70,16 @@ function s.check(ev,re)
 		return (((dv1 or 0)|(dv2 or 0))&LOCATION_REMOVED)~=0 or (#g>0 and g:IsExists(Card.IsLocation,1,nil,LOCATION_REMOVED))
 	end
 end
+function s.disfilter(c)
+	return c:IsSetCard(SET_HI_TECH) and c:IsType(TYPE_SYNCHRO) and c:IsLevelAbove(8)
+end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	if re:GetHandler():IsDisabled() or not Duel.IsChainDisablable(ev) then return false end
+	if re:GetHandler():IsDisabled() or re:GetHandler():IsCode(960010003) or re:GetHandler():IsCode(960010004)
+		or not Duel.IsChainDisablable(ev) then return false end
 	local checkfunc=s.check(ev,re)
-	return checkfunc(CATEGORY_TOHAND,true) or checkfunc(CATEGORY_SPECIAL_SUMMON,true)
-		or checkfunc(CATEGORY_TOGRAVE,true) or checkfunc(CATEGORY_TODECK,true)
+	return (checkfunc(CATEGORY_TOHAND,true) or checkfunc(CATEGORY_SPECIAL_SUMMON,true)
+		or checkfunc(CATEGORY_TOGRAVE,true) or checkfunc(CATEGORY_TODECK,true))
+		and Duel.IsExistingMatchingCard(s.disfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not re:GetHandler():IsStatus(STATUS_DISABLED) end

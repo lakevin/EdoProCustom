@@ -16,7 +16,7 @@ s.listed_series={SET_HI_TECH}
 -- Select Option
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local b1=s.sptg(e,tp,eg,ep,ev,re,r,rp,0)
-	local b2=s.tdtg(e,tp,eg,ep,ev,re,r,rp,0)
+	local b2=s.thtg(e,tp,eg,ep,ev,re,r,rp,0)
 	if chk==0 then return b1 or b2 end
 	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,0)},
@@ -28,8 +28,8 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		s.sptg(e,tp,eg,ep,ev,re,r,rp,1)
 	else
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e:SetOperation(s.tdop)
-		s.tdtg(e,tp,eg,ep,ev,re,r,rp,1)
+		e:SetOperation(s.thop)
+		s.thtg(e,tp,eg,ep,ev,re,r,rp,1)
 	end
 end
 
@@ -84,21 +84,19 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- Option 2
-function s.tdfilter(c)
-	return c:IsType(TYPE_SYNCHRO) and c:IsSetCard(SET_HI_TECH) and c:IsAbleToExtra()
+function s.thfilter(c)
+	return c:IsSetCard(SET_HI_TECH) and c:IsMonster() and c:IsAbleToHand() and not c:IsType(TYPE_SYNCHRO)
 end
-function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.tdfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,2,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOEXTRA,g,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.thfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local sg=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,sg,#sg,0,0)
 end
-function s.tdop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)>0 and Duel.GetOperatedGroup():GetFirst():IsLocation(LOCATION_EXTRA) then
-		Duel.BreakEffect()
-		Duel.Draw(tp,1,REASON_EFFECT)
+	if tc:IsRelateToEffect(e) then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end
 end
