@@ -1,15 +1,19 @@
 -- Majestal Monoclite
 local s,id=GetID()
 local SET_MAJESTAL=0x9615
+Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
+	Reflexxion.AddMajestalSpellActivation(s,id,c)
 	-- (SPELL) Special Summon from S/T Zone
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_MOVE)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.spcon)
+	e1:SetCountLimit(1,{id,0})
+	e1:SetCondition(s.spcond)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
@@ -19,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCountLimit(1,{id,0})
+	e2:SetCountLimit(1,{id,1})
 	e2:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e2:SetValue(s.hspval)
 	c:RegisterEffect(e2)
@@ -35,35 +39,39 @@ end
 s.listed_series={SET_MAJESTAL}
 
 -- (1)
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetType()==TYPE_SPELL+TYPE_CONTINUOUS
+function s.spfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(SET_MAJESTAL) and c:IsLocation(LOCATION_SZONE) and not c:IsPreviousLocation(LOCATION_SZONE)
+		and c:IsControler(tp) and c:GetSequence()<5 and not c:IsCode(id)
+end
+function s.spcond(e,tp,eg,ep,ev,re,r,rp)
+	return eg and eg:IsExists(s.spfilter,1,nil,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+	local g=eg:Filter(s.spfilter,nil,tp)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) and #g>0 end
+	Duel.SetTargetCard(g)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g+c,#g+1,tp,LOCATION_SZONE)
 end
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_MAJESTAL) and c:IsOriginalType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.filter(c,e,tp)
+	return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		--Special Summon as many "Advanced Crystal Beast" monsters as possible
+	if not c:IsRelateToEffect(e) then return end
+	local g=Duel.GetTargetCards(e):Filter(s.filter,nil,e,tp)
+	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 then
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-		local sg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_SZONE,0,nil,e,tp)
-		if  #sg==0 or ft<=0 then return end
-		if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
-		if Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		if #g>ft then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local g=sg:Select(tp,ft,ft,nil)
-			if #g>0 then
-				Duel.BreakEffect()
-				Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-			end
+			g=g:Select(tp,ft,ft,nil)
+		end
+		for tc in g:Iter() do
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
+	Duel.SpecialSummonComplete()
 end
 
 -- (2)

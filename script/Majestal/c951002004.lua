@@ -1,7 +1,9 @@
 -- Majestal Tedragon
 local s,id=GetID()
 local SET_MAJESTAL=0x9615
+Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
+	Reflexxion.AddMajestalSpellActivation(s,id,c)
 	-- (SPELL) Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -13,32 +15,33 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- (1) Place 1 "Majestal" monster in S/T Zone
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetTarget(s.pltg)
-	e2:SetOperation(s.plop)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	-- (2) Place 1 "Majestal" monster in S/T Zone
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetTarget(s.pltg)
+	e3:SetOperation(s.plop)
 	c:RegisterEffect(e3)
-    -- (2) Fusion Summon
-	local params2 = {aux.FilterBoolFunction(Card.IsSetCard,SET_MAJESTAL),Fusion.CheckWithHandler(Fusion.OnFieldMat),s.fextra,nil,nil}
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,2))
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_FREE_CHAIN)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetHintTiming(0,TIMING_MAIN_END)
-	e4:SetCountLimit(1,{id,1})
-	e4:SetCondition(function() return Duel.IsMainPhase() end)
-	e4:SetTarget(Fusion.SummonEffTG(table.unpack(params2)))
-	e4:SetOperation(Fusion.SummonEffOP(table.unpack(params2)))
+	local e4=e3:Clone()
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
+    -- (3) Fusion Summon
+	local params2 = {aux.FilterBoolFunction(Card.IsSetCard,SET_MAJESTAL),Fusion.CheckWithHandler(Fusion.OnFieldMat),s.fextra,nil,nil}
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,2))
+	e5:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetHintTiming(0,TIMING_MAIN_END)
+	e5:SetCountLimit(1,{id,2})
+	e5:SetCondition(function() return Duel.IsMainPhase() end)
+	e5:SetTarget(Fusion.SummonEffTG(table.unpack(params2)))
+	e5:SetOperation(Fusion.SummonEffOP(table.unpack(params2)))
+	c:RegisterEffect(e5)
 end
 s.listed_series={SET_MAJESTAL}
 
@@ -78,19 +81,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 	end
-	--Cannot Special Summon "Centur-Ion Emeth VI"
-	--[[local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,2))
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e2:SetTargetRange(1,0)
-	e2:SetTarget(function(_,c) return c:IsCode(id) end)
-	e2:SetReset(RESET_PHASE|PHASE_END)
-	Duel.RegisterEffect(e2,tp)]]
 end
 
--- (1)
+-- (2)
 function s.plfilter(c)
 	return c:IsSetCard(SET_MAJESTAL) and c:IsMonster() and not c:IsForbidden()
 end
@@ -116,7 +109,7 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (2)
+-- (3)
 function s.fextra(e,tp,mg)
 	return Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,LOCATION_SZONE,0,nil)
 end

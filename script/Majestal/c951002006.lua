@@ -2,7 +2,9 @@
 local s,id=GetID()
 local SET_MAJESTAL=0x9615
 local SET_CRYSTALBEAST=0x1034
+Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
+	Reflexxion.AddMajestalSpellActivation(s,id,c)
 	-- (SPELL) To hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -23,13 +25,13 @@ function s.initial_effect(c)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsContinuousSpell,true))
 	e2:SetValue(POS_FACEUP)
 	c:RegisterEffect(e2)
-	--tribute check
+	-- tribute check
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_MATERIAL_CHECK)
 	e3:SetValue(s.valcheck)
 	c:RegisterEffect(e3)
-	--destroy
+	-- destroy
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -39,7 +41,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.desop)
 	e4:SetLabelObject(e3)
 	c:RegisterEffect(e4)
-    -- (3) send replace
+    -- (2) send replace
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_TO_GRAVE_REDIRECT_CB)
@@ -113,7 +115,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
+-- (2)
 function s.repcon(e)
 	local c=e:GetHandler()
 	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsReason(REASON_DESTROY)

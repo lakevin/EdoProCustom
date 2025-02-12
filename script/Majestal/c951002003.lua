@@ -1,7 +1,9 @@
 -- Majestal Trigon
 local s,id=GetID()
 local SET_MAJESTAL=0x9615
+Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
+	Reflexxion.AddMajestalSpellActivation(s,id,c)
 	-- (SPELL) cannot be target/indestructable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -36,7 +38,7 @@ function s.initial_effect(c)
 	e4:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e4:SetValue(s.hspval)
 	c:RegisterEffect(e4)
-    -- (2) Add to hand
+    -- (3) Add to hand
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,0))
 	e5:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)

@@ -3,7 +3,7 @@ local s,id=GetID()
 local SET_REVENTANTS=0x9616
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	-- 2 Rank 4 "Exorsister" Xyz Monsters
+	-- 2 Rank 4 "Revenant Bones" Xyz Monsters
 	Xyz.AddProcedure(c,s.xyzfilter,nil,2,nil,nil,nil,nil,false)
 	-- Must be Xyz Summoned using the correct materials
 	local e0=Effect.CreateEffect(c)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(s.atkval)
 	c:RegisterEffect(e1)
-	-- (2) Attach 2 cards
+	-- (2) Immune to monsters
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -31,16 +31,16 @@ function s.initial_effect(c)
 	-- (3) Attach 1 face-up monster card to this card
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetCountLimit(1,id)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1)
 	e3:SetTarget(s.target)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 	-- (4) Negate Spell/Trap activation
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
+	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
@@ -64,7 +64,7 @@ end
 
 -- (1)
 function s.atkval(e,c)
-	return e:GetHandler():GetOverlayCount()*1200
+	return e:GetHandler():GetOverlayCount()*1000
 end
 
 -- (2)

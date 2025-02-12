@@ -1,7 +1,9 @@
 -- Majestal Orthodra
 local s,id=GetID()
 local SET_MAJESTAL=0x9615
+Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
+	Reflexxion.AddMajestalSpellActivation(s,id,c)
 	-- (SPELL) Fusion Summon (from S/T Zone)
 	local params2 = {aux.FilterBoolFunction(Card.IsSetCard,SET_MAJESTAL),nil,s.fextra,nil,Fusion.ForcedHandler}
 	local e1=Effect.CreateEffect(c)
@@ -14,15 +16,6 @@ function s.initial_effect(c)
 	e1:SetTarget(Fusion.SummonEffTG(table.unpack(params2)))
 	e1:SetOperation(Fusion.SummonEffOP(table.unpack(params2)))
 	c:RegisterEffect(e1)
-	-- (1) Place in S/T Zone
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_HAND)
-	e2:SetCountLimit(1,{id,0})
-	e2:SetTarget(s.settg)
-	e2:SetOperation(s.setop)
-	c:RegisterEffect(e2)
     -- (2) Move 1 "Majestal" to another S/T Zone
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
@@ -30,7 +23,7 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,{id,1})
+	e3:SetCountLimit(1,{id,0})
 	e3:SetTarget(s.seqtg)
 	e3:SetOperation(s.seqop)
 	c:RegisterEffect(e3)
@@ -46,26 +39,6 @@ function s.fextra(e,tp,mg)
 end
 
 -- (2)
-function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsLocation(LOCATION_HAND) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
-end
-function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:IsImmuneToEffect(e) or not c:IsLocation(LOCATION_HAND) then return end
-	if Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
-		-- Treat as Continuous Spell
-		local e1=Effect.CreateEffect(c)
-		e1:SetCode(EFFECT_CHANGE_TYPE)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-		e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
-		c:RegisterEffect(e1)
-	end
-end
-
--- (3)
 function s.seqfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_MAJESTAL) and c:IsOriginalType(TYPE_MONSTER)
 end
