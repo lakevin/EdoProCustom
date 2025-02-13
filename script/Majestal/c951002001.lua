@@ -40,8 +40,8 @@ s.listed_series={SET_MAJESTAL}
 
 -- (1)
 function s.spfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_MAJESTAL) and c:IsLocation(LOCATION_SZONE) and not c:IsPreviousLocation(LOCATION_SZONE)
-		and c:IsControler(tp) and c:GetSequence()<5 and not c:IsCode(id)
+	return c:IsFaceup() and c:IsSetCard(SET_MAJESTAL) and c:IsMonsterCard() and c:IsLocation(LOCATION_SZONE)
+		and c:IsControler(tp) and c:GetSequence()<5 and not c:IsPreviousLocation(LOCATION_SZONE) and not c:IsCode(id)
 end
 function s.spcond(e,tp,eg,ep,ev,re,r,rp)
 	return eg and eg:IsExists(s.spfilter,1,nil,tp)
@@ -76,7 +76,7 @@ end
 
 -- (2)
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsContinuousSpell()
+	return c:IsFaceup() and c:IsContinuousSpell()
 end
 function s.hspval(e,c)
 	local tp=c:GetControler()
