@@ -76,7 +76,7 @@ end
 
 -- (2)
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsContinuousSpell()
+	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsContinuousSpell()
 end
 function s.hspval(e,c)
 	local tp=c:GetControler()

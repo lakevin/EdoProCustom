@@ -26,8 +26,8 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetTarget(s.thtg)
-	e3:SetOperation(s.thop)
+	e3:SetTarget(s.drtg)
+	e3:SetOperation(s.drop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_REVENTANTS}
@@ -71,18 +71,18 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.thfilter(c)
-	return c:IsSetCard(SET_MAJESTAL) and c:IsContinuousSpell() and c:IsOriginalType(TYPE_MONSTER)
+function s.drfilter(c)
+	return c:IsFaceup() and c:IsContinuousSpell() and c:IsOriginalType(TYPE_MONSTER)
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local ct=Duel.GetMatchingGroupCount(s.thfilter,tp,LOCATION_SZONE,0,nil)
+		local ct=Duel.GetMatchingGroupCount(s.drfilter,tp,LOCATION_SZONE,0,nil)
 		return ct>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct and Duel.GetDecktopGroup(tp,ct):FilterCount(Card.IsAbleToHand,nil)>0
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
 end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroupCount(s.thfilter,tp,LOCATION_SZONE,0,nil)
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
+	local ct=Duel.GetMatchingGroupCount(s.drfilter,tp,LOCATION_SZONE,0,nil)
 	Duel.ConfirmDecktop(tp,ct)
 	local g=Duel.GetDecktopGroup(tp,ct)
 	if #g<1 then return end
