@@ -10,22 +10,22 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_CHAIN_SOLVING)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetCountLimit(1)
-	e1:SetCondition(s.negcon)
-	e1:SetOperation(s.negop)
+	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.discon)
+	e1:SetOperation(s.disop)
 	c:RegisterEffect(e1)
-	-- (1) Negate
+	-- (1) Negate opponent's monster effect and destroy that monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCode(EVENT_CHAINING)
-	e2:SetCountLimit(1,id)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_NO_TURN_RESET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(s.discon)
-	e2:SetTarget(s.distg)
-	e2:SetOperation(s.disop)
+	e2:SetCountLimit(1)
+	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep==1-tp and re:IsMonsterEffect() and Duel.IsChainNegatable(ev) end)
+	e2:SetTarget(s.negtg)
+	e2:SetOperation(s.negop)
 	c:RegisterEffect(e2)
 	-- (3) send replace
 	local e3=Effect.CreateEffect(c)
@@ -47,12 +47,10 @@ function s.matfilter2(c,lc,sumtype,tp)
 end
 
 -- (SPELL)
-function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local rc=re:GetHandler()
-	return rp~=tp and Duel.IsChainDisablable(ev) and c:GetColumnGroup():IsContains(rc)
+function s.discon(e,tp,eg,ep,ev,re,r,rp)
+	return rp~=tp and Duel.IsChainDisablable(ev) and (re:IsSpellEffect() or re:IsTrapEffect())
 end
-function s.negop(e,tp,eg,ep,ev,re,r,rp)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD, tp, e:GetHandler():GetCode())
 	local rc=re:GetHandler()
 	if Duel.NegateEffect(ev) and rc:IsRelateToEffect(re) then
@@ -61,17 +59,15 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
-end
-function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	local rc=re:GetHandler()
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,tp,0)
+	if rc:IsDestructable() and rc:IsRelateToEffect(re) then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,tp,0)
 	end
 end
-function s.disop(e,tp,eg,ep,ev,re,r,rp)
+function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end

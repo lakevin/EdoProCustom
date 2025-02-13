@@ -1,4 +1,4 @@
--- Revenant Bones - Chrystal Greed
+-- Wonder of Crystadel - Revenant Bones
 local s,id=GetID()
 local SET_REVENTANTS=0x9616
 function s.initial_effect(c)

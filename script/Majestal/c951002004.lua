@@ -105,11 +105,14 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 		e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 		tc:RegisterEffect(e1)
-		Duel.RaiseEvent(tc,EVENT_CUSTOM+47408488,e,0,tp,0,0)
+		--Duel.RaiseEvent(tc,EVENT_CUSTOM+47408488,e,0,tp,0,0)
 	end
 end
 
 -- (3)
+function s.fusfilter(c)
+	return c:IsSetCard(SET_MAJESTAL) and c:IsOriginalType(TYPE_MONSTER)
+end
 function s.fextra(e,tp,mg)
-	return Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,LOCATION_SZONE,0,nil)
+	return Duel.GetMatchingGroup(s.fusfilter,tp,LOCATION_SZONE,0,nil)
 end
