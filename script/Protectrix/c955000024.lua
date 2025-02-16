@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Xyz material
-	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9990),7,2,s.ovfilter,aux.Stringid(id,0),2,s.xyzop)
+	Xyz.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x9990),7,3,s.ovfilter,aux.Stringid(id,0),2,s.xyzop)
 	c:EnableReviveLimit()
 	-- (1) activate trap in hand
 	local e2=Effect.CreateEffect(c)
