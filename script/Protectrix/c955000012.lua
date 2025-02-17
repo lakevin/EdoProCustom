@@ -67,13 +67,13 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.tdfilter(c)
+function s.tdfilter(c,e)
 	return c:IsSetCard(0x9990) and c:IsAbleToDeck() and c:IsCanBeEffectTarget(e)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local g=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_GRAVE,0,e:GetHandler(),e)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	if chk==0 then return #g>=3 and Duel.IsPlayerCanDraw(tp,1) end
 	local sg=aux.SelectUnselectGroup(g,e,tp,3,3,aux.dncheck,1,tp,HINTMSG_TODECK)
 	Duel.SetTargetCard(sg)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,3,0,0)
