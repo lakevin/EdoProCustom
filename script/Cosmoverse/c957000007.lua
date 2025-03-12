@@ -41,6 +41,7 @@ function s.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_TO_GRAVE)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
+	e5:SetCountLimit(1,{id,1})
 	e5:SetCondition(s.spcon)
 	e5:SetTarget(s.sptg)
 	e5:SetOperation(s.spop)
@@ -74,8 +75,9 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,tp)
 		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_GRAVE,0,1,nil) end
-	local g=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
-	e:SetLabelObject(g:GetFirst())
+	--local tg=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
+	local tg=eg:FilterSelect(tp,s.cfilter,1,1,nil,tp)
+	Duel.SetTargetCard(tg)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_GRAVE)
 end
 function s.equipop(c,e,tp,tc)
@@ -108,8 +110,7 @@ end
 
 -- (3)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsReason(REASON_EFFECT) and c:IsPreviousLocation(LOCATION_FZONE)
+	return e:GetHandler():IsPreviousLocation(LOCATION_FZONE) 
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(SET_COSMO_QUEEN) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
