@@ -2,6 +2,7 @@
 local s,id=GetID()
 local SET_COSMOVERSE=0x9995
 local SET_COSMO_QUEEN=0x9996
+local CARD_COSMO_QUEEN=38999506
 function s.initial_effect(c)
 	-- (1) search
 	local e1=Effect.CreateEffect(c)
@@ -33,7 +34,8 @@ s.listed_names={id}
 
 -- (1)
 function s.filter(c)
-	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsSetCard(SET_COSMOVERSE)) and c:IsMonster() and c:IsAbleToHand()
+	return (c:IsCode(CARD_COSMO_QUEEN) or c:IsSetCard(SET_COSMO_QUEEN) or c:IsSetCard(SET_COSMOVERSE))
+		and c:IsMonster() and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -50,7 +52,9 @@ end
 
 -- (2)
 function s.tdfilter(c)
-	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsSetCard(SET_COSMOVERSE)) and c:IsAbleToDeck()
+	local b1=((c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and c:IsMonster())
+	local b2=c:IsSetCard(SET_COSMOVERSE)
+	return 	(b1 or b2) and c:IsAbleToDeck()
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.tdfilter(chkc) end

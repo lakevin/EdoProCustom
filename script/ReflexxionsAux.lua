@@ -8,6 +8,40 @@ if not Reflexxion then
 end
 
 
+-- [[ COSMOVERSE DEFAULTS ]]
+
+--Parameters
+-- c: the card that will receive the effect
+-- atk: Increase the equipped monsters ATK by this value
+-- def: Increase the equipped monsters DEF by this value
+-- effect: Effect Code of the effect the equipped monsters gains
+function Reflexxion.CosmoverseEquipHandler(c,atk,def,effcode,effval)
+    --Increase ATK
+    if atk==nil then atk=0 end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_EQUIP)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetValue(atk)
+	c:RegisterEffect(e1)
+    --Increase DEF
+    if def==nil then def=0 end
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_EQUIP)
+	e2:SetCode(EFFECT_UPDATE_DEFENSE)
+	e2:SetValue(def)
+	c:RegisterEffect(e2)
+    --Gain Effect
+    if effcode then
+        if effval==nil then effval=1 end
+        local e3=Effect.CreateEffect(c)
+        e3:SetType(EFFECT_TYPE_EQUIP)
+        e3:SetCode(effcode)
+        e3:SetValue(effval)
+        c:RegisterEffect(e3)
+    end
+end
+
+
 -- [[ MAJESTAL DEFAULTS ]]
 
 -- Majestal: Place in S/T Zone

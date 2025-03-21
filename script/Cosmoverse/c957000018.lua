@@ -1,7 +1,8 @@
---Cosmoverse Infinitum
+--The Great Cosmoverse
 local s,id=GetID()
 local SET_COSMOVERSE=0x9995
 local SET_COSMO_QUEEN=0x9996
+local CARD_COSMO_QUEEN=38999506
 function s.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
@@ -43,7 +44,7 @@ s.listed_names={id}
 
 -- (1)
 function s.cfilter1(c)
-	return c:IsSetCard(SET_COSMO_QUEEN) and c:IsMonster() and not c:IsPublic()
+	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and c:IsMonster() and not c:IsPublic()
 end
 function s.thcost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter1,tp,LOCATION_HAND,0,1,nil) end
@@ -79,7 +80,7 @@ function s.thcost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.ShuffleHand(tp)
 end
 function s.thfilter2(c)
-	return c:IsSetCard(SET_COSMO_QUEEN) and c:IsMonster() and c:IsAbleToHand()
+	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_DECK,0,1,nil) end
@@ -99,25 +100,18 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_FZONE) 
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_COSMOVERSE) and c:IsMonster() and (c:IsAbleToHand() or c:IsCanBeSpecialSummoned(e,0,tp,false,false))
+	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3))
-	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
-	if not tc then return end
-	aux.ToHandOrElse(tc,tp,
-					function()
-						return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-							and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) 
-					end,
-					function()
-						Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-					end,
-					aux.Stringid(id,4)
-					)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	end
 end

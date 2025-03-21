@@ -2,6 +2,7 @@
 local s,id=GetID()
 local SET_COSMOVERSE=0x9995
 local SET_COSMO_QUEEN=0x9996
+local CARD_COSMO_QUEEN=38999506
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
@@ -37,7 +38,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_COSMO_QUEEN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetMZoneCount(tp,e:GetHandler())>0
@@ -71,7 +72,7 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsSummonType(SUMMON_TYPE_FUSION)
 end
 function s.filter1(c)
-	return c:IsSetCard(SET_COSMO_QUEEN) and c:IsAbleToHand()
+	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and c:IsAbleToHand()
 end
 function s.filter2(c)
 	return c:IsSetCard(SET_COSMOVERSE) and c:IsAbleToHand()

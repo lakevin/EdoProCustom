@@ -2,6 +2,7 @@
 local s,id=GetID()
 local SET_COSMOVERSE=0x9995
 local SET_COSMO_QUEEN=0x9996
+local CARD_COSMO_QUEEN=38999506
 function s.initial_effect(c)
 	---link summon
 	c:EnableReviveLimit()
@@ -28,7 +29,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	-- (3) SpSummon "Cosmo Queen", when leaves field
+	-- (3) Special Summon "Cosmo Queen", when leaves field
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_DESTROY)
@@ -80,7 +81,8 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_COSMO_QUEEN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsType(TYPE_LINK)
+	return (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and not c:IsType(TYPE_LINK)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)

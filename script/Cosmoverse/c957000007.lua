@@ -51,19 +51,8 @@ s.listed_series={SET_COSMOVERSE,SET_COSMO_QUEEN}
 s.listed_names={id}
 
 -- (1)
-function s.afilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_COSMO_QUEEN) and c:IsControler(tp)
-end
-function s.actcon(e)
-	local tp=e:GetHandlerPlayer()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	return (a and s.afilter(a,tp)) or (d and s.afilter(d,tp))
-end
-
--- (2)
 function s.cfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_COSMO_QUEEN) and c:IsControler(tp)
+	return c:IsFaceup() and (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and c:IsControler(tp)
 end
 function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
@@ -108,23 +97,41 @@ function s.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
 
+-- (2)
+function s.afilter(c,tp)
+	return c:IsFaceup() and (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN)) and c:IsControler(tp)
+end
+function s.actcon(e)
+	local tp=e:GetHandlerPlayer()
+	local a=Duel.GetAttacker()
+	local d=Duel.GetAttackTarget()
+	return (a and s.afilter(a,tp)) or (d and s.afilter(d,tp))
+end
+
 -- (3)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_FZONE) 
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_COSMO_QUEEN) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_COSMOVERSE) and c:IsMonster() and (c:IsAbleToHand() or c:IsCanBeSpecialSummoned(e,0,tp,false,false))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-	end
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3))
+	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
+	if not tc then return end
+	aux.ToHandOrElse(tc,tp,
+					function()
+						return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+							and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) 
+					end,
+					function()
+						Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+					end,
+					aux.Stringid(id,4)
+					)
 end

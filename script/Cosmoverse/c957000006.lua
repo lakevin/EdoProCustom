@@ -44,7 +44,7 @@ s.listed_names={id}
 
 -- (1)
 function s.tgfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_COSMO_QUEEN)
+	return c:IsFaceup() and (c:IsSetCard(SET_COSMO_QUEEN) or c:IsCode(CARD_COSMO_QUEEN))
 end
 function s.eqfilter(c)
 	return c:IsSetCard(SET_COSMOVERSE) and c:IsMonster() and not c:IsForbidden()
