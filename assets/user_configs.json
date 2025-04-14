@@ -2,7 +2,8 @@
    "repos": [
       {
          "url": "https://github.com/lakevin/EdoProCustom",
-         "repo_name": "Reflexxion Cards",
+         "repo_name": "Reflexxions Customs",
+         "repo_path": "./repositories/reflexxions",
          "should_update": true,
          "should_read": true
       }
