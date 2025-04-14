@@ -121,7 +121,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3))
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
 	if not tc then return end
 	aux.ToHandOrElse(tc,tp,
@@ -132,6 +132,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 					function()
 						Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 					end,
-					aux.Stringid(id,4)
+					aux.Stringid(id,3)
 					)
 end
