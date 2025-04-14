@@ -9,20 +9,21 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,{id,0})
 	e1:SetCost(s.chcost)
 	e1:SetTarget(s.chtg)
 	e1:SetOperation(s.chop)
 	c:RegisterEffect(e1)
-	-- (2) level reduce
+	-- (2) level reduce and draw
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DRAW+CATEGORY_LVCHANGE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(2,id)
-	e2:SetCondition(s.lvcon)
-	e2:SetTarget(s.lvtg)
-	e2:SetOperation(s.lvop)
+	e2:SetCountLimit(1,{id,1})
+	e2:SetCondition(s.drcon)
+	e2:SetTarget(s.drtg)
+	e2:SetOperation(s.drop)
 	c:RegisterEffect(e2)
 	-- (3) spsummon
 	local e3=Effect.CreateEffect(c)
@@ -31,7 +32,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCountLimit(1,id)
+	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.spcon)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
@@ -73,42 +74,25 @@ function s.chop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.lvfilter(c)
-	return c:IsSetCard(SET_VEYERUS) and c:IsAbleToDeck()
-end
-function s.lvcon(e,tp,eg,ep,ev,re,r,rp)
+function s.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLevelAbove(3)
 end
-function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.lvfilter(chkc) end
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,2)
-		and Duel.IsExistingTarget(s.lvfilter,tp,LOCATION_GRAVE,0,3,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.lvfilter,tp,LOCATION_GRAVE,0,3,3,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(2)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 end
-function s.lvop(e,tp,eg,ep,ev,re,r,rp)
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:GetLevel()<3 then return end
-	-- reduce level
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_LEVEL)
-	e1:SetValue(-2)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e1)
-	-- effect
-	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local td=tg:Filter(Card.IsRelateToEffect,nil,e)
-	if not tg or #td<=0 then return end
-	Duel.SendtoDeck(td,nil,0,REASON_EFFECT)
-	local g=Duel.GetOperatedGroup()
-	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
-	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
-	if ct>0 then
-		Duel.BreakEffect()
-		Duel.Draw(tp,1,REASON_EFFECT)
+	if c:UpdateLevel(-2)==-2 then
+		local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+		if Duel.Draw(p,2,REASON_EFFECT)==2 then
+			Duel.ShuffleHand(tp)
+			Duel.BreakEffect()
+			Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)
+		end
 	end
 end
 
@@ -117,7 +101,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_HAND and (r&0x4040)==0x4040
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_VEYERUS) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_VEYERUS) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

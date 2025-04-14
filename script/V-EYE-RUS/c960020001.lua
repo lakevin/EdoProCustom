@@ -19,16 +19,16 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCondition(s.lvcon)
-	e2:SetTarget(s.lvtg)
-	e2:SetOperation(s.lvop)
+	e2:SetCondition(s.spcon)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_VEYERUS}
 
 -- (1)
 function s.exfilter1(c)
-	return c:IsFaceup() and c:IsSetCard(SET_VEYERUS) and (c:HasLevel() or c:IsType(TYPE_XYZ))
+	return c:IsFaceup() and c:IsSetCard(SET_VEYERUS) and c:IsType(TYPE_XYZ)
 end
 function s.exfilter2(c)
 	return c:IsFaceup() and ((c:HasLevel() and c:IsLevelAbove(2)) 
@@ -100,27 +100,33 @@ function s.efilter(e,te)
 end
 
 -- (2)
-function s.lvcon(e,tp,eg,ep,ev,re,r,rp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
     -- 0x4040 => REASON_EFFECT+REASON_DISCARD
 	return e:GetHandler():GetPreviousLocation()==LOCATION_HAND and (r&0x4040)==0x4040
 end
-function s.lvfilter(c)
-	return c:IsFaceup() and c:GetLevel()~=c:GetOriginalLevel()
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(SET_VEYERUS) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(s.lvfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,s.lvfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
-function s.lvop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local tc=g:GetFirst()
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		--change level
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE&~RESET_TOFIELD)
 		e1:SetCode(EFFECT_CHANGE_LEVEL)
-		e1:SetValue(tc:GetOriginalLevel())
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(1)
 		tc:RegisterEffect(e1)
 	end
+	Duel.SpecialSummonComplete()
 end

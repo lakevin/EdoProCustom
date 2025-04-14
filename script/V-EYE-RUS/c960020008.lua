@@ -99,4 +99,8 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_UPDATE_LEVEL)
 	e1:SetValue(-1)
 	c:RegisterEffect(e1)
+	if c:IsLevel(1) and c:IsRelateToEffect(e) and c:IsFaceup() then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
+		Duel.GetControl(c,1-tp)
+	end
 end
