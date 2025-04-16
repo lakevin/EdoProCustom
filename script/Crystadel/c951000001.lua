@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	-- (1 )special summon
+	-- (1) special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
@@ -18,11 +18,6 @@ end
 
 -- (1)
 function s.spfilter(c)
-	--Debug.Message(c:GetCode())
-	--Debug.Message("IsReleasable")
-	--Debug.Message(c:IsReleasable())
-	--Debug.Message("GetOriginalType")
-	--Debug.Message(c:GetOriginalType()&TYPE_MONSTER)
 	return c:IsFaceup() and c:IsReleasable() and c:GetSequence()<5
 		and c:GetOriginalType()&TYPE_MONSTER==TYPE_MONSTER
 end
@@ -51,80 +46,32 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	if tc:GetOriginalType()&TYPE_MONSTER~=TYPE_MONSTER then return end
 	Duel.SendtoGrave(g,REASON_RELEASE)
 	g:DeleteGroup()
-	-- Select Option
-	if tc:IsType(TYPE_PENDULUM) then
-		-- (1) Place 1 Pendulum Monster from your Deck/face-up Extra Deck in PZone
-		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(id,0))
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-		e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e1:SetLabelObject(tc)
-		e1:SetCountLimit(1,{id,1})
-		e1:SetValue(s.zones)
-		e1:SetTarget(s.pentg)
-		e1:SetOperation(s.penop)
-		c:RegisterEffect(e1)
-	else
-		-- (2) Place as Continuous Spell/Trap
-		local e2=Effect.CreateEffect(c)
-		e2:SetDescription(aux.Stringid(id,1))
-		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-		e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e2:SetLabelObject(tc)
-		e2:SetCountLimit(1,{id,1})
-		e2:SetTarget(s.settg)
-		e2:SetOperation(s.setop)
-		c:RegisterEffect(e2)
-	end
+	-- Place as Continuous Spell/Trap
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetLabelObject(tc)
+	e1:SetCountLimit(1,{id,1})
+	e1:SetTarget(s.pltg)
+	e1:SetOperation(s.plop)
+	c:RegisterEffect(e1)
 end
 
--- (2-1)
-function s.zones(e,tp,eg,ep,ev,re,r,rp)
-	local zone=0xff
-	if Duel.IsDuelType(DUEL_SEPARATE_PZONE) then return zone end
-	local p0=Duel.CheckLocation(tp,LOCATION_PZONE,0)
-	local p1=Duel.CheckLocation(tp,LOCATION_PZONE,1)
-	if p0==p1 then return zone end
-	if p0 then zone=zone-0x1 end
-	if p1 then zone=zone-0x10 end
-	return zone
-end
-function s.penfilter(c,code,att,race)
-	return c:IsType(TYPE_PENDULUM) and (c:IsFaceup() or c:IsLocation(LOCATION_DECK)) and c:IsAttribute(att) and c:IsRace(race)
-		and not (c:IsForbidden() or c:IsCode(code))
-end
-function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	local tc=e:GetLabelObject()
-	if chk==0 then return Duel.CheckPendulumZones(tp)
-		and Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,nil,tc:GetCode(),tc:GetAttribute(),tc:GetRace()) end
-end
-function s.penop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if not Duel.CheckPendulumZones(tp) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.penfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,1,nil,tc:GetCode(),tc:GetAttribute(),tc:GetRace()):GetFirst()
-	if tc then
-		Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
-	end
-end
-
--- (2-2)
-function s.setfilter(c)
+-- (2) Place as Continuous Spell/Trap
+function s.plfilter(c)
 	return c:IsMonster() and c:IsSummonableCard() and not (c:IsType(TYPE_PENDULUM) or c:IsForbidden())
 end
-function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.plfilter,tp,LOCATION_DECK,0,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 end
-function s.setop(e,tp,eg,ep,ev,re,r,rp)
+function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	local op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
+	local tc=Duel.SelectMatchingCard(tp,s.plfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	local op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
 	if tc and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 		if op==0 then
 			local e1=Effect.CreateEffect(e:GetHandler())
@@ -145,7 +92,7 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		--Cannot Special Summon that monster this turn
 		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetDescription(aux.Stringid(id,3))
+		e2:SetDescription(aux.Stringid(id,2))
 		e2:SetType(EFFECT_TYPE_FIELD)
 		e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)

@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_VEYERUS))
 	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
-	-- (3) Attach 1 card from the GY to a "V-EYE-RUS" Xyz Monster you control
+	-- (3) Attach 1 card from either GY to a "V-EYE-RUS" Xyz Monster you control
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,0))
 	e5:SetType(EFFECT_TYPE_IGNITION)
@@ -38,6 +38,13 @@ function s.initial_effect(c)
 	e5:SetTarget(s.mattg)
 	e5:SetOperation(s.matop)
 	c:RegisterEffect(e5)
+	-- (3) Add 1 of your "V-EYE-RUS" monsters attached to it to your hand
+	local e6=e5:Clone()
+	e6:SetDescription(aux.Stringid(id,1))
+	e6:SetCategory(CATEGORY_TOHAND)
+	e6:SetTarget(s.thtg)
+	e6:SetOperation(s.thop)
+	c:RegisterEffect(e6)
 end
 s.listed_series={SET_VEYERUS}
 
@@ -49,9 +56,6 @@ function s.atkval(e,c)
 	end
 	return diff*-200
 end
-
--- (2)
-
 
 -- (3)
 function s.xyzfilter(c)
@@ -78,4 +82,33 @@ function s.matop(e,tp,eg,ep,ev,re,r,rp)
 	local xyzc=g:GetNext()
 	if tc==e:GetLabelObject() then tc,xyzc=xyzc,tc end
 	Duel.Overlay(xyzc,tc)
+end
+
+-- (3)
+function s.thfilter(c,tp)
+	return c:IsMonster() and c:IsSetCard(SET_VEYERUS) and c:GetOwner()==tp and c:IsAbleToHand()
+end
+function s.tgfilter(c,tp)
+	if not (c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(SET_VEYERUS)) then return false end
+	local g=c:GetOverlayGroup()
+	return g:IsExists(s.thfilter,1,nil,tp)
+end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c:IsControler(tp) and s.tgfilter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE,0,1,nil,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tc=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_OVERLAY)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+end
+function s.thop(e,tp,eg,ep,ev,re,r,rp,chk)
+	local tc=Duel.GetFirstTarget()
+	if not tc:IsRelateToEffect(e) then return end
+	local g=tc:GetOverlayGroup()
+	if #g==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local sc=g:FilterSelect(tp,s.thfilter,1,1,nil,tp):GetFirst()
+	if sc then
+		Duel.SendtoHand(sc,nil,REASON_EFFECT)
+	end
 end
