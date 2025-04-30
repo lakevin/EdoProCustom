@@ -30,19 +30,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	-- (2) disable
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_BATTLED)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetOperation(s.disop)
-	c:RegisterEffect(e3)
-	-- (2) redirect
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_BATTLE_DESTROY_REDIRECT)
-	e4:SetValue(LOCATION_REMOVED)
-	c:RegisterEffect(e4)
 end
 s.listed_series={SET_SHIMMERBANE}
 
@@ -54,8 +41,18 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		--Cannot Special Summon non-Fiend monsters
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetAbsoluteRange(tp,1,0)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		e1:SetTarget(function(e,c) return c:IsLocation(LOCATION_EXTRA) and not c:IsType(TYPE_SYNCHRO) end)
+		c:RegisterEffect(e1)
+	end
 end
 
 -- (1)

@@ -22,12 +22,10 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,0})
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
@@ -53,7 +51,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 			local sc=g:Select(tp,1,1,nil):GetFirst()
-			if Duel.MoveToField(sc,tp,c:GetOwner(),LOCATION_SZONE,POS_FACEDOWN,true) then
+			if Duel.MoveToField(sc,tp,tp,LOCATION_SZONE,POS_FACEDOWN,true) then
 				if sc:IsOriginalType(TYPE_MONSTER) then
 					-- Treat as Continuous Trap
 					local e1=Effect.CreateEffect(c)
@@ -87,15 +85,10 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
-	local chk=Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
-	if chk and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		-- Treat as Continuous Trap
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_ADD_TYPE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetValue(TYPE_TUNER)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-		c:RegisterEffect(e1)
+	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
+		if tc then
+			Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
+		end
 	end
+	Duel.SpecialSummonComplete()
 end

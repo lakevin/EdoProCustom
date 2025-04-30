@@ -33,17 +33,18 @@ end
 s.listed_series={SET_REVENTANTS}
 
 -- (1)
-function s.tdfilter(c)
-	return c:IsMonsterCard() and c:IsContinuousSpell() and c:IsFaceup() and c:IsAbleToDeck()
-end
-function s.plfilter(c,lv)
+function s.plfilter(c,tp,lv)
 	return c:IsSetCard(SET_MAJESTAL) and c:IsMonster() and c:IsLevelBelow(lv-1) and not c:IsForbidden()
+end
+function s.tdfilter(c,tp)
+	return c:IsMonsterCard() and c:IsContinuousSpell() and c:IsFaceup() and c:IsAbleToDeck()
+		and Duel.IsExistingMatchingCard(s.plfilter,tp,LOCATION_DECK,0,1,nil,tp,c:GetLevel()) 
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_STZONE) and chkc:IsControler(tp) and s.thfilter(chck) end
-	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_STZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_STZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_STZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_STZONE,0,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,tp,0)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
@@ -53,7 +54,7 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)~=0 then
 			if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-			local sg=Duel.SelectMatchingCard(tp,s.plfilter,tp,LOCATION_DECK,0,1,1,nil,level)
+			local sg=Duel.SelectMatchingCard(tp,s.plfilter,tp,LOCATION_DECK,0,1,1,nil,tp,level)
 			local sc=sg:GetFirst()
 			if sc then
 				Duel.MoveToField(sc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)

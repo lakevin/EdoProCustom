@@ -21,21 +21,32 @@ function s.initial_effect(c)
 	-- (1) Place 1 monster in the Spell/Trap Zone as Continuous Trap
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
+	e2:SetCountLimit(1,id)
+	e2:SetCondition(s.plcon)
 	e2:SetTarget(s.pltg)
 	e2:SetOperation(s.plop)
 	c:RegisterEffect(e2)
-	-- (3) disable
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EVENT_CHAIN_ACTIVATING)
-	e3:SetOperation(s.disop)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetCountLimit(1,id)
+	e3:SetTarget(s.pltg)
+	e3:SetOperation(s.plop)
 	c:RegisterEffect(e3)
+	-- (3) disable
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCode(EVENT_CHAIN_ACTIVATING)
+	e4:SetOperation(s.disop)
+	c:RegisterEffect(e4)
 end
 s.listed_names={id}
 s.listed_series={SET_SHIMMERBANE}
@@ -63,6 +74,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (1)
+function s.plcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(Card.IsControler,1,nil,1-tp)
+end
 function s.plfilter(c)
 	local p=c:GetOwner()
 	return c:IsMonster() and Duel.GetLocationCount(p,LOCATION_SZONE)>0
@@ -72,9 +86,9 @@ function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.plfilter(chkc) end
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(s.plfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c) end
+		and Duel.IsExistingTarget(s.plfilter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,s.plfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c)
+	local g=Duel.SelectTarget(tp,s.plfilter,tp,0,LOCATION_MZONE,1,1,nil)
 end
 function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

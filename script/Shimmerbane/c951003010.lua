@@ -17,14 +17,12 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- (1) Second attack
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetCondition(s.abdcon)
-	e2:SetOperation(function() Duel.ChainAttack() end)
-	c:RegisterEffect(e2)
+	-- (1) Double attack
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_EXTRA_ATTACK)
+	e3:SetValue(1)
+	c:RegisterEffect(e3)
 	-- (2) Set destroyed monster
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
@@ -85,17 +83,11 @@ function s.actlimitcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE)
 end
 
--- (1)
-function s.abdcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsRelateToBattle() and Duel.GetAttacker()==c and c:CanChainAttack()
-end
-
 -- (2)
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if chk==0 then return c:IsType(TYPE_XYZ) and not bc:IsType(TYPE_TOKEN) end
+	if chk==0 then return not bc:IsType(TYPE_TOKEN) end
 	Duel.SetTargetCard(bc)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,bc,1,0,0)
 end
@@ -116,11 +108,12 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		--Can be activated
 		local e2=Effect.CreateEffect(c)
 		e2:SetDescription(aux.Stringid(id,3))
-		e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DAMAGE)
+		e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW)
 		e2:SetType(EFFECT_TYPE_ACTIVATE)
 		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e2:SetCode(EVENT_FREE_CHAIN)
 		e2:SetRange(LOCATION_SZONE)
+		e2:SetTarget(s.osptg)
 		e2:SetOperation(s.ospop)
 		tc:RegisterEffect(e2)
 	end

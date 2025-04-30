@@ -95,25 +95,35 @@ function s.tunerop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.spfilter(c,e,tp)
+function s.spfilter(c,e,tp,mc)
+	local mg=Group.FromCards(c,mc)
 	return c:IsSetCard(SET_SHIMMERBANE) and c:IsType(TYPE_TUNER)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+		and Duel.IsExistingMatchingCard(s.synfilter,tp,LOCATION_EXTRA,0,1,nil,mg)
+end
+function s.synfilter(c,mg)
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSynchroSummonable(nil,mg)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp,e:GetHandler()) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
-		tc:NegateEffects(c)
+	if not tc:IsRelateToEffect(e) or Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
+	if not c:IsRelateToEffect(e) then return end
+	local mg=Group.FromCards(c,tc)
+	local g=Duel.GetMatchingGroup(s.synfilter,tp,LOCATION_EXTRA,0,nil,mg)
+	if #g>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SynchroSummon(tp,sg:GetFirst(),nil,mg)
 	end
-	Duel.SpecialSummonComplete()
 end
 
 -- (3)
@@ -138,5 +148,7 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 		e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
 		sc:RegisterEffect(e1)
+		-- Reveal
+		Duel.ConfirmCards(tp,sc)
 	end
 end

@@ -33,6 +33,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
+	e3:SetCost(s.spcost)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
@@ -61,11 +62,15 @@ end
 -- (1)
 function s.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
+	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MMZONE,0,nil)==0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 
 -- (2)
+function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,500) end
+	Duel.PayLPCost(tp,500)
+end
 function s.actfilter(c)
 	return c:IsFacedown() and c:GetSequence()<5
 end
@@ -81,7 +86,4 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	local chk=Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
-	if chk and c:IsRelateToEffect(e) and c:IsFaceup() then
-		Duel.Damage(tp,500,REASON_EFFECT)
-	end
 end
