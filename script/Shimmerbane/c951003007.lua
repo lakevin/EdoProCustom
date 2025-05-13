@@ -30,56 +30,32 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	-- (2) Return to hand
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_BATTLE_START)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCountLimit(1,{id,1})
-	e3:SetTarget(s.settg)
-	e3:SetOperation(s.setop)
-	c:RegisterEffect(e3)
 end
 s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsNegatable() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsNegatable,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
-	local g=Duel.SelectTarget(tp,Card.IsNegatable,tp,0,LOCATION_ONFIELD,1,1,nil)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		if tc and ((tc:IsFaceup() and not tc:IsDisabled()) or tc:IsType(TYPE_TRAPMONSTER)) and tc:IsRelateToEffect(e) then
-			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e2:SetCode(EFFECT_DISABLE_EFFECT)
-			e2:SetValue(RESET_TURN_SET)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e2)
-			if tc:IsType(TYPE_TRAPMONSTER) then
-				local e3=Effect.CreateEffect(c)
-				e3:SetType(EFFECT_TYPE_SINGLE)
-				e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-				e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-				e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-				tc:RegisterEffect(e3)
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
+		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+			local sg=g:Select(tp,1,1,nil)
+			local tc=sg:GetFirst()
+			if tc then
+				Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 			end
 		end
 	end
@@ -104,20 +80,23 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-end
-
--- (2)
-function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsControler(1-tp) and chkc:IsAbleToHand() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-end
-function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+		local sg=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+		local sc=sg:GetFirst()
+		if sc and sc:IsLocation(LOCATION_MZONE) and Duel.GetLocationCount(sc:GetOwner(),LOCATION_SZONE)==0 then
+			Duel.BreakEffect()
+			Duel.SendtoGrave(sg,REASON_EFFECT)
+		elseif Duel.MoveToField(sc,tp,sc:GetOwner(),LOCATION_SZONE,POS_FACEDOWN,true) then
+			--Treat it as a Continuous Spell
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetCode(EFFECT_CHANGE_TYPE)
+			e1:SetValue(TYPE_TRAP|TYPE_CONTINUOUS)
+			e1:SetReset(RESET_EVENT|(RESETS_STANDARD&~RESET_TURN_SET))
+			sc:RegisterEffect(e1)
+		end
 	end
 end

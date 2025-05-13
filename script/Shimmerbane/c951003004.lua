@@ -35,7 +35,7 @@ s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
 function s.filter(c)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSSetable()
+	return c:IsSetCard(SET_SHIMMERBANE)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

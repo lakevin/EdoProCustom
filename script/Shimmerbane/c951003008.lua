@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	-- (3) Set 1 "Shimmerbane" monster from the Deck to S/T Zone
+	-- (3) Set "Shimmerbane" monsters from the Deck to S/T Zone
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetCategory(CATEGORY_TOGRAVE)
@@ -56,10 +56,6 @@ s.listed_names={id}
 s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
-function s.actcon(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
-    return not c:IsStatus(STATUS_SET_TURN)
-end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
@@ -102,7 +98,7 @@ function s.spfilter(c,e,tp,mc)
 		and Duel.IsExistingMatchingCard(s.synfilter,tp,LOCATION_EXTRA,0,1,nil,mg)
 end
 function s.synfilter(c,mg)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSynchroSummonable(nil,mg)
+	return c:IsRace(RACE_FIEND) and c:IsSynchroSummonable(nil,mg)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp,e:GetHandler()) end
@@ -128,16 +124,30 @@ end
 
 -- (3)
 function s.setfilter(c)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsMonster() and c:IsSSetable(true)
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSSetable(true)
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,0,nil,1,tp,LOCATION_DECK)
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
+	local g=Duel.GetMatchingGroup(s.setfilter,tp,LOCATION_DECK,0,nil)
+	if #g==0 then return end
+	local ft=math.min(Duel.GetLocationCount(tp,LOCATION_SZONE),2)
+	local sg=aux.SelectUnselectGroup(g,e,tp,1,ft,aux.dncheck,1,tp,HINTMSG_SET)
+	if #sg>0 then
+		Duel.SSet(tp,sg)
+		for sc in aux.Next(sg) do
+			-- Treat as Continuous Trap
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetCode(EFFECT_CHANGE_TYPE)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+			e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
+			sc:RegisterEffect(e1)
+		end
+	end
+	--[[ if #sg>0 then
 		local sc=g:GetFirst()
 		Duel.MoveToField(sc,tp,tp,LOCATION_SZONE,POS_FACEDOWN,true)
 		-- Treat as Continuous Trap
@@ -150,5 +160,5 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		sc:RegisterEffect(e1)
 		-- Reveal
 		Duel.ConfirmCards(tp,sc)
-	end
+	end ]]
 end

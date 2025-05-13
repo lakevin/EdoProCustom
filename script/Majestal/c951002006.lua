@@ -4,7 +4,7 @@ local SET_MAJESTAL=0x9615
 local SET_CRYSTALBEAST=0x1034
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	Reflexxion.AddMajestalSpellActivation(s,id,c)
+	Reflexxion.AddMajestalRuling(c)
 	-- (SPELL) To hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))

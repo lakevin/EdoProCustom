@@ -1,6 +1,7 @@
--- Shimmerbane Cataclysm
+-- Shimmerbane Obscura
 local s,id=GetID()
 local SET_SHIMMERBANE=0x9617
+local SET_CHRYSTADEL=0x9614
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
 	--Synchro summon procedure
@@ -18,26 +19,27 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- (1) Place 1 monster in the Spell/Trap Zone as Continuous Trap
+	-- (1) Set 1 monster in the Spell/Trap Zone as Continuous Trap
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,id)
+	e2:SetCountLimit(1,{id,0})
 	e2:SetTarget(s.pltg)
 	e2:SetOperation(s.plop)
 	c:RegisterEffect(e2)
-	-- (2) Prevent effect target
+	-- (2) Add to hand
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(LOCATION_ONFIELD,0)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsSpellTrap))
-	e3:SetValue(aux.tgoval)
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_DECKDES)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_BE_MATERIAL)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO end)
+	e3:SetTarget(s.thtg)
+	e3:SetOperation(s.thop)
 	c:RegisterEffect(e3)
 end
 s.listed_names={id}
@@ -56,8 +58,13 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
-
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CHANGE_LEVEL)
+		e1:SetValue(5)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
+		c:RegisterEffect(e1)
 	end
 end
 
@@ -65,8 +72,8 @@ end
 function s.plfilter(c)
 	return c:IsSetCard(SET_SHIMMERBANE) and c:IsFaceup() and not c:IsForbidden()
 end
-function s.thfilter(c)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsMonster() and c:IsAbleToHand()
+function s.cfilter(c)
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsAbleToHand()
 end
 function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.plfilter(chkc) end
@@ -93,8 +100,8 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetReset((RESET_EVENT|RESETS_STANDARD)&~RESET_TURN_SET)
 			tc:RegisterEffect(e1)
 			--Add to hand
-			local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.thfilter),tp,LOCATION_GRAVE,0,nil)
-			if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+			local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.cfilter),tp,LOCATION_GRAVE,0,nil)
+			if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 				Duel.BreakEffect()
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 				local sg=g:Select(tp,1,1,nil)
@@ -102,5 +109,40 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 				Duel.ConfirmCards(1-tp,sg)
 			end
 		end
+	end
+end
+
+-- (2)
+function s.thfilter(c)
+	return (c:IsSetCard(SET_SHIMMERBANE) or c:IsSetCard(SET_CHRYSTADEL)) and c:IsAbleToHand()
+end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		local dg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
+		return dg:GetClassCount(Card.GetCode)>=3
+	end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
+	if g:GetClassCount(Card.GetCode)>=3 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+		local sg1=g:Select(tp,1,1,nil)
+		g:Remove(Card.IsCode,nil,sg1:GetFirst():GetCode())
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+		local sg2=g:Select(tp,1,1,nil)
+		g:Remove(Card.IsCode,nil,sg2:GetFirst():GetCode())
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+		local sg3=g:Select(tp,1,1,nil)
+		sg1:Merge(sg2)
+		sg1:Merge(sg3)
+		Duel.ConfirmCards(1-tp,sg1)
+		Duel.ShuffleDeck(tp)
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
+		local cg=sg1:Select(1-tp,1,1,nil)
+		local tc=cg:GetFirst()
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		sg1:RemoveCard(tc)
+		Duel.SendtoGrave(sg1,REASON_EFFECT)
 	end
 end

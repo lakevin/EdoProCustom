@@ -6,6 +6,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetOperation(s.setop)
 	c:RegisterEffect(e1)
 	-- (1) Special summon 1 of your "Shimmerbane" monsters that was sent to GY
 	local e2=Effect.CreateEffect(c)
@@ -33,6 +34,19 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_REVENTANTS}
+
+function s.setop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	-- Treat as Continuous Trap
+	local e1=Effect.CreateEffect(c)
+	e1:SetCode(EFFECT_CHANGE_TYPE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+	e1:SetValue(TYPE_FIELD+TYPE_SPELL)
+	c:RegisterEffect(e1)
+	Duel.MoveToField(c,tp,tp,LOCATION_FZONE,POS_FACEUP,true,LOCATION_FZONE)
+end
 
 -- (1)
 function s.cfilter(c,e,tp)

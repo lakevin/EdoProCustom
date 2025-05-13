@@ -50,7 +50,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local dg=Duel.GetMatchingGroup(nil,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+		local dg=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 		if #dg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 			dg=dg:Select(tp,1,1,nil)

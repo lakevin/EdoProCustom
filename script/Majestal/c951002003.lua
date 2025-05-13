@@ -3,7 +3,7 @@ local s,id=GetID()
 local SET_MAJESTAL=0x9615
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	Reflexxion.AddMajestalSpellActivation(s,id,c)
+	Reflexxion.AddMajestalRuling(c)
 	-- (SPELL) cannot be target/indestructable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

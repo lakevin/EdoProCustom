@@ -3,7 +3,7 @@ local s,id=GetID()
 local SET_MAJESTAL=0x9615
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	Reflexxion.AddMajestalSpellActivation(s,id,c)
+	Reflexxion.AddMajestalRuling(c)
 	-- (SPELL) Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))

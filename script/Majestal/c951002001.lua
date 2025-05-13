@@ -3,11 +3,11 @@ local s,id=GetID()
 local SET_MAJESTAL=0x9615
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	Reflexxion.AddMajestalSpellActivation(s,id,c)
+	Reflexxion.AddMajestalRuling(c)
 	-- (SPELL) Special Summon from S/T Zone
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_MOVE)
@@ -41,7 +41,7 @@ s.listed_series={SET_MAJESTAL}
 -- (1)
 function s.spfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(SET_MAJESTAL) and c:IsMonsterCard() and c:IsLocation(LOCATION_SZONE)
-		and c:IsControler(tp) and c:GetSequence()<5 and not c:IsPreviousLocation(LOCATION_SZONE) and not c:IsCode(id)
+		and c:IsControler(tp) and c:GetSequence()<5 and c:IsPreviousLocation(LOCATION_MZONE) and not c:IsCode(id)
 end
 function s.spcond(e,tp,eg,ep,ev,re,r,rp)
 	return eg and eg:IsExists(s.spfilter,1,nil,tp)
