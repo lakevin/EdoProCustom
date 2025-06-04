@@ -27,10 +27,11 @@ function s.initial_effect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,{id,2})
-	e4:SetTarget(s.sptg)
-	e4:SetOperation(s.spop)
+	e4:SetTarget(s.thtg2)
+	e4:SetOperation(s.thop2)
 	c:RegisterEffect(e4)
 	--[[local e5=e4:Clone()
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -59,21 +60,32 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_WARFLAME) and c:IsLevelBelow(6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.tgfilter(c,e,tp)
+	return c:IsSetCard(SET_WARFLAME) and c:HasLevel() and c:IsAbleToHand()
 end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.tgfilter(chkc,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_GRAVE,0,1,nil,lv) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_GRAVE,0,1,1,nil,lv)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+	local c=e:GetHandler()
+	if tc and tc:IsRelateToEffect(e) then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tc)
+		Duel.BreakEffect()
+		if c:IsFaceup() and c:IsRelateToEffect(e) and c:GetLevel()~=tc:GetLevel()
+			and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CHANGE_LEVEL)
+			e1:SetValue(tc:GetLevel())
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			c:RegisterEffect(e1)
+		end
 	end
 end
 	-- or if your opponent activates a monster effect during your Main Phase

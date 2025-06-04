@@ -4,17 +4,18 @@ local SET_WARFLAME=0xBAA1
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	-- (1) Make 1 monster battle-indestructible
+	-- (1) Negate the opponent's effect
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetCode(EVENT_CHAINING)
+	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
 	e1:SetCountLimit(1,{id,0})
-	e1:SetCost(s.indescost)
-	e1:SetTarget(s.indestg)
-	e1:SetOperation(s.indesop)
+	e1:SetCondition(s.negcon)
+	e1:SetCost(s.negcost)
+	e1:SetTarget(s.negtg)
+	e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp) Duel.NegateEffect(ev) end)
 	c:RegisterEffect(e1)
 	-- (2) Special Summon
 	local e2=Effect.CreateEffect(c)
@@ -44,63 +45,37 @@ end
 s.listed_series={SET_WARFLAME}
 
 -- (1)
-function s.thcfilter(c,tp)
-	return c:IsMonster() and c:IsReleasable() 
-		and Duel.IsExistingTarget(s.indesfilter,tp,LOCATION_MZONE,0,1,c)
-end
-function s.indesfilter(c)
-	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(SET_WARFLAME)
-end
-function s.indescost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.thcfilter,1,true,nil,nil,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroupCost(tp,s.thcfilter,1,1,true,nil,nil,tp)
-	Duel.Release(g,REASON_COST)
-end
-function s.indestg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingTarget(s.indesfilter,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,s.indesfilter,tp,LOCATION_MZONE,0,1,1,nil)	
-end
-function s.indesop(e,tp,eg,ep,ev,re,r,rp)
+function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		e1:SetReset(RESET_PHASE+PHASE_END)
-		e1:SetValue(1)
-		tc:RegisterEffect(e1,true)
-	end
+	if chk==0 then return c:IsReleasable() end
+	Duel.Release(c,REASON_COST)
+end
+function s.negcon(e,tp,eg,ep,ev,re,r,rp)
+	local ch=ev-1
+	if ch==0 or not (ep==1-tp and Duel.IsChainDisablable(ev)) or re:GetHandler():IsDisabled() then return false end
+	local ch_player,ch_eff=Duel.GetChainInfo(ch,CHAININFO_TRIGGERING_PLAYER,CHAININFO_TRIGGERING_EFFECT)
+	local ch_c=ch_eff:GetHandler()
+	return ch_player==tp and ch_c:IsSetCard(SET_WARFLAME) and ch_eff:IsMonsterEffect()
+end
+function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
 
 -- (2)
-function s.spfilter(c,e,tp,zone)
+function s.spfilter(c,e,tp)
 	return c:IsSetCard(SET_WARFLAME) and c:IsLinkMonster() and c:GetLink()<=2 
-		and (
-			c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
-			or (c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,e:GetHandler(),c,0x60)>0)
-		)
+		and Duel.GetLocationCountFromEx(tp,tp,e:GetHandler(),c,0x60)>0
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local zone=Duel.GetZoneWithLinkedCount(1,tp)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,zone) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local zone=Duel.GetZoneWithLinkedCount(1,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,zone)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
-	if tc then
-		if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsInExtraMZone),tp,LOCATION_MZONE,0,1,nil) then
-			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP,zone)
-		else
-			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP,0x60)
-		end
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP,0x60) then
 		--Cannot attack
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(3206)

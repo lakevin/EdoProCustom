@@ -8,55 +8,96 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	-- (1) special summon in the battle phase
+	-- (1) Cannot be destroyed by battle
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCountLimit(1)
-	e2:SetHintTiming(0,TIMING_BATTLE_START+TIMING_BATTLE_END)
-	e2:SetCondition(s.condition)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_WARFLAME))
+	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	-- (2) Cannot be target
+	-- (2) Gain 500 ATK
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCategory(CATEGORY_ATKCHANGE)
+	e3:SetCode(EVENT_BATTLE_DESTROYING)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetTargetRange(LOCATION_MZONE,0)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_WARFLAME))
-	e3:SetValue(1)
+	e3:SetCountLimit(1,id)
+	e3:SetCondition(s.condition)
+	e3:SetOperation(s.operation1)
 	c:RegisterEffect(e3)
+	-- (3) special summon in the battle phase
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e4:SetCode(EVENT_BATTLE_DESTROYING)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetCountLimit(1,id)
+	e4:SetCondition(s.condition)
+	e4:SetTarget(s.target2)
+	e4:SetOperation(s.operation2)
+	c:RegisterEffect(e4)
 end
 s.listed_series={SET_WARFLAME}
 
--- (1)
+-- Conditions
+function s.cfilter(c,tp)
+	return c:IsSetCard(SET_WARFLAME) and c:IsControler(tp) and c:IsRelateToBattle()
+end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local ph=Duel.GetCurrentPhase()
-	return (ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE)
+	return eg:IsExists(s.cfilter,1,nil,tp)
 end
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_WARFLAME) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+
+-- (1)
+function s.atkfilter(c)
+	return c:IsFaceup() and c:IsSetCard(SET_WARFLAME)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+	local g=Duel.GetMatchingGroup(s.atkfilter,tp,LOCATION_MZONE,0,nil)
+	local tc=g:GetFirst()
+	for tc in aux.Next(g) do
+		--Activate
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(500)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
+		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	end
+end
+
+-- (2)
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(SET_WARFLAME) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(c,REASON_COST)
+end
+function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
+end
+function s.operation2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp):GetFirst()
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
+		--Cannot activate its effects
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(3302)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_TRIGGER)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 	end

@@ -60,7 +60,7 @@ end
 
 -- (3)
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_WARFLAME) and c:IsLevelBelow(6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_WARFLAME) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsRitualMonster()
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_HAND) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
@@ -69,11 +69,21 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
-	if g then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+	local tc=g:GetFirst()
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
+		--Cannot activate its effects
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(3302)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_TRIGGER)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
 	end
+	Duel.SpecialSummonComplete()
 end
 	-- or if your opponent activates a monster effect during your Main Phase
 function s.rmeffcon(e,tp,eg,ep,ev,re,r,rp)

@@ -21,11 +21,10 @@ function s.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	-- (2A) To Deck + Draw
+	-- (2A) Add 1 "Kniguard" monster from your GY or banishment to your hand
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCountLimit(1,{id,0})
@@ -33,29 +32,17 @@ function s.initial_effect(c)
 	e4:SetTarget(s.tg1)
 	e4:SetOperation(s.op1)
 	c:RegisterEffect(e4)
-	-- (2B) search
+	-- (2B) Special Summon 1 "Kniguard" monster from your hand.
 	local e5=Effect.CreateEffect(c)
-	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e5:SetDescription(aux.Stringid(id,1))
+	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetRange(LOCATION_SZONE)
-	e5:SetCountLimit(1,{id,1})
+	e5:SetCountLimit(1,{id,2})
 	e5:SetCost(s.cost2)
 	e5:SetTarget(s.tg2)
 	e5:SetOperation(s.op2)
 	c:RegisterEffect(e5)
-	-- (2C) special summon
-	local e6=Effect.CreateEffect(c)
-	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e6:SetDescription(aux.Stringid(id,2))
-	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e6:SetType(EFFECT_TYPE_IGNITION)
-	e6:SetRange(LOCATION_SZONE)
-	e6:SetCountLimit(1,{id,2})
-	e6:SetCost(s.cost3)
-	e6:SetTarget(s.tg3)
-	e6:SetOperation(s.op3)
-	c:RegisterEffect(e6)
 	-- (3) Can treat "Holy Grail" Spell cards as Link Material
 	local e7a=Effect.CreateEffect(c)
 	e7a:SetType(EFFECT_TYPE_FIELD)
@@ -105,76 +92,45 @@ end
 
 -- (2A)
 function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,2,REASON_COST) end
+	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,3,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,2,REASON_COST)
+	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,3,REASON_COST)
 end
 function s.filter1(c,e,tp)
-	return c:IsMonster() and c:IsSetCard(SET_KNIGUARD) and c:IsAbleToDeck()
-end
-function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.filter1(chkc) end
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingTarget(s.filter1,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.filter1,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
-end
-function s.op1(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	if not tg or tg:FilterCount(Card.IsRelateToEffect,nil,e)~=1 then return end
-	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
-	local g=Duel.GetOperatedGroup()
-	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
-	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
-	if ct==1 then
-		Duel.BreakEffect()
-		Duel.Draw(tp,1,REASON_EFFECT)
-	end
-end
-
--- (2B)
-function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,4,REASON_COST) end
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,4,REASON_COST)
-end
-function s.filter2(c)
 	return c:IsMonster() and c:IsSetCard(SET_KNIGUARD) and c:IsAbleToHand()
 end
-function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK,0,1,nil) end
+function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingTarget(s.filter1,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function s.op2(e,tp,eg,ep,ev,re,r,rp)
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.filter1,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
 
--- (2C)
-function s.cost3(e,tp,eg,ep,ev,re,r,rp,chk)
+-- (2B)
+function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,COUNTER_GRAIL,6,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.RemoveCounter(tp,1,0,COUNTER_GRAIL,6,REASON_COST)
 end
-function s.filter3(c,e,tp)
+function s.filter2(c,e,tp)
 	return c:IsMonster() and c:IsSetCard(SET_KNIGUARD) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.tg3(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_HAND) and s.filter3(chkc,e,tp) end
+function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.filter3,tp,LOCATION_HAND,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
-function s.op3(e,tp,eg,ep,ev,re,r,rp)
+function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.filter3,tp,LOCATION_HAND,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end

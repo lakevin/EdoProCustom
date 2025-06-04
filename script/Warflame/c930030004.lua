@@ -14,9 +14,9 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e2:SetCondition(s.spicon)
-	e2:SetTarget(s.spitg)
-	e2:SetOperation(s.spiop)
+	e2:SetCondition(s.sphcon)
+	e2:SetTarget(s.sphtg)
+	e2:SetOperation(s.sphop)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	-- (2) special summon
@@ -38,7 +38,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1,{id,3})
+	e4:SetCountLimit(1,{id,2})
 	e4:SetTarget(s.destg)
 	e4:SetOperation(s.desop)
 	c:RegisterEffect(e4)
@@ -52,17 +52,17 @@ end
 s.listed_series={SET_WARFLAME}
 
 -- (1)
-function s.spifilter(c)
+function s.sphfilter(c)
 	return c:IsSetCard(SET_WARFLAME)
 end
-function s.spicon(e,c)
+function s.sphcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),s.spifilter,1,true,1,true,c,c:GetControler(),nil,false,e:GetHandler())
+	return Duel.CheckReleaseGroup(c:GetControler(),s.sphfilter,1,true,1,true,c,c:GetControler(),nil,false,e:GetHandler())
 end
 
-function s.spitg(e,tp,eg,ep,ev,re,r,rp,c)
+function s.sphtg(e,tp,eg,ep,ev,re,r,rp,c)
 	if c==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
-	local g=Duel.SelectReleaseGroup(tp,s.spifilter,1,1,true,true,true,c,nil,nil,false,e:GetHandler())
+	local g=Duel.SelectReleaseGroup(tp,s.sphfilter,1,1,true,true,true,c,nil,nil,false,e:GetHandler())
 	if g then
 		g:KeepAlive()
 		e:SetLabelObject(g)
@@ -70,7 +70,7 @@ function s.spitg(e,tp,eg,ep,ev,re,r,rp,c)
 	end
 	return false
 end
-function s.spiop(e,tp,eg,ep,ev,re,r,rp,c)
+function s.sphop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	if not g then return end
 	Duel.Release(g,REASON_COST)
@@ -82,37 +82,44 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return re and re:GetHandler():IsSetCard(SET_WARFLAME)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_WARFLAME) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_WARFLAME) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) 
+		and not (c:IsRitualMonster() or c:IsCode(id))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_DECK) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp,atk) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(s.splimit)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	local e2=Effect.CreateEffect(c)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	e2:SetTargetRange(1,0)
+	Duel.RegisterEffect(e2,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1,true)
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e2,true)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
-	Duel.SpecialSummonComplete()
+end
+function s.splimit(e,c,sump,sumtype,sumpos,targetp)
+	return not c:IsAttribute(ATTRIBUTE_FIRE)
 end
 	-- or if your opponent activates a monster effect during your Main Phase
-function s.rmeffcon(e,tp,eg,ep,ev,re,r,rp)
+--[[function s.rmeffcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return ep==1-tp and Duel.IsTurnPlayer(tp) and re:IsActiveType(TYPE_MONSTER) and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
-end
+end]]--
 
 -- (3)
 function s.desfilter(c)

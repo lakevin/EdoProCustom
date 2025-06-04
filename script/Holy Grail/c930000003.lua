@@ -32,13 +32,10 @@ s.listed_series={SET_HOLYGRAIL}
 s.listed_names={CARD_HOLY_GRAIL}
 
 -- (1)
-function s.filter(c)
-	return c:IsFaceup() and c:IsSpell() and c:IsCode(CARD_HOLY_GRAIL)
-end
 function s.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
-		Duel.IsExistingMatchingCard(s.filter,c:GetControler(),LOCATION_SZONE,0,1,nil)
+		Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_HOLY_GRAIL),c:GetControler(),LOCATION_SZONE,0,1,nil)
 end
 
 -- (2)

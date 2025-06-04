@@ -89,7 +89,7 @@ end
 
 -- (3)
 function s.thfilter(c)
-	return c:IsSetCard(SET_KNIGUARD) and not c:IsCode(id) and c:IsAbleToHand()
+	return c:IsSetCard(SET_KNIGUARD) and c:IsMonster() and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

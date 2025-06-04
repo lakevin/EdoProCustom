@@ -27,7 +27,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_KNIGUARD,SET_HOLYGRAIL}
 function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(SET_KNIGUARD,lc,sumtype,tp) and not c:IsSummonCode(lc,sumtype,tp,id)
+	return c:IsSetCard(SET_KNIGUARD,lc,sumtype,tp) and not c:IsType(TYPE_LINK,lc,sumtype,tp)
 end
 
 -- (1)

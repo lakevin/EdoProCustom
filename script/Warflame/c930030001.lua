@@ -39,17 +39,18 @@ s.listed_series={SET_WARFLAME}
 
 -- (1)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(Card.IsMonster,tp,LOCATION_GRAVE,0,1,nil)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsRelateToEffect(e) then
-		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
-	end
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
 
 -- (2)

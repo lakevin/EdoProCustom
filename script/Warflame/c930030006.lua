@@ -39,7 +39,6 @@ function s.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,{id,2})
-	e4:SetCondition(s.negcon)
 	e4:SetCost(s.negcost)
 	e4:SetTarget(s.negtg)
 	e4:SetOperation(s.negop)
@@ -94,9 +93,6 @@ end
 function s.filter(c,e)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and (not e or c:IsCanBeEffectTarget(e))
 end
-function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
-end
 function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(100)
 	return true
@@ -106,10 +102,10 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return ct>0 and Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_ONFIELD+LOCATION_HAND,0,1,e:GetHandler())
+		return ct>0 and Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_ONFIELD+LOCATION_HAND,0,1,nil)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsReleasable,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,ct,e:GetHandler())
+	local g=Duel.SelectMatchingCard(tp,Card.IsReleasable,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,ct,nil)
 	Duel.Release(g,REASON_COST)
 	local og=Duel.GetOperatedGroup()
 	e:SetLabel(#og)

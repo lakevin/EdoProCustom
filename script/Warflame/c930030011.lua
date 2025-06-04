@@ -32,7 +32,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_WARFLAME,SET_HOLYGRAIL}
 function s.matfilter(c,lc,sumtype,tp)
-	return c:HasLevel() and c:IsSetCard(SET_WARFLAME,lc,sumtype,tp)
+	return c:IsSetCard(SET_WARFLAME,lc,sumtype,tp) and not c:IsType(TYPE_LINK,lc,sumtype,tp)
 end
 
 -- (1)
@@ -80,7 +80,7 @@ end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) end
-	if chk==0 then return c:IsAttackAbove(1000) and Duel.IsExistingTarget(s.atkfilter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return c:IsAttackAbove(1000) and Duel.IsExistingTarget(s.atkfilter,tp,LOCATION_MZONE,0,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
 	local g=Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,c)
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,g,1,0,0)

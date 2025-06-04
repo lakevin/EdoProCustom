@@ -42,6 +42,82 @@ function Reflexxion.CosmoverseEquipHandler(c,atk,def,effcode,effval)
 end
 
 
+-- [[ HOLY GRAIL DEFAULTS ]]
+
+--Parameters
+-- c: the card that will receive the effect
+-- matfilter: filter function that contains conditions of the material
+-- lnkfilter: filter function that contains conditions of the link monster
+-- addAttr: adds an attribute to this face-up spell/trap
+-- addCode: adds a setcode to this face-up spell/trap
+function Reflexxion.SpellTrapAsLinkMaterial(c,matfilter,lnkfilter,addAttr,addCode)
+	-- functions
+	local function mfilter(c)
+		return c:IsFaceup() and c:IsCode(c:GetCode())
+	end
+	local function extraval(chk,summon_type,e,...)
+		local filter=nil
+		if matfilter then
+			filter = matfilter(c)
+		else
+			filter = mfilter(c)
+		end
+		if chk==0 then
+			local tp,sc=...
+			if summon_type~=SUMMON_TYPE_LINK or not (sc and lnkfilter(sc)) then
+				return Group.CreateGroup()
+			else
+				Duel.RegisterFlagEffect(tp,c:GetCode(),0,0,1)
+				return Duel.GetMatchingGroup(matfilter,tp,LOCATION_SZONE,0,nil)
+			end
+		elseif chk==2 then
+			Duel.ResetFlagEffect(e:GetHandlerPlayer(),c:GetCode())
+		end
+	end
+	local function addtypecon(e,tp,eg,ep,ev,re,r,rp)
+		return Duel.GetFlagEffect(e:GetHandlerPlayer(),c:GetCode())>0
+	end
+
+	-- init
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_EXTRA_MATERIAL)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET|EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetTargetRange(1,0)
+	e1:SetCountLimit(1,c:GetCode())
+	e1:SetOperation(aux.TRUE)
+	e1:SetValue(extraval)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_ADD_TYPE)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetTargetRange(LOCATION_SZONE,0)
+	e2:SetCondition(addtypecon)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_HOLYGRAIL))
+	e2:SetValue(TYPE_MONSTER)
+	c:RegisterEffect(e2)
+	if addAttr then
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_ADD_ATTRIBUTE)
+		e3:SetRange(LOCATION_SZONE)
+		e3:SetValue(addAttr)
+		c:RegisterEffect(e3)
+	end
+	if addCode then
+		local e4=Effect.CreateEffect(c)
+		e4:SetType(EFFECT_TYPE_SINGLE)
+		e4:SetCode(EFFECT_ADD_SETCODE)
+		e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e4:SetRange(LOCATION_SZONE)
+		e4:SetValue(addCode)
+		c:RegisterEffect(e4)
+	end
+end
+
+
 -- [[ MAJESTAL DEFAULTS ]]
 
 --Parameters
@@ -162,8 +238,9 @@ function Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
 			target=te:GetTarget()
 			operation=te:GetOperation()
 		end
-		local chk=te and te:GetCode()==EVENT_BECOME_TARGET and te:IsActivatable(tep)
-        --local chk=te and te:GetCode()==EVENT_FREE_CHAIN and te:IsActivatable(tep)
+		--local chk=te and te:GetCode()==EVENT_FREE_CHAIN and te:IsActivatable(tep)
+		local chk=te and ((te:GetCode()==EVENT_BECOME_TARGET and tc:IsOriginalType(TYPE_MONSTER)) 
+			or te:GetCode()==EVENT_FREE_CHAIN) --and te:IsActivatable(tep)
 			and (not condition or condition(te,tep,eg,ep,ev,re,r,rp))
 			and (not cost or cost(te,tep,eg,ep,ev,re,r,rp,0))
 			and (not target or target(te,tep,eg,ep,ev,re,r,rp,0))
@@ -198,12 +275,13 @@ function Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
 			for tg in aux.Next(g) do
 				tg:ReleaseEffectRelation(te)
 			end
-        else
-            Duel.SendtoGrave(tc,REASON_RULE)
+        else 
+            Duel.ChangePosition(tc,POS_FACEDOWN)
 		end
         return chk
 	else
-		Duel.ConfirmCards(tp,tc)
+		Duel.ChangePosition(tc,POS_FACEUP)
+		Duel.SendtoGrave(tc,REASON_RULE)
         return chk
 	end
 end

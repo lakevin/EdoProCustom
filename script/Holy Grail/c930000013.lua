@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.spcon)
+	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return Duel.IsMainPhase() end)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -55,11 +55,8 @@ function s.acop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==1-tp and Duel.IsMainPhase()
-end
 function s.spfilter(c,mc,fg)
-	return c:IsAttribute(ATTRIBUTE_DARK) and not c:IsCode(id) and c:IsLinkSummonable(mc,fg+mc)
+	return c:IsSetCard(SET_HOLYGRAIL) and not c:IsCode(id) and c:IsLinkSummonable(mc,fg+mc)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
