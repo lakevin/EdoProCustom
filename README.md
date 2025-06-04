@@ -38,29 +38,34 @@ If you need any help, you can contact me on my Discord server (link above).
 
 ## Custom Cards Details
 
-Last updated: 29.07.2024
+Last updated: 04.06.2025
 
 ### Released Archetypes
 
-1. Grimm Chain | 29/29 cards | `Finished`
-2. Protectrix | 25/25 cards | `Finished`
-3. Draconier | 27/27 cards | `Finished`
-4. Cosmoverse | 16/16 cards | `Finished`
-5. Holy Grail | 22/22 cards | `Finished`
-6. Kniguard | 17/17 cards | `Finished`
-7. Shadowblade | 20/20 cards | `Finished`
-8. Warflame | 19/19 cards | `Finished`
-9. Time Travel | 7/7 cards | `Finished`
+| Archetype       | No. of Cards | Status     |
+| :-------------- | :----------- | :--------- |
+| 1. Grimm Chain  | 29 cards     | `Finished` |
+| 2. Protectrix   | 25 cards     | `Finished` |
+| 3. Draconier    | 27 cards     | `Finished` |
+| 4. Cosmoverse   | 18 cards     | `Finished` |
+| 5. Holy Grail   | 22 cards     | `Finished` |
+| 6. Kniguard     | 17 cards     | `Finished` |
+| 7. Shadowblade  | 20 cards     | `Finished` |
+| 8. Warflame     | 19 cards     | `Finished` |
+| 9. Time Travel  | 7 cards      | `Finished` |
+| 10. Hi-Tech     | 16 cards     | `Finished` |
+| 11. V-EYE-RUS   | 17 cards     | `Finished` |
+| 12. NETWORLD    | 5 cards      | `Finished` |
 
-### Released Archetypes (Testing)
+### Working on (Testing)
 
-1. Hi-Tech `99% Done`
-2. V-EYE-RUS `99% Done`
+1. Crystadel | 5/15 cards | `33% Done`
+2. Revenant Bones | 11/15 cards | `75% Done`
+3. Majestal | 11/15 cards | `75% Done`
+4. Shimmerbane | 12/15 cards | `80% Done`
 
 ### Planned Archetypes
 
 1. Demon Mask: This archetype is based on the "Masks" cards from the first anime season. The new "Demon Mask" cards take control of opponent monsters and use them for Fusion Summons.
-2. Majestal: It takes the mechanics of the "Crystal Beast" archetype and applies them in a more modern and competitive way. It will be a Fusion Summon focused archetype.
-3. Shimmerbane/Diamonshard: The competing deck to the "Majestal" deck theme. It redefines the trap monster mechanic and uses mainly Synchro Summon.
 
 
