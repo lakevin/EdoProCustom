@@ -4,7 +4,7 @@ local SET_REVENTANTS=0x9616
 function s.initial_effect(c)
 	--pendulum summon
 	Pendulum.AddProcedure(c)
-	-- (P1) Special Summon monster from GY
+	-- (PEND) Special Summon monster from GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- (1 )spsummon proc
+	-- (1) spsummon proc
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetCode(EFFECT_SPSUMMON_PROC)
@@ -131,7 +131,7 @@ end
 
 -- (2)
 function s.tgfilter(c)
-	return c:IsMonster() and c:IsSetCard(SET_REVENTANTS) and not c:IsCode(id) and c:IsAbleToGrave()
+	return c:IsSetCard(SET_REVENTANTS) and not c:IsCode(id) and c:IsAbleToGrave()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil) end

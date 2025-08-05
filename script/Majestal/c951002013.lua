@@ -43,7 +43,7 @@ function s.matfilter1(c,fc,sumtype,tp)
 	return c:IsSetCard(SET_MAJESTAL,fc,sumtype,tp) and c:IsType(TYPE_FUSION,fc,sumtype,tp)
 end
 function s.matfilter2(c,lc,sumtype,tp)
-	return c:IsAttribute(ATTRIBUTE_LIGHT,lc,sumtype,tp) or c:IsSetCard(SET_MAJESTAL,lc,sumtype,tp)
+	return c:IsSetCard(SET_MAJESTAL,lc,sumtype,tp)
 end
 
 -- (SPELL)

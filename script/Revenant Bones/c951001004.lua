@@ -101,8 +101,8 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_DISABLE)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	tc1:RegisterEffect(e1)
-	local e1=e1:Clone()
-	tc2:RegisterEffect(e1)
+	local e2=e1:Clone()
+	tc2:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(e:GetHandler())
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_DISABLE_EFFECT)
@@ -137,10 +137,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleasable() end
-	Duel.Release(e:GetHandler(),REASON_COST)
-end
 function s.thfilter(c)
 	return c:IsSetCard(SET_REVENTANTS) and c:IsSpellTrap() and c:IsAbleToHand()
 end

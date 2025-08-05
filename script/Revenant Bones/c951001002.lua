@@ -79,5 +79,6 @@ end
 -- (3)
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,3))
 	return c:GetOriginalRace()==RACE_ZOMBIE and c:IsType(TYPE_XYZ)
 end

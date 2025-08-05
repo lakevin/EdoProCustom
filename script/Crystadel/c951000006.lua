@@ -59,10 +59,13 @@ end
 function s.matfilter(c)
 	return c:IsType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
 end
+function s.typecount(c)
+	return c:GetType()&TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK
+end
 function s.drcfilter(c)
 	if not c:IsFaceup() or not c:IsType(TYPE_XYZ) then return false end
 	local mg=c:GetOverlayGroup():Filter(s.matfilter,nil)
-	return mg:GetClassCount(Card.GetType)>=2
+	return mg:GetClassCount(s.typecount)>=2
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -70,7 +73,7 @@ function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,s.drcfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	local mg=g:GetFirst():GetOverlayGroup():Filter(s.matfilter,nil)
-	local ct=mg:GetClassCount(Card.GetType)
+	local ct=mg:GetClassCount(s.typecount)
 	if ct<2 and not Duel.IsPlayerCanDraw(tp,ct) then return end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(ct)

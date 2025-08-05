@@ -60,10 +60,10 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	aux.addTempLizardCheck(c,tp,s.lizfilter)
 end
 function s.splimit(e,c)
-	return not c:IsType(TYPE_XYZ) and c:IsLocation(LOCATION_EXTRA)
+	return not c:IsRace(RACE_ZOMBIE) and c:IsLocation(LOCATION_EXTRA)
 end
 function s.lizfilter(e,c)
-	return not c:IsOriginalType(TYPE_XYZ)
+	return not c:GetOriginalRace(RACE_ZOMBIE)
 end
 
 -- (2)

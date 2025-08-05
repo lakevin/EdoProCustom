@@ -49,7 +49,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local op=e:GetLabel()
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if op==1 then
-		--Place 1 "Centurion" monster from your Deck to your Spell & Trap Zone as a Continuous Trap
+		--Place to your Spell & Trap Zone as a Continuous Spell
 		if ft<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 		local sc=Duel.SelectMatchingCard(tp,s.plfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil):GetFirst()
@@ -66,8 +66,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			sc:RegisterEffect(e1)
 		end
 	elseif op==2 then
-		--Set 1 "Centurion" Spell/Trap directly from your Deck
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+		--Special Summon
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
 		if #g>0 then
 			Duel.SpecialSummon(g,0,tp,tp,true,false,POS_FACEUP)
