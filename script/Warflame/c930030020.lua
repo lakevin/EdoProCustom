@@ -2,6 +2,7 @@
 local SET_WARFLAME=0xBAA1
 local s,id=GetID()
 function s.initial_effect(c)
+	c:EnableReviveLimit()
 	-- (1) cannot be destroyed by card effects
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
