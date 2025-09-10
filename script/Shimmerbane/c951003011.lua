@@ -4,7 +4,7 @@ local SET_SHIMMERBANE=0x9617
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
 	--Synchro summon procedure
-	Synchro.AddProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_FIEND),1,1,Synchro.NonTunerEx(Card.IsType,TYPE_SYNCHRO),1,99)
+	Synchro.AddProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,SET_SHIMMERBANE),1,1,Synchro.NonTuner(nil),1,99)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
 	-- (TRAP) Activation

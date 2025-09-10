@@ -1,123 +1,87 @@
--- Shimmerbane Crystvorax
+-- Shimmerbane Fiendish sealer
 local s,id=GetID()
 local SET_SHIMMERBANE=0x9617
-Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	--Cannot be Normal Summoned/Set
-	c:EnableUnsummonable()
-	--Set as a Continuous Trap
-	Reflexxion.AddShimmerbaneRuling(c)
-	-- (TRAP) Activation
+	-- (TRAP) Activate (negate 1 of opponent's monsters)
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DISABLE)
+	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EVENT_BECOME_TARGET)
-	e1:SetRange(LOCATION_SZONE)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
+	e1:SetCategory(CATEGORY_DISABLE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
+	e1:SetTarget(s.distg)
+	e1:SetOperation(s.disop)
 	c:RegisterEffect(e1)
-	-- (1) Special Summon
+	--A WIND Synchro Monster summoned using this card cannot be destroyed by your opponent's card effects
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e2:SetCode(EVENT_DESTROYED)
-	e2:SetCountLimit(1,{id,0})
-	e2:SetCondition(s.spcon)
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetCode(EVENT_BE_MATERIAL)
+	e2:SetCondition(s.efcon)
+	e2:SetOperation(s.efop)
 	c:RegisterEffect(e2)
-	-- (2) Return to hand
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_BATTLE_START)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCountLimit(1,{id,1})
-	e3:SetTarget(s.settg)
-	e3:SetOperation(s.setop)
-	c:RegisterEffect(e3)
 end
 s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsNegatable() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsNegatable,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
-	local g=Duel.SelectTarget(tp,Card.IsNegatable,tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
+function s.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsNegatableMonster() and chkc:IsLocation(LOCATION_MZONE) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingTarget(Card.IsNegatableMonster,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if Duel.IsExistingTarget(Card.IsNegatableMonster,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+		local g=Duel.SelectTarget(tp,Card.IsNegatableMonster,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+		Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,tp,0)
+	end
 end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		if tc and ((tc:IsFaceup() and not tc:IsDisabled()) or tc:IsType(TYPE_TRAPMONSTER)) and tc:IsRelateToEffect(e) then
-			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e2:SetCode(EFFECT_DISABLE_EFFECT)
-			e2:SetValue(RESET_TURN_SET)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e2)
-			if tc:IsType(TYPE_TRAPMONSTER) then
-				local e3=Effect.CreateEffect(c)
-				e3:SetType(EFFECT_TYPE_SINGLE)
-				e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-				e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-				e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-				tc:RegisterEffect(e3)
-			end
-		end
-	end
+	if tc:IsDisabled() or not tc:IsFaceup() or not tc:IsRelateToEffect(e) then return end 
+	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCode(EFFECT_DISABLE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	tc:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetCode(EFFECT_DISABLE_EFFECT)
+	e2:SetValue(RESET_TURN_SET)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	tc:RegisterEffect(e2)
+	Duel.BreakEffect()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	if not c:IsRelateToEffect(e)
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id,0,0x21,0,0,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
+	c:AddMonsterAttribute(TYPE_EFFECT+TYPE_TRAP)
+	Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP)
+	c:AddMonsterAttributeComplete()
+	Duel.SpecialSummonComplete()
 end
 
 -- (1)
-function s.spcfilter(c,tp)
-	return c:IsReason(REASON_BATTLE+REASON_EFFECT)
-		and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_ONFIELD)
+function s.efcon(e,tp,eg,ep,ev,re,r,rp)
+	return r==REASON_SYNCHRO and e:GetHandler():GetReasonCard():IsRace(RACE_FIEND)
 end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.spcfilter,1,nil,tp)
-end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.efop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and ((c:IsLocation(LOCATION_GRAVE) and not eg:IsContains(c)) 
-		or (c:IsLocation(LOCATION_HAND))) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	local rc=c:GetReasonCard()
+	--Cannot be destroyed by opponent's card effects
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(3060)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1:SetLabel(ep)
+	e1:SetValue(s.tgval)
+	e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+	rc:RegisterEffect(e1)
 end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-end
-
--- (2)
-function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsControler(1-tp) and chkc:IsAbleToHand() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-end
-function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-	end
+function s.tgval(e,re,rp)
+	return rp==1-e:GetLabel()
 end

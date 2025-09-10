@@ -98,7 +98,7 @@ function s.spfilter(c,e,tp,mc)
 		and Duel.IsExistingMatchingCard(s.synfilter,tp,LOCATION_EXTRA,0,1,nil,mg)
 end
 function s.synfilter(c,mg)
-	return c:IsRace(RACE_FIEND) and c:IsSynchroSummonable(nil,mg)
+	return (c:IsRace(RACE_FIEND) or c:IsRace(RACE_DRAGON)) and c:IsSynchroSummonable(nil,mg)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp,e:GetHandler()) end

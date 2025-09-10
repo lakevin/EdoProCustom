@@ -10,7 +10,6 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- (TRAP) Activation
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -21,7 +20,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	-- (1) Set 1 monster in the Spell/Trap Zone as Continuous Trap
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -30,9 +28,9 @@ function s.initial_effect(c)
 	e2:SetTarget(s.pltg)
 	e2:SetOperation(s.plop)
 	c:RegisterEffect(e2)
-	-- (2) Add to hand
+	-- (2) Search or send to the GY 1 "Shimmerbane" card from your Deck
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_DECKDES)
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_BE_MATERIAL)
@@ -58,7 +56,7 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CHANGE_LEVEL)
@@ -73,7 +71,7 @@ function s.plfilter(c)
 	return c:IsSetCard(SET_SHIMMERBANE) and c:IsFaceup() and not c:IsForbidden()
 end
 function s.cfilter(c)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsAbleToHand()
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.plfilter(chkc) end
@@ -101,7 +99,7 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 			tc:RegisterEffect(e1)
 			--Add to hand
 			local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.cfilter),tp,LOCATION_GRAVE,0,nil)
-			if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
+			if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 				Duel.BreakEffect()
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 				local sg=g:Select(tp,1,1,nil)
@@ -114,35 +112,15 @@ end
 
 -- (2)
 function s.thfilter(c)
-	return (c:IsSetCard(SET_SHIMMERBANE) or c:IsSetCard(SET_CHRYSTADEL)) and c:IsAbleToHand()
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local dg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
-		return dg:GetClassCount(Card.GetCode)>=3
-	end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
-	if g:GetClassCount(Card.GetCode)>=3 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-		local sg1=g:Select(tp,1,1,nil)
-		g:Remove(Card.IsCode,nil,sg1:GetFirst():GetCode())
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-		local sg2=g:Select(tp,1,1,nil)
-		g:Remove(Card.IsCode,nil,sg2:GetFirst():GetCode())
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-		local sg3=g:Select(tp,1,1,nil)
-		sg1:Merge(sg2)
-		sg1:Merge(sg3)
-		Duel.ConfirmCards(1-tp,sg1)
-		Duel.ShuffleDeck(tp)
-		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
-		local cg=sg1:Select(1-tp,1,1,nil)
-		local tc=cg:GetFirst()
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		sg1:RemoveCard(tc)
-		Duel.SendtoGrave(sg1,REASON_EFFECT)
-	end
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
+	local tc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	aux.ToHandOrElse(tc,tp)
 end
