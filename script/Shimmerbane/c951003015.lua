@@ -27,10 +27,11 @@ end
 
 -- (1)
 function s.filter(c)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsAbleToHand() and not c:IsCode(id)
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSSetable(true) and not c:IsCode(id)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,2,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,2,nil) and
+		Duel.GetLocationCount(tp,LOCATION_SZONE)>1 end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -42,16 +43,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ShuffleDeck(tp)
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SET)
 		local tc=sg:Select(1-tp,1,1,nil):GetFirst()
-        if Duel.SSet(tp,tc)>0 and tc:IsType(TYPE_TRAP) then
-			--It can be activated this turn
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetDescription(aux.Stringid(id,2))
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-			e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-			e1:SetReset(RESET_EVENT|RESETS_STANDARD)
-			tc:RegisterEffect(e1)
-		end
+        Duel.SSet(tp,tc)
 		sg:RemoveCard(tc)
         local sc=sg:GetFirst()
 	    Duel.SendtoHand(sc,nil,REASON_EFFECT)
@@ -61,7 +53,7 @@ end
 -- (2)
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(SET_SHIMMERBANE) and c:IsContinuousTrap() and c:IsTrapMonster()
-        and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+        and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.spfilter(chkc,e,tp) end

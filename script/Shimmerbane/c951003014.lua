@@ -34,12 +34,15 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id,0,TYPE_MONSTER|TYPE_EFFECT,1500,600,4,RACE_ILLUSION,ATTRIBUTE_DARK,POS_FACEUP,tp,1) end
+	local lv=Duel.AnnounceLevel(tp,2,4)
+	Duel.SetTargetParam(lv)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,tp,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local lv=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and s.sptg(e,tp,eg,ep,ev,re,r,rp,0) then
-		c:AddMonsterAttribute(TYPE_EFFECT|TYPE_TRAP)
+		c:AddMonsterAttribute(TYPE_EFFECT+TYPE_TUNER+TYPE_TRAP,ATTRIBUTE_DARK,RACE_FIEND,lv)
 		Duel.SpecialSummonStep(c,1,tp,tp,true,false,POS_FACEUP)
 		-- (2.1) Force activation
 		local e1=Effect.CreateEffect(c)
@@ -60,8 +63,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_NONTUNER)
 		e2:SetValue(s.ntval)
 		c:RegisterEffect(e2)
-		c:AddMonsterAttributeComplete()
 	end
+	c:AddMonsterAttributeComplete()
 	Duel.SpecialSummonComplete()
 end
 
@@ -72,10 +75,10 @@ end
 function s.forcetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE) and s.actfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.actfilter,tp,LOCATION_SZONE,0,1,c) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	if chk==0 then return Duel.IsExistingTarget(s.actfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,c) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEDOWN)
-	Duel.SelectTarget(tp,s.actfilter,tp,LOCATION_SZONE,0,1,1,e:GetHandler())
+	Duel.SelectTarget(tp,s.actfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,e:GetHandler())
 end
 function s.forceop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

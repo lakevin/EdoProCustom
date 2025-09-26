@@ -3,8 +3,6 @@ local s,id=GetID()
 local SET_SHIMMERBANE=0x9617
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	--Cannot be Normal Summoned/Set
-	c:EnableUnsummonable()
 	--Set as a Continuous Trap
 	Reflexxion.AddShimmerbaneRuling(c)
 	-- (TRAP) Activation
