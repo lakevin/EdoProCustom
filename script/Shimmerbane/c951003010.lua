@@ -38,63 +38,47 @@ s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() and chkc:IsRace(RACE_FIEND) end
-	if chk==0 then return Duel.IsExistingTarget(aux.FaceupFilter(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,aux.FaceupFilter(Card.IsRace,RACE_FIEND),tp,LOCATION_MZONE,0,1,1,nil)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+		Duel.Hint(HINT_CARD,tp,id)
 		--Cannot activate cards/effects when your Fiend Monster attacks
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCondition(s.actcon)
-		e1:SetOperation(s.actop)
-		e1:SetLabelObject(tc)
+		e1:SetCode(EVENT_CHAINING)
+		e1:SetOperation(s.chainop)
+		e1:SetReset(RESET_PHASE|PHASE_END)
 		Duel.RegisterEffect(e1,tp)
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_CONTROL,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,0))
+		aux.RegisterClientHint(c,nil,tp,1,1,aux.Stringid(id,1),nil)
 	end
 end
-function s.actcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if tc:GetFlagEffect(id)==0 then
-		e:Reset()
-		return false
+function s.chainop(e,tp,eg,ep,ev,re,r,rp)
+	if re:GetHandler():IsSetCard(SET_SHIMMERBANE) and ep==tp then
+		Duel.SetChainLimit(s.chainlm)
 	end
-	local ac=Duel.GetAttacker()
-	return ac and ac:IsControler(tp) and ac:IsRace(RACE_FIEND) and tc:GetFlagEffect(id)>0
 end
-function s.actop(e,tp,eg,ep,ev,re,r,rp)
-	--Cannot activate
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(0,1)
-	e1:SetCondition(s.actlimitcon)
-	e1:SetValue(1)
-	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
-	Duel.RegisterEffect(e1,tp)
-end
-function s.actlimitcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE)
+function s.chainlm(e,ep,tp)
+	return tp==ep
 end
 
 -- (2)
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if chk==0 then return not bc:IsType(TYPE_TOKEN) end
+	if chk==0 then return not bc:IsType(TYPE_TOKEN) and not bc:IsSpellTrap() end
 	Duel.SetTargetCard(bc)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,bc,1,0,0)
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and not tc:IsLocation(LOCATION_DECK) and Duel.GetLocationCount(tc:GetOwner(),LOCATION_SZONE)==0 then
+	if not tc:IsRelateToEffect(e) or tc:IsImmuneToEffect(e) then return end
+	if Duel.GetLocationCount(tc:GetOwner(),LOCATION_SZONE)==0 then
 		Duel.SendtoGrave(tc,REASON_RULE,nil,PLAYER_NONE)
 	elseif Duel.MoveToField(tc,tp,tc:GetOwner(),LOCATION_SZONE,POS_FACEDOWN,tc:IsMonsterCard()) then
 		--Treat as Continuous Trap
@@ -105,22 +89,31 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 		e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
 		tc:RegisterEffect(e1)
-		--Can be activated
-		local e2=Effect.CreateEffect(c)
-		e2:SetDescription(aux.Stringid(id,3))
-		e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW)
-		e2:SetType(EFFECT_TYPE_ACTIVATE)
-		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e2:SetCode(EVENT_FREE_CHAIN)
-		e2:SetRange(LOCATION_SZONE)
-		e2:SetTarget(s.osptg)
-		e2:SetOperation(s.ospop)
-		tc:RegisterEffect(e2)
+		tc:SetStatus(STATUS_SET_TURN,true)
+		if tc:IsOriginalType(TYPE_MONSTER) then
+			--Can be activated
+			local e2=Effect.CreateEffect(c)
+			e2:SetDescription(aux.Stringid(id,3))
+			e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW)
+			e2:SetType(EFFECT_TYPE_ACTIVATE)
+			e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+			e2:SetCode(EVENT_FREE_CHAIN)
+			e2:SetRange(LOCATION_SZONE)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+			e2:SetCondition(s.actcon)
+			e2:SetTarget(s.osptg)
+			e2:SetOperation(s.ospop)
+			tc:RegisterEffect(e2)
+		end
 	end
+end
+function s.actcon(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+    return not c:IsStatus(STATUS_SET_TURN)
 end
 function s.osptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,true) end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
@@ -130,7 +123,7 @@ end
 function s.ospop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if Duel.SpecialSummon(c,0,tp,tp,false,true,POS_FACEUP)~=0 then
 		local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 		Duel.Draw(p,d,REASON_EFFECT)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)

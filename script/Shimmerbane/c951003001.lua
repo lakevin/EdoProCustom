@@ -100,8 +100,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2)
-function s.syncmfilter(c,must)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSynchroSummonable(must)
+function s.syncmfilter(c,mat)
+	return (c:IsRace(RACE_FIEND) or c:IsRace(RACE_DRAGON)) and c:IsSynchroSummonable(mat)
 end
 function s.syncsumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.syncmfilter,tp,LOCATION_EXTRA,0,1,nil,e:GetHandler()) end

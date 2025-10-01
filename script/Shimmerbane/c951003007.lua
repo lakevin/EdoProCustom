@@ -1,4 +1,4 @@
--- Shimmerbane Crystvorax
+-- Shimmerbane Crystorax
 local s,id=GetID()
 local SET_SHIMMERBANE=0x9617
 Duel.LoadScript('ReflexxionsAux.lua')
@@ -105,6 +105,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetValue(TYPE_TRAP|TYPE_CONTINUOUS)
 			e1:SetReset(RESET_EVENT|(RESETS_STANDARD&~RESET_TURN_SET))
 			sc:RegisterEffect(e1)
+			--Shuffle it into the Deck during the End Phase of the next turn
+			local turn_count=Duel.GetTurnCount()
+			aux.DelayedOperation(sc,PHASE_END,id,e,tp,
+				function(ag) Duel.SendtoDeck(ag,nil,SEQ_DECKSHUFFLE,REASON_EFFECT) end,
+				function() return Duel.GetTurnCount()==turn_count+1 end,
+				nil,2,aux.Stringid(id,3)
+			)
 		end
 	end
 end

@@ -21,7 +21,6 @@ function s.initial_effect(c)
 	-- (1) Place 1 monster in the Spell/Trap Zone as Continuous Trap
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -32,10 +31,11 @@ function s.initial_effect(c)
 	e2:SetOperation(s.plop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetCountLimit(1,id)
 	e3:SetTarget(s.pltg)
 	e3:SetOperation(s.plop)
@@ -53,24 +53,21 @@ s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_ONFIELD,nil)
-		for tc in aux.Next(g) do
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_DISABLE_EFFECT)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-			tc:RegisterEffect(e2)
+	local cond=Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_MZONE,1,nil)
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and cond and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		Duel.Hint(HINT_CARD,tp,id)
+		local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
+		Duel.Destroy(g,REASON_EFFECT)
+		local ct=Duel.GetOperatedGroup():FilterCount(function(c,tp) return c:IsPreviousControler(tp) end,nil,1-tp)
+		if ct>0 then
+			Duel.Damage(1-tp,ct*200,REASON_EFFECT)
 		end
 	end
 end
@@ -96,7 +93,7 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) or tc:IsImmuneToEffect(e) then return end
-	if tc:IsLocation(LOCATION_MZONE) and Duel.GetLocationCount(tc:GetOwner(),LOCATION_SZONE)==0 then
+	if Duel.GetLocationCount(tc:GetOwner(),LOCATION_SZONE)==0 then
 		Duel.SendtoGrave(tc,REASON_RULE,nil,PLAYER_NONE)
 	elseif Duel.MoveToField(tc,tp,tc:GetOwner(),LOCATION_SZONE,POS_FACEDOWN,tc:IsMonsterCard()) then
 		--Treat as Continuous Trap
@@ -107,28 +104,37 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 		e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
 		tc:RegisterEffect(e1)
-		--Can be activated
-		local e2=Effect.CreateEffect(c)
-		e2:SetDescription(aux.Stringid(id,3))
-		e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DAMAGE)
-		e2:SetType(EFFECT_TYPE_ACTIVATE)
-		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e2:SetCode(EVENT_FREE_CHAIN)
-		e2:SetRange(LOCATION_SZONE)
-		e2:SetTarget(s.osptg)
-		e2:SetOperation(s.ospop)
-		tc:RegisterEffect(e2)
+		tc:SetStatus(STATUS_SET_TURN,true)
+		if tc:IsOriginalType(TYPE_MONSTER) then
+			--Can be activated
+			local e2=Effect.CreateEffect(c)
+			e2:SetDescription(aux.Stringid(id,3))
+			e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DAMAGE)
+			e2:SetType(EFFECT_TYPE_ACTIVATE)
+			e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+			e2:SetCode(EVENT_FREE_CHAIN)
+			e2:SetRange(LOCATION_SZONE)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+			e2:SetCondition(s.actcon)
+			e2:SetTarget(s.osptg)
+			e2:SetOperation(s.ospop)
+			tc:RegisterEffect(e2)
+		end
 	end
+end
+function s.actcon(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+    return not c:IsStatus(STATUS_SET_TURN)
 end
 function s.osptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,true) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function s.ospop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if Duel.SpecialSummon(c,0,tp,tp,false,true,POS_FACEUP)~=0 then
 		Duel.Damage(c:GetOwner(),c:GetAttack(),REASON_EFFECT)
 	end
 end
