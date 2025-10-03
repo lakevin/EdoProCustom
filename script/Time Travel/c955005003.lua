@@ -134,5 +134,6 @@ end
 -- (4)
 function s.rdcon(e)
 	local c=e:GetHandler()
-	return c:IsReason(REASON_MATERIAL) and c:IsReason(REASON_LINK) and c:GetReasonCard():IsCode(955005004)
+	return c:IsReason(REASON_MATERIAL) and c:IsReason(REASON_LINK) 
+		and (c:GetReasonCard():IsCode(955005004) or c:GetReasonCard():IsCode(955005009))
 end

@@ -56,8 +56,7 @@ end
 
 -- (2)
 function s.thfilter(c)
-	return c:IsSetCard(SET_TIME_TRAVEL) and c:IsMonster() and c:IsAbleToHand() 
-		and not c:IsCode(id)
+	return c:IsSetCard(SET_TIME_TRAVEL) and c:IsSpellTrap() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -93,5 +92,6 @@ end
 -- (4)
 function s.rdcon(e)
 	local c=e:GetHandler()
-	return c:IsReason(REASON_MATERIAL) and c:IsReason(REASON_LINK) and c:GetReasonCard():IsCode(955005004)
+	return c:IsReason(REASON_MATERIAL) and c:IsReason(REASON_LINK) 
+		and (c:GetReasonCard():IsCode(955005004) or c:GetReasonCard():IsCode(955005009))
 end
