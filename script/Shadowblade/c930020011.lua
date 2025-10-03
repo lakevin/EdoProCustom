@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e1:SetCountLimit(1,{id,0})
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -19,10 +19,9 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCost(aux.bfgcost)
+	e2:SetCost(Cost.SelfBanish)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -67,7 +66,7 @@ function s.spfilter2(c,e,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
-		return Duel.IsExistingTarget(s.spfilter1,tp,LOCATION_GRAVE,0,1,nil,e,tp)
+		return Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp)
 			and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 			and Duel.GetLocationCount(1-tp,LOCATION_MZONE,1-tp)>0
 	end
@@ -78,9 +77,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	-- Special Summon to opponent field
 	if Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
-	local og=Duel.SelectTarget(tp,s.spfilter1,tp,LOCATION_GRAVE,0,1,1,nil,e,1-tp)
+	local og=Duel.SelectMatchingCard(tp,s.spfilter1,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,1-tp)
 	local oc=og:GetFirst()
-	if oc and oc:IsRelateToEffect(e) then
+	if oc then
 		Duel.SpecialSummonStep(oc,0,tp,1-tp,false,false,POS_FACEDOWN_DEFENSE)
 	end
 	if Duel.SpecialSummonComplete()==0 then return end

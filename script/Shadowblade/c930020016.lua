@@ -3,7 +3,7 @@ local SET_SHADOWBLADE=0xB64A
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,s.matfilter,5,2)
+	Xyz.AddProcedure(c,s.matfilter,3,2)
 	c:EnableReviveLimit()
 	-- (1) Flip: Attach
 	local e1=Effect.CreateEffect(c)
@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
-	e2:SetCost(aux.dxmcostgen(2,2,nil))
+	e2:SetCost(Cost.DetachFromSelf(2,2,nil))
 	e2:SetTarget(s.destg)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
