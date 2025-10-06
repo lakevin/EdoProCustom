@@ -87,10 +87,14 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler()) and eg:IsExists(Card.IsSummonLocation,1,nil,LOCATION_STZONE)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local locations=LOCATION_MZONE|LOCATION_GRAVE
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsMonster() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsMonster,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsMonster,tp,locations,locations,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,Card.IsMonster,tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsMonster,tp,locations,locations,1,1,nil)
+	if g:GetFirst():IsLocation(LOCATION_GRAVE) then
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,tp,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
