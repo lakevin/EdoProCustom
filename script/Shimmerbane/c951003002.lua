@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	e3:SetValue(1)
 	e3:SetCondition(s.spcon)
 	c:RegisterEffect(e3)
-	-- Activate if special summoned
+	-- (2) Add to hand
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCategory(CATEGORY_TOHAND)
@@ -43,12 +43,14 @@ function s.initial_effect(c)
 	e4:SetTarget(s.thtg)
 	e4:SetOperation(s.thop)
 	c:RegisterEffect(e4)
-	-- (2) Force activation
+	-- (3) Force activation
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DAMAGE)
-	e5:SetType(EFFECT_TYPE_IGNITION)
+	e5:SetCategory(CATEGORY_DAMAGE)
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
 	e5:SetRange(LOCATION_MZONE)
+	e5:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E|TIMING_MAIN_END)
 	e5:SetCountLimit(1)
 	e5:SetCost(s.spcost)
 	e5:SetTarget(s.sptg)
@@ -87,6 +89,8 @@ function s.spcon(e,c)
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MMZONE,0,nil)==0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
+
+-- (2)
 function s.thcon(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+1)
 end

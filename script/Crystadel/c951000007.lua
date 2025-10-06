@@ -73,17 +73,18 @@ end
 
 -- (2)
 function s.drfilter(c)
-	return c:IsFaceup() and c:IsContinuousSpell() and c:IsOriginalType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER)
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local ct=Duel.GetMatchingGroupCount(s.drfilter,tp,LOCATION_SZONE,0,nil)
+		local g=Duel.GetMatchingGroup(s.drfilter,tp,LOCATION_SZONE,0,nil)
+		local ct=g:GetClassCount(Card.GetCode)
 		return ct>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct and Duel.GetDecktopGroup(tp,ct):FilterCount(Card.IsAbleToHand,nil)>0
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroupCount(s.drfilter,tp,LOCATION_SZONE,0,nil)
+	local ct=Duel.GetMatchingGroup(s.drfilter,tp,LOCATION_SZONE,0,nil):GetClassCount(Card.GetCode)
 	Duel.ConfirmDecktop(tp,ct)
 	local g=Duel.GetDecktopGroup(tp,ct)
 	if #g<1 then return end

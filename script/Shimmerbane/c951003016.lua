@@ -3,17 +3,6 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Synchro summon procedure
 	Synchro.AddProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_FIEND),1,1,Synchro.NonTuner(nil),1,99)
-    
-	-- Set as a Continuous Trap
-	local e0=Effect.CreateEffect(c)
-	e0:SetCategory(CATEGORY_LVCHANGE)
-	e0:SetType(EFFECT_TYPE_IGNITION)
-	e0:SetCode(EVENT_BECOME_TARGET)
-	e0:SetRange(LOCATION_EXTRA)
-	e0:SetTarget(s.target)
-	e0:SetOperation(s.activate)
-	c:RegisterEffect(e0)
-
 	-- (1) Name becomes "Red Dragon Archfiend"
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
