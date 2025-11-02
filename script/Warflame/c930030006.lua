@@ -90,48 +90,58 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.filter(c,e)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and (not e or c:IsCanBeEffectTarget(e))
-end
 function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(100)
 	return true
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsType,TYPE_EFFECT),tp,0,LOCATION_MZONE,nil)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return ct>0 and Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_ONFIELD+LOCATION_HAND,0,1,nil)
+		return Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_MZONE,0,1,nil)
+			and Duel.IsExistingTarget(Card.IsNegatable,tp,0,LOCATION_ONFIELD,1,nil)
 	end
+	e:SetLabel(0)
+	local rt=Duel.GetTargetCount(Card.IsNegatable,tp,0,LOCATION_ONFIELD,nil)
+	-- release any number of monsters you control
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsReleasable,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,ct,nil)
-	Duel.Release(g,REASON_COST)
-	local og=Duel.GetOperatedGroup()
-	e:SetLabel(#og)
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,nil,#og,0,0)
+	local cg=Duel.SelectMatchingCard(tp,Card.IsReleasable,tp,LOCATION_MZONE,0,1,rt,nil)
+	local ct=#cg
+	Duel.Release(cg,REASON_COST)
+	-- select targets to negate negate
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local g=Duel.SelectTarget(tp,Card.IsNegatable,tp,0,LOCATION_ONFIELD,ct,ct,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,#g,0,0)
+end
+function s.disfilter(c,e)
+	return ((c:IsFaceup() and not c:IsDisabled()) or c:IsType(TYPE_TRAPMONSTER)) and c:IsRelateToEffect(e)
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=e:GetLabel()
-	local sg=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsType,TYPE_EFFECT),tp,0,LOCATION_MZONE,nil)
-	if #sg<ct then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
-	local g=sg:Select(tp,ct,ct,nil)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(s.disfilter,nil,e)
+	local tc=g:GetFirst()
 	for tc in aux.Next(g) do
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESETS_STANDARD_PHASE_END)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetValue(RESET_TURN_SET)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e2:SetReset(RESETS_STANDARD_PHASE_END)
 		tc:RegisterEffect(e2)
+		if tc:IsType(TYPE_TRAPMONSTER) then
+			local e3=Effect.CreateEffect(c)
+			e3:SetType(EFFECT_TYPE_SINGLE)
+			e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+			e3:SetReset(RESETS_STANDARD_PHASE_END)
+			tc:RegisterEffect(e3)
+		end
 	end
 end

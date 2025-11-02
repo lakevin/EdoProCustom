@@ -11,9 +11,9 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
-	e1:SetCost(s.indcost)
-	e1:SetTarget(s.indtg)
-	e1:SetOperation(s.indop)
+	e1:SetCost(s.immcost)
+	e1:SetTarget(s.immtg)
+	e1:SetOperation(s.immop)
 	c:RegisterEffect(e1)
 	-- (2) Set "Warflame" Quick Spell from your Deck
 	local e2=Effect.CreateEffect(c)
@@ -43,7 +43,7 @@ end
 s.listed_series={SET_WARFLAME}
 
 -- (1)
-function s.indcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.immcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsReleasable() end
 	Duel.Release(c,REASON_COST)
@@ -51,25 +51,28 @@ end
 function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_WARFLAME)
 end
-function s.indtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) end
+function s.immtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
-function s.indop(e,tp,eg,ep,ev,re,r,rp)
+function s.immop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		--Cannot be destroyed by battle or card effects
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(3008)
-		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetDescription(3110)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(1)
+		e1:SetCode(EFFECT_IMMUNE_EFFECT)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetValue(s.efilter)
+		e1:SetReset(RESETS_STANDARD_DISABLE_PHASE_END|RESET_OPPO_TURN)
+		e1:SetOwnerPlayer(tp)
 		tc:RegisterEffect(e1)
 	end
+end
+function s.efilter(e,re)
+	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
 
 -- (2)

@@ -11,11 +11,11 @@ function s.initial_effect(c)
 	-- (1) Cannot be destroyed by battle
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_WARFLAME))
-	e2:SetValue(1)
+	e2:SetValue(s.indct)
 	c:RegisterEffect(e2)
 	-- (2) Gain 500 ATK
 	local e3=Effect.CreateEffect(c)
@@ -43,7 +43,14 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_WARFLAME}
 
--- Conditions
+-- (1)
+function s.indct(e,re,r,rp)
+	if (r&REASON_BATTLE+REASON_EFFECT)~=0 then
+		return 1
+	else return 0 end
+end
+
+-- (2) & (3) conditions
 function s.cfilter(c,tp)
 	return c:IsSetCard(SET_WARFLAME) and c:IsControler(tp) and c:IsRelateToBattle()
 end
@@ -51,7 +58,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
 end
 
--- (1)
+-- (2)
 function s.atkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_WARFLAME)
 end
@@ -71,7 +78,7 @@ function s.operation1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (2)
+-- (3)
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(SET_WARFLAME) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

@@ -71,7 +71,7 @@ end
 
 --
 function s.cfilter(c,e,tp)
-	return c:IsSetCard(SET_WARFLAME) and c:IsMonster() and Duel.GetMZoneCount(tp,c)>0
+	return c:IsSetCard(SET_WARFLAME) and c:IsMonster() and c:HasLevel() and Duel.GetMZoneCount(tp,c)>0
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetLevel(),c:GetCode()) 
 end
 function s.spfilter(c,e,tp,lv,code)
