@@ -38,23 +38,10 @@ function s.initial_effect(c)
 	e3:SetTarget(s.target)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
-	-- (4) Negate Spell/Trap activation
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCode(EVENT_CHAINING)
-	e4:SetCountLimit(1)
-	e4:SetCondition(s.negcon)
-	e4:SetCost(s.negcost)
-	e4:SetTarget(s.negtg)
-	e4:SetOperation(s.negop)
-	c:RegisterEffect(e4,false,REGISTER_FLAG_DETACH_XMAT)
 end
 s.listed_series={SET_REVENTANTS}
 
+-- Xyz Summon Procedure
 function s.xyzfilter(c,xyz,sumtype,tp)
 	return c:IsType(TYPE_XYZ,xyz,sumtype,tp) and c:IsRank(4) and c:IsRace(RACE_ZOMBIE,xyz,sumtype,tp)
 end
@@ -71,10 +58,8 @@ end
 function s.efilter(e,te)
 	local c=e:GetHandler()
 	local tc=te:GetHandler()
-	return ((tc:IsType(TYPE_FUSION) and c:GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_FUSION))
-		or (tc:IsType(TYPE_SYNCHRO) and c:GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_SYNCHRO))
-		or (tc:IsType(TYPE_XYZ) and c:GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_XYZ))
-		or (tc:IsType(TYPE_LINK) and c:GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_LINK)))
+	local ty = tc:GetType()&(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
+	return ty~=0 and c:GetOverlayGroup():IsExists(Card.IsType,1,nil,ty)
 		and te:GetOwner()~=e:GetOwner()
 end
 

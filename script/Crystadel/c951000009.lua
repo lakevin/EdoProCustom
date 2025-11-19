@@ -7,58 +7,38 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	-- (1) Set Spell/Traps cannot be destroyed or targeted 
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetTargetRange(LOCATION_SZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsPosition,POS_FACEDOWN))
-	e2:SetValue(s.tgvalue)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	c:RegisterEffect(e3)
 	-- (2) Special summon 1 of your "Shimmerbane" monsters that was sent to GY
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCountLimit(1,{id,0})
-	e4:SetTarget(s.sstg)
-	e4:SetOperation(s.ssop)
-	c:RegisterEffect(e4)
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCountLimit(1,{id,0})
+	e2:SetTarget(s.sstg)
+	e2:SetOperation(s.ssop)
+	c:RegisterEffect(e2)
 	-- (3) Destroy 1 Spell/Trap the opponent controls
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,1))
-	e5:SetCategory(CATEGORY_DESTROY)
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e5:SetRange(LOCATION_SZONE)
-	e5:SetCountLimit(1,{id,1})
-	e5:SetCondition(s.thcon)
-	e5:SetTarget(s.thtg)
-	e5:SetOperation(s.thop)
-	c:RegisterEffect(e5)
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetCondition(s.thcon)
+	e3:SetTarget(s.thtg)
+	e3:SetOperation(s.thop)
+	c:RegisterEffect(e3)
 end
 s.listed_series={SET_REVENTANTS}
 
--- (1)
-function s.tgvalue(e,re,rp)
-	return rp==1-e:GetHandlerPlayer()
-end
-
--- (2)
+-- (1) Set 1 of your "Shimmerbane" monsters that was sent to GY
 function s.cfilter(c,e,tp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousSetCard(SET_SHIMMERBANE) and c:GetReasonPlayer()==1-tp
 		and c:IsPreviousControler(tp) and c:IsCanBeEffectTarget(e) and c:IsPreviousPosition(POS_FACEUP)
 end
-	--Activation legality
 function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return s.cfilter(chkc,e,tp) end
 	if chk==0 then return eg:IsExists(s.cfilter,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
@@ -73,7 +53,6 @@ function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(c)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,LOCATION_GRAVE)
 end
-	--Special summon 1 of your "Penguin" monsters that was sent to GY
 function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
@@ -82,7 +61,7 @@ function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
+-- (2)
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler()) and eg:IsExists(Card.IsSummonLocation,1,nil,LOCATION_STZONE)
 end
@@ -102,5 +81,13 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
+	end
+end
+
+-- (3)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not re or not re:GetHandler():IsSetCard(SET_SHIMMERBANE) then return end
+	for ec in eg:Iter() do
+		ec:RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1)
 	end
 end

@@ -50,9 +50,26 @@ function s.spitg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spiop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		--Cannot be used as material for a Fusion/Synchro/Xyz/Link Summon, unless it is for a "Revenants Bones" monster
+		local e1=Effect.CreateEffect(c)
+		e1:SetDescription(aux.Stringid(id,2))
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetCode(EFFECT_CANNOT_BE_MATERIAL)
+		e1:SetValue(s.matlimit)
+		e1:SetReset(RESETS_STANDARD_PHASE_END)
+		c:RegisterEffect(e1)
 	end
+end
+--Cannot be material    
+function s.matlimit(e,c,sumtype,tp)
+	if not c then return false end
+	local summon_types={SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK}
+	for _,val in pairs(summon_types) do
+		if val==sumtype then return not c:IsSetCard(SET_REVENTANTS) end
+	end
+	return false
 end
 
 -- (2)

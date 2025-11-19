@@ -27,7 +27,7 @@ s.listed_series={SET_REVENTANTS}
 
 -- (1)
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_REVENTANTS) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_REVENTANTS) and c:IsLevel(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
