@@ -1,6 +1,7 @@
 -- Revenant Bones - Tombstone of the Future
 local s,id=GetID()
 local SET_REVENTANTS=0x9616
+local CARD_TOMBSTONE_OF_PAST=951001005
 function s.initial_effect(c)
 	--pendulum summon
 	Pendulum.AddProcedure(c)
@@ -58,65 +59,55 @@ s.listed_series={SET_REVENTANTS}
 function s.filter(c,e,tp)
 	return c:IsRace(RACE_ZOMBIE) and c:IsCanBeEffectTarget(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
+function s.filter2(c,e,tp)
+	return c:IsRelateToEffect(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function s.xyzfilter(c,tp,mg)
-	return c:IsSetCard(SET_REVENTANTS) and Duel.GetLocationCountFromEx(tp,tp,mg,c)>0 and c:IsXyzSummonable(nil,mg,2,2)
+	return c:IsSetCard(SET_REVENTANTS)
+		and Duel.GetLocationCountFromEx(tp,tp,mg,c)>0
+		and c:IsXyzSummonable(nil,mg,#mg,#mg)
 end
-function s.mfilter1(c,mg,exg)
-	return mg:IsExists(s.mfilter2,1,c,c,exg)
-end
-function s.mfilter2(c,mc,exg)
-	return exg:IsExists(Card.IsXyzSummonable,1,nil,nil,Group.FromCards(c,mc))
+function s.xyz_rescon(sg,e,tp)
+	if #sg<2 or #sg>3 then return false end
+	return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,tp,sg)
 end
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local mg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
-	local exg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,tp,mg)
-	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2)
-		and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
-		and #exg>0 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sg1=mg:FilterSelect(tp,s.mfilter1,1,1,nil,mg,exg)
-	local tc1=sg1:GetFirst()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sg2=mg:FilterSelect(tp,s.mfilter2,1,1,tc1,tc1,exg)
-	sg1:Merge(sg2)
-	Duel.SetTargetCard(sg1)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg1,2,0,0)
-end
-function s.filter2(c,e,tp)
-	return c:IsRelateToEffect(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	local min=2
+	local max=math.min(3, Duel.GetLocationCount(tp,LOCATION_MZONE), #mg)
+	if chk==0 then
+		return max>=min
+			and Duel.IsPlayerCanSpecialSummonCount(tp,min)
+			and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
+			and aux.SelectUnselectGroup(mg,e,tp,min,max,s.xyz_rescon,0)
+	end
+	local sg=aux.SelectUnselectGroup(mg,e,tp,min,max,s.xyz_rescon,chk,tp,HINTMSG_SPSUMMON)
+	Duel.SetTargetCard(sg)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg,#sg,0,0)
 end
 function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(s.filter2,nil,e,tp)
-	if #g<2 then return end
-	local tc1=g:GetFirst()
-	local tc2=g:GetNext()
-	Duel.SpecialSummonStep(tc1,0,tp,tp,false,false,POS_FACEUP)
-	Duel.SpecialSummonStep(tc2,0,tp,tp,false,false,POS_FACEUP)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_DISABLE)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	tc1:RegisterEffect(e1)
-	local e2=e1:Clone()
-	tc2:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(e:GetHandler())
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_DISABLE_EFFECT)
-	e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-	tc1:RegisterEffect(e3)
-	local e4=e3:Clone()
-	tc2:RegisterEffect(e4)
+	local g=Duel.GetTargetCards(e):Filter(s.filter2,nil,e,tp)
+	for tc in aux.Next(g) do
+		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		tc:RegisterEffect(e2)
+	end
 	Duel.SpecialSummonComplete()
 	Duel.BreakEffect()
 	local xyzg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,tp,g)
 	if #xyzg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
-		Duel.XyzSummon(tp,xyz,nil,g)
+		Duel.XyzSummon(tp,xyz,g,nil,#g,#g)
 	end
 end
 
@@ -155,7 +146,7 @@ end
 
 -- (3)
 function s.penfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_REVENTANTS) and c:IsType(TYPE_PENDULUM) and not c:IsCode(id)
+	return c:IsFaceup() and c:IsCode(CARD_TOMBSTONE_OF_PAST)
 end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_ONFIELD,0,1,nil) 

@@ -85,7 +85,7 @@ function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.setfilter(c)
-	return c:IsSetCard(SET_REVENTANTS) and c:IsSpellTrap() and c:IsSSetable()
+	return c:IsSetCard(SET_REVENTANTS) and c:IsSpellTrap() and c:IsSSetable() and not c:IsCode(id)
 end
 function s.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.setfilter(chkc) end

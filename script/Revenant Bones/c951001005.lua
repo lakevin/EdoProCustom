@@ -1,6 +1,7 @@
 -- Revenant Bones - Tombstone of the Past
 local s,id=GetID()
 local SET_REVENTANTS=0x9616
+local CARD_TOMBSTONE_OF_FUTURE=951001004
 function s.initial_effect(c)
 	--pendulum summon
 	Pendulum.AddProcedure(c)
@@ -147,7 +148,7 @@ end
 
 -- (3)
 function s.penconfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_REVENTANTS) and c:IsType(TYPE_PENDULUM) and not c:IsCode(id)
+	return c:IsFaceup() and c:IsCode(CARD_TOMBSTONE_OF_FUTURE)
 end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.penconfilter,tp,LOCATION_ONFIELD,0,1,nil) 

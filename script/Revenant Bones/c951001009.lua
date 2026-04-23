@@ -38,6 +38,13 @@ function s.initial_effect(c)
 	e3:SetTarget(s.target)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
+	-- (4) Cannot attack unless detaching 1 material
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_ATTACK_COST)
+	e4:SetCost(s.atcost)
+	e4:SetOperation(s.atop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={SET_REVENTANTS}
 
@@ -84,7 +91,30 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (4)
-function s.negcon(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.atcost(e,c,tp)
+	return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
+end
+function s.atop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if Duel.IsAttackCostPaid()~=2 and c:IsLocation(LOCATION_MZONE) then
+		if Duel.IsAttackCostPaid()==0 then
+			-- Keep the same ATK for this battle after detaching 1 material
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_UPDATE_ATTACK)
+			e1:SetValue(1000)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE|RESET_PHASE|PHASE_DAMAGE_CAL)
+			c:RegisterEffect(e1)
+
+			c:RemoveOverlayCard(tp,1,1,REASON_COST)
+			Duel.AttackCostPaid()
+		else
+			Duel.AttackCostPaid(2)
+		end
+	end
+end
+
+--[[ function s.negcon(e,tp,eg,ep,ev,re,r,rp,chk)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
@@ -103,4 +133,4 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
-end
+end ]]
