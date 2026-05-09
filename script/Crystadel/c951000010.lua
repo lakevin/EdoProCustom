@@ -5,11 +5,9 @@ local SET_SHIMMERBANE=0x9617
 function s.initial_effect(c)
 	-- (1) Activate
 	local e0=Effect.CreateEffect(c)
-	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	e0:SetCountLimit(1,{id,0})
-	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
 	-- (2) Activate the turn it is set
@@ -22,7 +20,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	-- (3) Special Summon this card as an Effect Monster
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,2))
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -34,19 +32,17 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-s.listed_series={SET_REVENTANTS}
+s.listed_series={SET_CRYSTADEL}
 
 -- (1)
 function s.setfilter(c)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsMonster()
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsMonster() and c:IsSSetable()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.setfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
-	if #g==0 then return end
-	local sc=aux.SelectUnselectGroup(g,e,tp,1,1,aux.dncheck,1,tp,HINTMSG_SET):GetFirst()
+	if #g==0 or not Duel.SelectYesNo(tp,aux.Stringid(id,0)) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local sc=g:Select(tp,1,1,nil):GetFirst()
 	if sc and Duel.SSet(tp,sc) then
 		-- Treat as Continuous Trap
 		local e1=Effect.CreateEffect(e:GetHandler())
@@ -89,5 +85,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:AddMonsterAttribute(TYPE_EFFECT|TYPE_TRAP)
 		Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP)
 		c:AddMonsterAttributeComplete()
+		Duel.SpecialSummonComplete()
 	end
 end

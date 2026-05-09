@@ -38,7 +38,7 @@ s.listed_series={SET_REVENTANTS}
 
 -- (1)
 function s.spifilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_REVENTANTS)
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_ZOMBIE)
 end
 function s.spicon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.spifilter,tp,LOCATION_MZONE,0,1,nil)

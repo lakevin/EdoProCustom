@@ -1,5 +1,6 @@
 -- Revenant Bones - Tombstone of the Present
 local s,id=GetID()
+local SET_CRYSTADEL=0x9614
 local SET_REVENTANTS=0x9616
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
@@ -44,7 +45,7 @@ s.listed_series={SET_REVENTANTS}
 
 -- PENDULUM
 function s.cfilter(c)
-	return c:IsSetCard(SET_REVENTANTS)
+	return c:IsSetCard(SET_REVENTANTS) or c:IsSetCard(SET_CRYSTADEL)
 end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_PZONE,0,1,e:GetHandler())
@@ -111,8 +112,18 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_PZONE,0,1,1,nil,e,tp)
-	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
+	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_PZONE,0,1,1,nil,e,tp):GetFirst()
+	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
 		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+		--Increase this card's Pendulum Scale by the sent monster's
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_LSCALE)
+		e1:SetValue(tc:GetLeftScale())
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE)
+		c:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_UPDATE_RSCALE)
+		c:RegisterEffect(e2)
 	end
 end

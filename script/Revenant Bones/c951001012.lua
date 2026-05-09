@@ -50,7 +50,7 @@ end
 
 -- (2)
 function s.xyzfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsRace(RACE_ZOMBIE) and c:GetOverlayCount()==0
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsRace(RACE_ZOMBIE)
 end
 function s.matfilter(c)
 	return c:IsMonster() and c:IsRace(RACE_ZOMBIE) and not c:IsForbidden()
@@ -58,7 +58,7 @@ end
 function s.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.xyzfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.xyzfilter,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingMatchingCard(s.matfilter,tp,LOCATION_REMOVED,0,2,nil) end
+		and Duel.IsExistingMatchingCard(s.matfilter,tp,LOCATION_REMOVED,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,s.xyzfilter,tp,LOCATION_MZONE,0,1,1,nil)
 end
@@ -67,8 +67,8 @@ function s.activate1(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsImmuneToEffect(e) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 		local g=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_REMOVED,0,nil)
-		if #g>=2 then
-			local og=g:Select(tp,2,2,nil)
+		if #g>=1 then
+			local og=g:Select(tp,1,1,nil)
 			Duel.Overlay(tc,og)
 		end
 	end

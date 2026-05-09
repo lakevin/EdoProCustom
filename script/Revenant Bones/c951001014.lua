@@ -5,7 +5,7 @@ function s.initial_effect(c)
 	-- (1) Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -40,38 +40,37 @@ end
 s.listed_series={SET_REVENTANTS}
 
 -- (1)
+function s.filter(c)
+	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and c:IsType(TYPE_XYZ) and c:GetOverlayCount()>0
+end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+	return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local ratk=Duel.GetOverlayCount(tp,1,0)*-300
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
-	local ct=Duel.GetMatchingGroupCount(Card.IsRace,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,RACE_ZOMBIE)
-	-- Debug.Message("Count: " .. ct)
 	if #g>0 then
-		g:ForEach(s.op,e:GetHandler(),-100*ct)
+		g:ForEach(s.atkop,e:GetHandler(),ratk)
 	end
-	local dg = g:Filter(s.filter,nil)
+	local dg = g:Filter(s.desfilter,nil)
 	if #dg>0 then
 		Duel.BreakEffect()
 		Duel.Destroy(dg,REASON_EFFECT)
 	end
 end
-function s.filter(c)
-	return c:GetBaseAttack()~=0 and c:GetAttack()==0
-end
-function s.op(tc,c,atk)
+function s.atkop(tc,c,atk)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(atk)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 	tc:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_UPDATE_DEFENSE)
-	tc:RegisterEffect(e2)
+end
+function s.desfilter(c)
+	return c:GetBaseAttack()~=0 and c:GetAttack()==0
 end
 
 -- (2)

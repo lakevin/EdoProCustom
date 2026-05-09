@@ -35,16 +35,10 @@ function s.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
+	e3:SetCost(s.cost)
 	e3:SetTarget(s.target)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
-	-- (4) Cannot attack unless detaching 1 material
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_ATTACK_COST)
-	e4:SetCost(s.atcost)
-	e4:SetOperation(s.atop)
-	c:RegisterEffect(e4)
 end
 s.listed_series={SET_REVENTANTS}
 
@@ -71,6 +65,15 @@ function s.efilter(e,te)
 end
 
 -- (3)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetAttackAnnouncedCount()==0 end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e1:SetReset(RESETS_STANDARD_PHASE_END)
+	e1:SetProperty(EFFECT_FLAG_OATH)
+	e:GetHandler():RegisterEffect(e1)
+end
 function s.atfilter(c)
 	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsAbleToChangeControler()
 		and not c:IsType(TYPE_TOKEN) 
@@ -89,48 +92,3 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(c,tc,true)
 	end
 end
-
--- (4)
-function s.atcost(e,c,tp)
-	return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
-end
-function s.atop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if Duel.IsAttackCostPaid()~=2 and c:IsLocation(LOCATION_MZONE) then
-		if Duel.IsAttackCostPaid()==0 then
-			-- Keep the same ATK for this battle after detaching 1 material
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_UPDATE_ATTACK)
-			e1:SetValue(1000)
-			e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE|RESET_PHASE|PHASE_DAMAGE_CAL)
-			c:RegisterEffect(e1)
-
-			c:RemoveOverlayCard(tp,1,1,REASON_COST)
-			Duel.AttackCostPaid()
-		else
-			Duel.AttackCostPaid(2)
-		end
-	end
-end
-
---[[ function s.negcon(e,tp,eg,ep,ev,re,r,rp,chk)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
-		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
-end
-function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-end
-function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
-	end
-end
-function s.negop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
-		Duel.Destroy(eg,REASON_EFFECT)
-	end
-end ]]

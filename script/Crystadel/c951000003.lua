@@ -1,157 +1,135 @@
--- Sola, Wizard of Crystadel
+-- Vitreas, medium of Crystadel
 local s,id=GetID()
+local SET_REVENTANTS=0x9616
 function s.initial_effect(c)
-	c:EnableReviveLimit()
-	-- (1) special summon
+	--pendulum summon
+	Pendulum.AddProcedure(c)
+	-- (1) Send 1 face-up Zombie Pendulum Monster from your Extra Deck to your GY
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_SPSUM_PARAM+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetTargetRange(POS_FACEUP,0)
-	e1:SetRange(LOCATION_HAND)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_TOGRAVE)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_PZONE)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.spcon)
-	e1:SetTarget(s.sptg)
-	e1:SetOperation(s.spop)
+	e1:SetTarget(s.tgtg)
+	e1:SetOperation(s.tgop)
 	c:RegisterEffect(e1)
+	-- (2) Special Summon this card from your hand to either field
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_HAND)
+	e2:SetCountLimit(1,{id,1})
+	e2:SetCost(s.spcost)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
+	c:RegisterEffect(e2)
+	-- (3) This card's owner adds 1 "Revenant Bones" Spell/Trap from their Deck to their hand
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,6))
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e3:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_F)
+	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	e3:SetCountLimit(1,{id,2})
+	e3:SetTarget(s.thtg)
+	e3:SetOperation(s.thop)
+	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e4)
 end
 
 -- (1)
-function s.spfilter(c)
-	--Debug.Message(c:GetCode())
-	--Debug.Message("IsReleasable")
-	--Debug.Message(c:IsReleasable())
-	--Debug.Message("GetOriginalType")
-	--Debug.Message(c:GetOriginalType()&TYPE_MONSTER)
-	return c:IsFaceup() and c:IsReleasable() and c:GetSequence()<5
-		and c:GetOriginalType()&TYPE_MONSTER==TYPE_MONSTER
+function s.tgfilter(c)
+	return c:IsRace(RACE_ZOMBIE) and c:IsType(TYPE_PENDULUM) and c:IsFaceup() 
+		and c:IsAbleToGrave()
 end
-function s.spcon(e,c)
-	if c==nil then return true end
-	local tp=e:GetHandlerPlayer()
-	local rg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_SZONE+LOCATION_PZONE,LOCATION_SZONE+LOCATION_PZONE,nil)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #rg>0 and aux.SelectUnselectGroup(rg,e,tp,1,1,nil,0)
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_EXTRA,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_EXTRA)
 end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
+function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=nil
-	local rg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_SZONE+LOCATION_PZONE,LOCATION_SZONE+LOCATION_PZONE,nil)
-	local g=aux.SelectUnselectGroup(rg,e,tp,1,1,nil,1,tp,HINTMSG_RELEASE,nil,nil,true)
-	if #g>0 then
-		g:KeepAlive()
-		e:SetLabelObject(g)
-		return true
-	end
-	return false
-end
-function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=e:GetLabelObject()
-	if not g then return end
-	local tc=g:GetFirst()
-	if tc:GetOriginalType()&TYPE_MONSTER~=TYPE_MONSTER then return end
-	Duel.SendtoGrave(g,REASON_RELEASE)
-	g:DeleteGroup()
-	-- Select Option
-	if tc:IsType(TYPE_PENDULUM) then
-		-- (1) Place 1 Pendulum Monster from your Deck/face-up Extra Deck in PZone
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local tc=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_EXTRA,0,1,1,nil):GetFirst()
+	if tc and Duel.SendtoGrave(tc,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_GRAVE) and tc:GetLeftScale()>0
+		and c:IsRelateToEffect(e) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		Duel.BreakEffect()
+		--Increase this card's Pendulum Scale by the sent monster's
 		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(id,0))
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-		e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e1:SetLabelObject(tc)
-		e1:SetCountLimit(1,{id,1})
-		e1:SetValue(s.zones)
-		e1:SetTarget(s.pentg)
-		e1:SetOperation(s.penop)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_LSCALE)
+		e1:SetValue(tc:GetLeftScale())
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE)
 		c:RegisterEffect(e1)
-	else
-		-- (2) Place as Continuous Spell/Trap
-		local e2=Effect.CreateEffect(c)
-		e2:SetDescription(aux.Stringid(id,1))
-		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-		e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e2:SetLabelObject(tc)
-		e2:SetCountLimit(1,{id,1})
-		e2:SetTarget(s.settg)
-		e2:SetOperation(s.setop)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_UPDATE_RSCALE)
 		c:RegisterEffect(e2)
 	end
 end
 
--- (2-1)
-function s.zones(e,tp,eg,ep,ev,re,r,rp)
-	local zone=0xff
-	if Duel.IsDuelType(DUEL_SEPARATE_PZONE) then return zone end
-	local p0=Duel.CheckLocation(tp,LOCATION_PZONE,0)
-	local p1=Duel.CheckLocation(tp,LOCATION_PZONE,1)
-	if p0==p1 then return zone end
-	if p0 then zone=zone-0x1 end
-	if p1 then zone=zone-0x10 end
-	return zone
+-- (2)
+function s.spcostfilter(c)
+	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_ZOMBIE) and c:IsLevelBelow(4)
+		and not c:IsPublic()
 end
-function s.penfilter(c,code,att,race)
-	return c:IsType(TYPE_PENDULUM) and (c:IsFaceup() or c:IsLocation(LOCATION_DECK)) and c:IsAttribute(att) and c:IsRace(race)
-		and not (c:IsForbidden() or c:IsCode(code))
+function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spcostfilter,tp,LOCATION_HAND,0,1,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+	local rc=Duel.SelectMatchingCard(tp,s.spcostfilter,tp,LOCATION_HAND,0,1,1,c):GetFirst()
+	e:SetLabelObject(rc) -- important
+	Duel.ConfirmCards(1-tp,rc)
+	Duel.ShuffleHand(tp)
 end
-function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	local tc=e:GetLabelObject()
-	if chk==0 then return Duel.CheckPendulumZones(tp)
-		and Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,nil,tc:GetCode(),tc:GetAttribute(),tc:GetRace()) end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	local b2=Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
+	if chk==0 then return b1 or b2 end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
-function s.penop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if not Duel.CheckPendulumZones(tp) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.penfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,1,nil,tc:GetCode(),tc:GetAttribute(),tc:GetRace()):GetFirst()
-	if tc then
-		Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local rc=e:GetLabelObject()
+	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	local b2=Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
+	local op=Duel.SelectEffect(tp,
+		{b1,aux.Stringid(id,3)},
+		{b2,aux.Stringid(id,4)}
+	)
+	if not op then return end
+	local target_player=op==1 and tp or 1-tp
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.SpecialSummon(c,0,tp,target_player,false,false,POS_FACEUP)>0 then
+		if target_player==1-tp and rc and rc:IsLocation(LOCATION_HAND) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+			and rc:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.SelectYesNo(tp,aux.Stringid(id,5)) then
+			Duel.BreakEffect()
+			Duel.SpecialSummon(rc,0,tp,tp,false,false,POS_FACEUP)
+		end
 	end
 end
 
--- (2-2)
-function s.setfilter(c)
-	return c:IsMonster() and c:IsSummonableCard() and not (c:IsType(TYPE_PENDULUM) or c:IsForbidden())
+-- (3)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,e:GetHandler():GetOwner(),LOCATION_DECK)
 end
-function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil)
-		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+function s.thfilter(c)
+	return c:IsSetCard(SET_REVENTANTS) and c:IsSpellTrap() and c:IsAbleToHand()
 end
-function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	local op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
-	if tc and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
-		if op==0 then
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetCode(EFFECT_CHANGE_TYPE)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-			e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
-			tc:RegisterEffect(e1)
-		else
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetCode(EFFECT_CHANGE_TYPE)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-			e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
-			tc:RegisterEffect(e1)
-		end
-		--Cannot Special Summon that monster this turn
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetDescription(aux.Stringid(id,3))
-		e2:SetType(EFFECT_TYPE_FIELD)
-		e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-		e2:SetTargetRange(1,0)
-		e2:SetTarget(aux.TargetBoolFunction(Card.IsCode,tc:GetCode()))
-		e2:SetReset(RESET_PHASE+PHASE_END)
-		Duel.RegisterEffect(e2,tp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	local p=e:GetHandler():GetOwner()
+	Duel.Hint(HINT_SELECTMSG,p,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(p,s.thfilter,p,LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoHand(g,p,REASON_EFFECT)
+		Duel.ConfirmCards(1-p,g)
 	end
 end
