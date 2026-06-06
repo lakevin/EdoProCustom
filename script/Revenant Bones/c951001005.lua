@@ -132,7 +132,8 @@ end
 
 -- (2)
 function s.tgfilter(c)
-	return c:IsSetCard(SET_REVENTANTS) and not c:IsCode(id) and c:IsAbleToGrave()
+	return c:IsSetCard(SET_REVENTANTS) and c:IsMonster() and not c:IsCode(id) 
+		and c:IsAbleToGrave()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil) end

@@ -3,14 +3,14 @@ local s,id=GetID()
 local SET_MAJESTAL=0x9615
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	Reflexxion.AddMajestalRuling(c)
+	Reflexxion.AddManifestProcedure(c)
 	-- (SPELL) cannot be target/indestructable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetTargetRange(LOCATION_ONFIELD,0)
+	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetCondition(function(e) return e:GetHandler():IsContinuousSpell() end)
 	e1:SetTarget(s.tgtg)
 	e1:SetValue(aux.tgoval)
@@ -30,6 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	-- (2) Special Summon itself from hand
 	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetCode(EFFECT_SPSUMMON_PROC)
 	e4:SetProperty(EFFECT_FLAG_UNCOPYABLE)
@@ -40,18 +41,20 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
     -- (3) Add to hand
 	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,0))
-	e5:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e5:SetDescription(aux.Stringid(id,1))
+	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
+	--e5:SetCode(EVENT_BE_MATERIAL)
 	e5:SetCode(EVENT_TO_GRAVE)
 	e5:SetCountLimit(1,{id,1})
-	e5:SetCondition(s.thcon)
+	e5:SetCondition(function(e) return e:GetHandler():IsReason(REASON_EFFECT) end)
 	e5:SetTarget(s.thtg)
 	e5:SetOperation(s.thop)
 	c:RegisterEffect(e5)
 end
 s.listed_series={SET_MAJESTAL}
+s.is_manifest_monster=true
 
 -- (SPELL)
 function s.tgtg(e,c)
@@ -60,12 +63,17 @@ end
 
 -- (1)
 function s.untg(e,c)
-	return c:IsSetCard(SET_MAJESTAL) and c~=e:GetHandler()
+	local hc=e:GetHandler()
+	return c:IsSetCard(SET_MAJESTAL)
+		and c~=hc
+		and c:IsControler(hc:GetControler())
+		and c:IsLocation(LOCATION_MZONE)
+		and c:IsSequence(hc:GetSequence()-1,hc:GetSequence()+1)
 end
 
 -- (2)
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsContinuousSpell()
+	return c:IsFaceup() and c:IsSpellTrap()
 end
 function s.hspval(e,c)
 	local tp=c:GetControler()
@@ -78,9 +86,9 @@ function s.hspval(e,c)
 end
 
 -- (3)
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
-end
+--[[function s.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and (r&REASON_FUSION)==REASON_FUSION
+end]]
 function s.thfilter(c)
 	return c:IsAbleToHand() and c:IsSetCard(SET_MAJESTAL) and c:IsSpellTrap()
 end

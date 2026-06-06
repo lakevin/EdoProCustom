@@ -3,7 +3,7 @@ local s,id=GetID()
 local SET_MAJESTAL=0x9615
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	Reflexxion.AddMajestalRuling(c)
+	Reflexxion.AddManifestProcedure(c)
 	-- (SPELL) Special Summon from S/T Zone
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -27,14 +27,26 @@ function s.initial_effect(c)
 	e2:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e2:SetValue(s.hspval)
 	c:RegisterEffect(e2)
-    -- (2) send replace
+    -- (2) -- Register the fact it was sent from MZONE to GY this turn
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_TO_GRAVE_REDIRECT_CB)
-	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCondition(s.repcon)
-	e3:SetOperation(s.repop)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetCode(EVENT_TO_GRAVE)
+	e3:SetCondition(s.regcon)
+	e3:SetOperation(s.regop)
 	c:RegisterEffect(e3)
+	-- Place itself in S/T Zone during the End Phase
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,2))
+	e4:SetCategory(CATEGORY_LEAVE_GRAVE)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetRange(LOCATION_GRAVE)
+	e4:SetCode(EVENT_PHASE+PHASE_END)
+	e4:SetCountLimit(1,{id,2})
+	e4:SetCondition(s.plcon)
+	e4:SetTarget(s.pltg)
+	e4:SetOperation(s.plop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={SET_MAJESTAL}
 
@@ -50,7 +62,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local g=eg:Filter(s.spfilter,nil,tp)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) and #g>0 end
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) and #g>0 end
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g+c,#g+1,tp,LOCATION_SZONE)
 end
@@ -61,7 +73,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local g=Duel.GetTargetCards(e):Filter(s.filter,nil,e,tp)
-	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 then
+	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 then
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 		if #g>ft then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -76,7 +88,7 @@ end
 
 -- (2)
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsContinuousSpell()
+	return c:IsFaceup() and c:IsSpellTrap()
 end
 function s.hspval(e,c)
 	local tp=c:GetControler()
@@ -89,17 +101,31 @@ function s.hspval(e,c)
 end
 
 -- (3)
-function s.repcon(e)
-	local c=e:GetHandler()
-	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE)
+function s.regcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
 end
-function s.repop(e,tp,eg,ep,ev,re,r,rp)
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1)
+end
+function s.plcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffect(id)>0
+end
+function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetCode(EFFECT_CHANGE_TYPE)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
-	c:RegisterEffect(e1)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+end
+function s.plop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
+		-- Treat as Continuous Spell
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_CHANGE_TYPE)
+		e1:SetValue(TYPE_SPELL|TYPE_CONTINUOUS)
+		e1:SetReset((RESET_EVENT|RESETS_STANDARD)&~RESET_TURN_SET)
+		c:RegisterEffect(e1)
+	end
 end

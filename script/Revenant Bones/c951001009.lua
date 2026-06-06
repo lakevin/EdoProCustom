@@ -22,6 +22,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	-- (2) Immune to monsters
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
@@ -30,14 +31,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- (3) Attach 1 face-up monster card to this card
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
-	e3:SetCost(s.cost)
-	e3:SetTarget(s.target)
-	e3:SetOperation(s.operation)
+	e3:SetCost(s.atcost)
+	e3:SetTarget(s.attg)
+	e3:SetOperation(s.atop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_REVENTANTS}
@@ -59,36 +60,59 @@ end
 function s.efilter(e,te)
 	local c=e:GetHandler()
 	local tc=te:GetHandler()
-	local ty = tc:GetType()&(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
+	if not te:IsActiveType(TYPE_EFFECT) then return false end
+	if not tc or tc==c or not tc:IsMonster() then return false end
+	local ty=tc:GetType()&(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
 	return ty~=0 and c:GetOverlayGroup():IsExists(Card.IsType,1,nil,ty)
-		and te:GetOwner()~=e:GetOwner()
 end
 
 -- (3)
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetAttackAnnouncedCount()==0 end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-	e1:SetReset(RESETS_STANDARD_PHASE_END)
-	e1:SetProperty(EFFECT_FLAG_OATH)
-	e:GetHandler():RegisterEffect(e1)
+function s.xyzmatfilter(c)
+	return c:IsType(TYPE_XYZ)
+end
+
+function s.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local og=c:GetOverlayGroup()
+	local b1=c:CheckRemoveOverlayCard(tp,2,REASON_COST)
+	local b2=og:IsExists(s.xyzmatfilter,1,nil)
+	if chk==0 then return b1 or b2 end
+
+	local op=0
+	if b1 and b2 then
+		op=Duel.SelectEffect(tp,
+			{true,aux.Stringid(id,2)}, -- detach 2
+			{true,aux.Stringid(id,3)}  -- detach 1 Xyz
+		)
+	elseif b1 then
+		op=1
+	else
+		op=2
+	end
+	if op==1 then
+		c:RemoveOverlayCard(tp,2,2,REASON_COST)
+	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+		local g=og:FilterSelect(tp,s.xyzmatfilter,1,1,nil)
+		Duel.SendtoGrave(g,REASON_COST)
+	end
 end
 function s.atfilter(c)
 	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsAbleToChangeControler()
 		and not c:IsType(TYPE_TOKEN) 
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.attg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsOnField() and s.atfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.atfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,s.atfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,c)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		Duel.Overlay(c,tc,true)
 	end
 end
+

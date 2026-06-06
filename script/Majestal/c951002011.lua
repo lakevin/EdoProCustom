@@ -77,7 +77,7 @@ end
 
 -- (1)
 function s.thfilter(c)
-	return c:IsAbleToHand() and (c:IsSetCard(SET_MAJESTAL) or (c:IsSetCard(SET_CHRYSTALIA) and c:IsSpellTrap()))
+	return c:IsSetCard(SET_MAJESTAL) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

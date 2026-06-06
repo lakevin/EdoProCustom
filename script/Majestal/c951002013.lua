@@ -4,7 +4,7 @@ local SET_MAJESTAL=0x9615
 function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	Fusion.AddProcMix(c,true,true,s.matfilter1,s.matfilter2)
+	Fusion.AddProcMix(c,true,true,s.matfilter1,aux.FilterBoolFunctionEx(Card.IsType,TYPE_EFFECT))
 	-- (SPELL) Cannot be destroyed by card effects
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -41,9 +41,6 @@ s.listed_series={SET_MAJESTAL}
 --fusion material
 function s.matfilter1(c,fc,sumtype,tp)
 	return c:IsSetCard(SET_MAJESTAL,fc,sumtype,tp) and c:IsType(TYPE_FUSION,fc,sumtype,tp)
-end
-function s.matfilter2(c,lc,sumtype,tp)
-	return c:IsSetCard(SET_MAJESTAL,lc,sumtype,tp)
 end
 
 -- (SPELL)

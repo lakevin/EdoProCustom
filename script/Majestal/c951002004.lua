@@ -3,7 +3,7 @@ local s,id=GetID()
 local SET_MAJESTAL=0x9615
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	Reflexxion.AddMajestalRuling(c)
+	Reflexxion.AddManifestProcedure(c)
 	-- (SPELL) Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -36,7 +36,7 @@ function s.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_QUICK_O)
 	e5:SetCode(EVENT_FREE_CHAIN)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetHintTiming(0,TIMING_MAIN_END)
+	e5:SetHintTiming(0,TIMING_MAIN_END|TIMINGS_CHECK_MONSTER)
 	e5:SetCountLimit(1,{id,2})
 	e5:SetCondition(function() return Duel.IsMainPhase() end)
 	e5:SetTarget(Fusion.SummonEffTG(table.unpack(params2)))
@@ -110,7 +110,7 @@ end
 
 -- (3)
 function s.fusfilter(c)
-	return c:IsSetCard(SET_MAJESTAL) and c:IsOriginalType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER)
 end
 function s.fextra(e,tp,mg)
 	return Duel.GetMatchingGroup(s.fusfilter,tp,LOCATION_SZONE,0,nil)

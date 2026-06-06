@@ -3,7 +3,7 @@ local s,id=GetID()
 local SET_MAJESTAL=0x9615
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	Reflexxion.AddMajestalRuling(c)
+	Reflexxion.AddManifestProcedure(c)
 	-- (SPELL) Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -26,16 +26,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	-- (1) Special summon itself from hand
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_SPSUMMON_PROC)
+	e4:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e4:SetRange(LOCATION_HAND)
-	e4:SetCode(EVENT_DESTROYED)
-	e4:SetCountLimit(1,{id,0})
-	e4:SetCondition(s.condition)
-	e4:SetTarget(s.target)
-	e4:SetOperation(s.operation)
+	e4:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e4:SetValue(s.hspval)
 	c:RegisterEffect(e4)
 	-- (2) Return both to hand
 	local e5=Effect.CreateEffect(c)
@@ -47,8 +43,8 @@ function s.initial_effect(c)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e5:SetCountLimit(1,{id,1})
-	e5:SetTarget(s.thtg)
-	e5:SetOperation(s.thop)
+	e5:SetTarget(s.rhtg)
+	e5:SetOperation(s.rhop)
 	c:RegisterEffect(e5)
     -- (3) Add to hand / Special Summon
 	local e6=Effect.CreateEffect(c)
@@ -57,9 +53,9 @@ function s.initial_effect(c)
 	e6:SetProperty(EFFECT_FLAG_DELAY)
 	e6:SetCode(EVENT_TO_GRAVE)
 	e6:SetCountLimit(1,{id,2})
-	e6:SetCondition(s.thspcon)
-	e6:SetTarget(s.thsptg)
-	e6:SetOperation(s.thspop)
+	e6:SetCondition(function(e) return e:GetHandler():IsReason(REASON_EFFECT) end)
+	e6:SetTarget(s.thtg)
+	e6:SetOperation(s.thop)
 	c:RegisterEffect(e6)
 end
 s.listed_series={SET_MAJESTAL}
@@ -77,26 +73,21 @@ function s.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 end
 
 -- (1)
-function s.filter(c,tp)
-	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:IsSetCard(SET_MAJESTAL) and c:IsPreviousControler(tp)
-		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
+function s.cfilter(c)
+	return c:IsFaceup() and c:IsSpellTrap()
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.filter,1,nil,tp)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+function s.hspval(e,c)
+	local tp=c:GetControler()
+	local zone=0
+	local lg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)
+	for tc in aux.Next(lg) do
+		zone=(zone|tc:GetColumnZone(LOCATION_MZONE,0,0,tp))
+	end
+	return 0,zone
 end
 
 -- (2)
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.rhtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() and chkc:IsAbleToHand() end
 	if chk==0 then return c:IsAbleToHand() and Duel.IsExistingTarget(aux.FaceupFilter(Card.IsAbleToHand),tp,0,LOCATION_MZONE,1,nil) end
@@ -105,7 +96,7 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	g:AddCard(c)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,2,0,0)
 end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.rhop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
@@ -115,35 +106,21 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (3)
-function s.thspfilter(c,e,tp,mmz_check)
-	return c:IsLevelBelow(4) and c:IsSetCard(SET_MAJESTAL)
-		and (c:IsAbleToHand() or (mmz_check and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
+function s.thfilter(c)
+	return c:IsLevelBelow(4) and c:IsSetCard(SET_MAJESTAL) and c:IsAbleToHand()
 end
-function s.thspcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
-end
-function s.thsptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local cost_chk=e:GetLabel()==1 or Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		e:SetLabel(0)
-		return Duel.IsExistingMatchingCard(s.thspfilter,tp,LOCATION_DECK,0,1,nil,e,tp,cost_chk)
+		return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
 	end
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function s.thspop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local mmz_check=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
-	local sc=Duel.SelectMatchingCard(tp,s.thspfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,mmz_check):GetFirst()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local sc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
 	if sc then
-		aux.ToHandOrElse(sc,tp,
-			function(c)
-				return mmz_check and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-			end,
-			function(c)
-				Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
-			end,
-			aux.Stringid(id,3)
-		)
+		Duel.SendtoHand(sc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sc)
 	end
 end

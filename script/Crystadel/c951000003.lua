@@ -1,6 +1,8 @@
--- Vitreas, medium of Crystadel
+-- Vitreas, the Medium of Crystadel
 local s,id=GetID()
+local SET_CRYSTADEL=0x9614
 local SET_REVENTANTS=0x9616
+local CARD_VITREAS_CRYSTADEL=951000003
 function s.initial_effect(c)
 	--pendulum summon
 	Pendulum.AddProcedure(c)
@@ -39,6 +41,8 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
 end
+s.listed_series={SET_CRYSTADEL,SET_REVENTANTS}
+s.listed_names={CARD_VITREAS_CRYSTADEL}
 
 -- (1)
 function s.tgfilter(c)
@@ -122,7 +126,9 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,e:GetHandler():GetOwner(),LOCATION_DECK)
 end
 function s.thfilter(c)
-	return c:IsSetCard(SET_REVENTANTS) and c:IsSpellTrap() and c:IsAbleToHand()
+	return ((c:IsSetCard(SET_CRYSTADEL) and c:IsSpell() and c:ListsCode(CARD_VITREAS_CRYSTADEL)) 
+		or (c:IsSetCard(SET_REVENTANTS) and c:IsSpellTrap()))
+		and c:IsAbleToHand()
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local p=e:GetHandler():GetOwner()
