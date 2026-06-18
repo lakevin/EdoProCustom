@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.distg)
 	e1:SetOperation(s.disop)
 	c:RegisterEffect(e1)
-	--A WIND Synchro Monster summoned using this card cannot be destroyed by your opponent's card effects
+	-- (1) A WIND Synchro Monster summoned using this card cannot be destroyed by your opponent's card effects
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetCondition(s.efcon)
 	e2:SetOperation(s.efop)
 	c:RegisterEffect(e2)
-	--activatable if set by a Shimmerbane card
+	-- Can be activated this turn, if set by a Shimmerbane card
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetType(EFFECT_TYPE_SINGLE)

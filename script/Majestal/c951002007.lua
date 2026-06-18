@@ -28,7 +28,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if e:GetHandler():IsLocation(LOCATION_HAND) then ft=ft-1 end
 	local b1=not Duel.HasFlagEffect(tp,id) and ft>0
-		and Duel.IsExistingMatchingCard(s.plfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil)
+		and Duel.IsExistingMatchingCard(s.plfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,0,1,nil)
 	local b2=not Duel.HasFlagEffect(tp,id+100) and ct>0
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_SZONE,0,1,nil,e,tp)
 	if chk==0 then return b1 or b2 end
@@ -38,7 +38,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(op)
 	if op==1 then
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE|PHASE_END,0,1)
-		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,LOCATION_ONFIELD|LOCATION_GRAVE)
 	elseif op==2 then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE|PHASE_END,0,1)
@@ -52,7 +52,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		--Place to your Spell & Trap Zone as a Continuous Spell
 		if ft<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-		local sc=Duel.SelectMatchingCard(tp,s.plfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil):GetFirst()
+		local sc=Duel.SelectMatchingCard(tp,s.plfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,0,1,1,nil):GetFirst()
 		if sc and Duel.MoveToField(sc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 			sc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,0,1)
 			local c=e:GetHandler()

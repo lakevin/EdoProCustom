@@ -3,71 +3,72 @@ local s,id=GetID()
 local SET_SHIMMERBANE=0x9617
 Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
-	-- (1.1) Change effect target
+	-- (1) Special Summon itself, Set 1 face-up "Shimmerbane" monster, protect Set cards
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_CHAINING)
-	e1:SetLabel(0)
-	e1:SetCondition(s.condition1)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate1)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- (1.2) Change battle target
+	-- (2) Banish from GY; reveal/force activation
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetType(EFFECT_TYPE_ACTIVATE)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e2:SetLabel(1)
-	e2:SetCondition(s.condition2)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.activate2)
+	e2:SetCost(aux.bfgcost)
+	e2:SetTarget(s.acttg)
+	e2:SetOperation(s.actop)
 	c:RegisterEffect(e2)
-	--Special Summon
+	-- Can be activated this turn, if set by a Shimmerbane card
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCondition(s.actcon)
-	e3:SetTarget(s.acttg)
-	e3:SetOperation(s.actop)
+	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e3:SetCondition(function(e) return e:GetHandler():HasFlagEffect(id) end)
 	c:RegisterEffect(e3)
+	aux.GlobalCheck(s,function()
+		local ge=Effect.CreateEffect(c)
+		ge:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge:SetCode(EVENT_SSET)
+		ge:SetOperation(s.operation)
+		Duel.RegisterEffect(ge,0)
+	end)
 end
 s.listed_names={id}
 s.listed_series={SET_SHIMMERBANE}
 
--- (1.1)
-function s.condition1(e,tp,eg,ep,ev,re,r,rp)
-	if rp==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
-	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	if not g or #g~=1 then return false end
-	local tc=g:GetFirst()
-	e:SetLabelObject(tc)
-	return tc:IsControler(tp) and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() and tc:IsSetCard(SET_SHIMMERBANE)
+-- (1)
+function s.spfilter(c)
+	return c:IsFaceup() and c:IsSetCard(SET_SHIMMERBANE) and c:IsMonster()
+		and not c:IsForbidden()
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	local tc=e:GetLabelObject()
-	local label=e:GetLabel()
-	if chk==0 then return (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or tc:IsInMainMZone()) 
-		and (label==0 or (label==1 and not c:IsStatus(STATUS_CHAINING)))
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id,SET_SHIMMERBANE,0x21,1000,2000,4,RACE_FIEND,ATTRIBUTE_DARK) end
-	Duel.SetTargetCard(tc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.spfilter(chkc) end
+	if chk==0 then
+		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_MZONE,0,1,nil)
+			and Duel.IsPlayerCanSpecialSummonMonster(tp,id,SET_SHIMMERBANE,TYPE_EFFECT,1000,2000,4,RACE_FIEND,ATTRIBUTE_DARK)
+	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+	Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
-function s.activate1(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id,SET_SHIMMERBANE,0x21,1000,2000,4,RACE_FIEND,ATTRIBUTE_DARK) then return end
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	if not Duel.IsPlayerCanSpecialSummonMonster(tp,id,SET_SHIMMERBANE,TYPE_EFFECT,1000,2000,4,RACE_FIEND,ATTRIBUTE_DARK) then return end
 	c:AddMonsterAttribute(TYPE_EFFECT,ATTRIBUTE_DARK,RACE_FIEND,4,1000,2000)
 	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)>0 then
-		if Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEDOWN,true) then
-			--Treat it as a Continuous Spell
+		if tc and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e)
+			and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEDOWN,true) then
+			-- Treat as Continuous Trap
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -76,48 +77,29 @@ function s.activate1(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetReset(RESET_EVENT|(RESETS_STANDARD&~RESET_TURN_SET))
 			tc:RegisterEffect(e1)
 		end
-		if Duel.CheckChainTarget(ev,c) then
-			local g=Group.CreateGroup()
-			g:AddCard(c)
-			Duel.ChangeTargetCard(ev,g)
-		end
+		-- Set cards in your Spell & Trap Zone are unaffected by opponent's card effects this turn
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_FIELD)
+		e2:SetCode(EFFECT_IMMUNE_EFFECT)
+		e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+		e2:SetTargetRange(LOCATION_SZONE,0)
+		e2:SetTarget(s.immtg)
+		e2:SetValue(s.immval)
+		e2:SetReset(RESET_PHASE|PHASE_END)
+		e2:SetLabel(tp)
+		Duel.RegisterEffect(e2,tp)
 	end
 end
-
--- (1.2)
-function s.condition2(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsTurnPlayer(tp) then return false end
-	local tc=Duel.GetAttackTarget()
-	e:SetLabelObject(tc)
-	return tc and tc:IsFaceup() and tc:IsSetCard(SET_SHIMMERBANE)
+function s.immtg(e,c)
+	return c:GetSequence()<5 and c:IsFacedown()
 end
-function s.activate2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id,SET_SHIMMERBANE,0x21,1000,2000,4,RACE_FIEND,ATTRIBUTE_DARK) then return end
-	c:AddMonsterAttribute(TYPE_EFFECT,ATTRIBUTE_DARK,RACE_FIEND,4,1000,2000)
-	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)>0 then
-		if Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEDOWN,true) then
-			--Treat it as a Continuous Spell
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetCode(EFFECT_CHANGE_TYPE)
-			e1:SetValue(TYPE_TRAP|TYPE_CONTINUOUS)
-			e1:SetReset(RESET_EVENT|(RESETS_STANDARD&~RESET_TURN_SET))
-			tc:RegisterEffect(e1)
-		end
-		Duel.ChangeAttackTarget(c)
-	end
+function s.immval(e,te)
+	return te:GetOwnerPlayer()~=e:GetLabel()
 end
 
 -- (2)
 function s.actfilter(c)
-	return c:IsFacedown() and c:GetSequence()<5
-end
-function s.actcon(e)
-	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE) and e:GetHandler():IsPreviousPosition(POS_FACEUP)
+	return c:GetSequence()<5 and c:IsFacedown()
 end
 function s.acttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()

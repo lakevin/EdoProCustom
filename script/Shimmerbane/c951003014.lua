@@ -16,7 +16,6 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E|TIMING_MAIN_END)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
@@ -24,19 +23,19 @@ function s.initial_effect(c)
 	-- (2.1) Force activation
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1)
 	e3:SetTarget(s.forcetg)
 	e3:SetOperation(s.forceop)
 	c:RegisterEffect(e3)
-	-- (2.2) Can be treated as a Non-Tuner
+	-- (2.2) Can be treated as a Level 2 or 4 monster for the Synchro Summon
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetCode(EFFECT_SYNCHRO_MATERIAL_CUSTOM)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCode(EFFECT_NONTUNER)
-	e4:SetValue(s.ntval)
+	e4:SetOperation(s.synop)
 	c:RegisterEffect(e4)
 end
 s.listed_names={id}
@@ -49,19 +48,24 @@ end
 
 -- (2)
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id,0,TYPE_MONSTER|TYPE_EFFECT,1500,600,4,RACE_ILLUSION,ATTRIBUTE_DARK,POS_FACEUP,tp,1) end
-	local lv=Duel.AnnounceLevel(tp,2,4)
-	Duel.SetTargetParam(lv)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,tp,0)
+	if chk==0 then return Duel.IsPlayerCanSpecialSummonMonster(tp,id,0,0x21,0,0,1,RACE_FIEND,ATTRIBUTE_DARK)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local lv=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and s.sptg(e,tp,eg,ep,ev,re,r,rp,0) then
-		c:AddMonsterAttribute(TYPE_EFFECT+TYPE_TUNER+TYPE_TRAP,ATTRIBUTE_DARK,RACE_FIEND,lv)
-		Duel.SpecialSummonStep(c,1,tp,tp,true,false,POS_FACEUP)
-	end
+	if not c:IsRelateToEffect(e) or not (Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id,0,0x21,0,0,1,RACE_FIEND,ATTRIBUTE_DARK)) then return end
+	c:AddMonsterAttribute(TYPE_EFFECT+TYPE_TRAP)
+	Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP)
+	--Treat this card as a Tuner
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CAN_BE_TUNER)
+	e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+	c:RegisterEffect(e1)
 	c:AddMonsterAttributeComplete()
 	Duel.SpecialSummonComplete()
 end
@@ -86,6 +90,9 @@ function s.forceop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (2.2)
-function s.ntval(c,sc,tp)
-	return sc and sc:IsRace(RACE_FIEND)
+function s.synop(e,tg,ntg,sg,lv,sc,tp)
+	local c=e:GetHandler()
+	local sum=(sg-c):GetSum(Card.GetSynchroLevel,sc)
+	if sum+c:GetSynchroLevel(sc)==lv then return true,true end
+	return sc:IsSetCard(SET_SHIMMERBANE) and ((sum+2==lv) or (sum+4==lv)),true
 end

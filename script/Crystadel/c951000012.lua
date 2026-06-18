@@ -8,16 +8,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- Fusion Materials
 	Fusion.AddProcMix(c,true,true,CARD_SOLA_CRYSTADEL,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON))
-	-- Special Summon by sending materials from MZONE/SZONE
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD)
-	e0:SetCode(EFFECT_SPSUMMON_PROC)
-	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e0:SetRange(LOCATION_EXTRA)
-	e0:SetCondition(s.spcon)
-	e0:SetTarget(s.sptg)
-	e0:SetOperation(s.spop)
-	c:RegisterEffect(e0)
+	-- Fusion.AddContactProc(c,function(tp) return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost,tp,LOCATION_ONFIELD,0,nil) end,function(g) Duel.SendtoGrave(g,REASON_COST|REASON_MATERIAL) end,nil,nil,nil,nil,false)
 	-- Manifest marker / activation as Continuous Spell
 	Reflexxion.AddManifestProcedure(c)
 	-- [Manifest Effect] copy another Manifest Monster's Manifest Effects
@@ -52,44 +43,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_CRYSTADEL}
 s.listed_names={CARD_SOLA_CRYSTADEL}
-
--- Fusion Summon Proc
-function s.matfilter(c)
-	return c:IsAbleToGraveAsCost()
-		and (
-			c:IsCode(CARD_SOLA_CRYSTADEL)
-			or c:IsRace(RACE_DRAGON)
-		)
-end
-function s.matrescon(sg,e,tp)
-	return #sg==2
-		and sg:IsExists(Card.IsCode,1,nil,CARD_SOLA_CRYSTADEL)
-		and sg:IsExists(Card.IsRace,1,nil,RACE_DRAGON)
-end
-function s.spcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_MZONE|LOCATION_SZONE,0,nil)
-	return Duel.GetLocationCountFromEx(tp,tp,g,c)>0
-		and aux.SelectUnselectGroup(g,e,tp,2,2,s.matrescon,0)
-end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_MZONE|LOCATION_SZONE,0,nil)
-	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.matrescon,1,tp,HINTMSG_TOGRAVE)
-	if #sg>0 then
-		sg:KeepAlive()
-		e:SetLabelObject(sg)
-		return true
-	end
-	return false
-end
-function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local sg=e:GetLabelObject()
-	if sg then
-		Duel.SendtoGrave(sg,REASON_COST+REASON_MATERIAL+REASON_FUSION)
-		sg:DeleteGroup()
-	end
-end
+s.miracle_synchro_fusion=true
 
 -- Manifest Effect
 function s.copycostfilter(c,fc)
@@ -145,25 +99,20 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc or not tc:IsRelateToEffect(e) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-
-	if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local seq=tc:GetSequence()
-
-		-- Negate effects in same column for rest of turn
+	if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		--Unaffected by opponent's traps
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetTargetRange(0,LOCATION_ONFIELD)
-		e1:SetTarget(function(e,c)
-			return c:IsColumn(seq)
-		end)
-		e1:SetReset(RESET_PHASE|PHASE_END)
-		Duel.RegisterEffect(e1,tp)
-
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		Duel.RegisterEffect(e2,tp)
+		e1:SetDescription(3113)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetCode(EFFECT_IMMUNE_EFFECT)
+		e1:SetValue(s.efilter)
+		e1:SetOwnerPlayer(tp)
+		e1:SetReset(RESETS_STANDARD_PHASE_END)
+		tc:RegisterEffect(e1,true)
 	end
+	Duel.SpecialSummonComplete()
 end
 
 -- (2)

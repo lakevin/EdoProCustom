@@ -2,9 +2,16 @@
 local s,id=GetID()
 local SET_SHIMMERBANE=0x9617
 Duel.LoadScript('ReflexxionsAux.lua')
+
+local function shimmerbane_spfilter(e,se,sp,st)
+	return se
+		and se:IsHasType(EFFECT_TYPE_ACTIONS)
+		and se:GetHandler():IsSetCard(SET_SHIMMERBANE)
+end
+
 function s.initial_effect(c)
 	--Set as a Continuous Trap
-	Reflexxion.AddShimmerbaneRuling(c)
+	Reflexxion.AddAmbushProcedure(c,shimmerbane_spfilter)
 	-- (TRAP) Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -13,18 +20,22 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_BECOME_TARGET)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
+	e1:SetTarget(s.target1)
+	e1:SetOperation(s.activate1)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_SET)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCondition(s.condition)
+	e2:SetCondition(s.condition2)
+	e2:SetTarget(s.target2)
+	e2:SetOperation(s.activate2)
 	c:RegisterEffect(e2)
 	-- (2) Set 1 Continuous Trap from your hand or GY
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetCategory(CATEGORY_SET)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
@@ -51,54 +62,50 @@ end
 s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
-function s.filter(c)
-	return c:IsSetCard(SET_SHIMMERBANE)
-end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEDOWN)
-		and c:IsReason(REASON_DESTROY)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	-- Special Summon
+function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE,0,nil)
-		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-			Duel.BreakEffect()
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-			local sc=g:Select(tp,1,1,nil):GetFirst()
-			if Duel.MoveToField(sc,tp,tp,LOCATION_SZONE,POS_FACEDOWN,true) then
-				if sc:IsOriginalType(TYPE_MONSTER) then
-					-- Treat as Continuous Trap
-					local e1=Effect.CreateEffect(c)
-					e1:SetCode(EFFECT_CHANGE_TYPE)
-					e1:SetType(EFFECT_TYPE_SINGLE)
-					e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-					e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
-					sc:RegisterEffect(e1)
-				end
-			end
-		end
+	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+end
+	-- Set 1 Continuous Trap from your GY
+function s.setfilter(c)
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSpellTrap() and c:IsSSetable()
+end
+function s.condition2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEDOWN)
+		and c:IsReason(REASON_DESTROY)
+end
+function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.setfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.setfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectTarget(tp,s.setfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,tp,0)
+end
+function s.activate2(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SSet(tp,tc)
 	end
 end
 
 -- (2)
 function s.setfilter(c)
-	return c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsSSetable()
+	return c:IsSetCard(SET_SHIMMERBANE) and c:IsType(TYPE_TRAP+TYPE_CONTINUOUS) and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil) end
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil):GetFirst()
 	if tc and tc:IsSSetable() then
 		Duel.SSet(tp,tc)
 	end
@@ -106,22 +113,27 @@ end
 
 -- (3)
 function s.spconfilter(c,tp)
-	return c:IsContinuousTrap() and c:IsFaceup() and c:IsControler(tp)
+	return c:IsControler(tp) and c:IsFaceup() and c:IsLocation(LOCATION_MZONE)
+		and c:IsPreviousLocation(LOCATION_SZONE)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.spconfilter,1,nil,tp)
 end
 function s.scfilter1(c,e,tp,mc)
 	local mg=Group.FromCards(c,mc)
-	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.scfilter2,tp,LOCATION_EXTRA,0,1,nil,tp,mg)
+	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.scfilter2,tp,LOCATION_EXTRA,0,1,nil,mg)
+		and not c:IsType(TYPE_TUNER)
 end
-function s.scfilter2(c,tp,mg)
+function s.scfilter2(c,mg)
 	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSynchroSummonable(nil,mg)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.scfilter1(chkc,e,tp,c) end
+	if chkc then 
+		return eg:IsContains(chkc) and chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE)
+			and s.spconfilter(chkc,tp) and s.scfilter1(chkc,e,tp,c) 
+	end
 	if chk==0 then return ft>0 and Duel.IsExistingTarget(s.scfilter1,tp,LOCATION_MZONE,0,1,nil,e,tp,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,s.scfilter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp,c)
@@ -149,7 +161,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			c:RegisterEffect(e1,true)
 			local e2=e1:Clone()
 			tc:RegisterEffect(e2,true)
-			Duel.SynchroSummon(tp,sg:GetFirst(),nil,mg)
+			Duel.SynchroSummon(tp,sg:GetFirst(),c,mg)
 		end
 	end
 end

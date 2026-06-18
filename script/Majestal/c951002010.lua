@@ -9,6 +9,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetCondition(s.condition)
+	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -27,43 +28,41 @@ end
 s.listed_series={SET_MAJESTAL}
 
 -- (1)
-function s.filter(c,tp)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(SET_MAJESTAL)
-end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	if rp==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
-	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return g and g:IsExists(s.filter,1,nil,tp)
-		and Duel.IsChainNegatable(ev) and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE))
+	return (re:IsMonsterEffect() or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
+end
+function s.cfilter(c)
+	return c:IsFaceup() and c:IsSetCard(SET_MAJESTAL)
+end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
+		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
+	if Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
+		--Treat as Continuous Spell
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetCode(EFFECT_CHANGE_TYPE)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+		e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
+		tc:RegisterEffect(e1)
+	end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
+	local rc=re:GetHandler()
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsRelateToEffect(re) then
+	if rc:IsDestructable() and rc:IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
-	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS):Filter(s.filter,nil,tp)
-	if not Duel.NegateActivation(ev) or not rc:IsRelateToEffect(re) then return end
-	rc:CancelToGrave()
-	if Duel.SendtoDeck(rc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)<1 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local tg=g:Filter(Card.IsRelateToEffect,nil,re)
-	if #tg>0 then
-		Duel.BreakEffect()
-		local tc=tg:Select(tp,1,1,nil):GetFirst()
-		if Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
-			--Treat as Continuous Spell
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetCode(EFFECT_CHANGE_TYPE)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-			e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
-			tc:RegisterEffect(e1)
-		end
+	if Duel.NegateActivation(ev) and rc:IsRelateToEffect(re) then
+		rc:CancelToGrave()
+		Duel.SendtoDeck(rc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
 

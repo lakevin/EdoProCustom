@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e3:SetCondition(s.accon)
 	e3:SetOperation(s.acop)
 	c:RegisterEffect(e3)
-	-- (3) Activatable if set by Shimmerbane
+	-- (3) Can be activated this turn, if set by a Shimmerbane card
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetType(EFFECT_TYPE_SINGLE)

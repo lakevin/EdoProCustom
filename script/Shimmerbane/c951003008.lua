@@ -17,16 +17,12 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- (1) Change Level
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e2:SetCondition(function(e) return e:GetHandler():IsPreviousLocation(LOCATION_SZONE) end)
-	e2:SetTarget(s.tunertg)
-	e2:SetOperation(s.tunerop)
+	local e2=e1:Clone()
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCondition(s.condition)
 	c:RegisterEffect(e2)
-	-- (2) Synchro Summon
+	-- (1) Synchro Summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_LEAVE_GRAVE)
@@ -40,7 +36,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	-- (3) Set "Shimmerbane" monsters from the Deck to S/T Zone
+	-- (2) Set "Shimmerbane" monsters from the Deck to S/T Zone
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_TOGRAVE)
@@ -57,6 +53,11 @@ s.listed_names={id}
 s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEDOWN)
+		and c:IsReason(REASON_DESTROY)
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
@@ -88,29 +89,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (1)
-function s.tunerfilter(c)
-	return c:IsFaceup() and not c:IsType(TYPE_TUNER)
-end
-function s.tunertg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.tunerfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.tunerfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.tunerfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
-end
-function s.tunerop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_ADD_TYPE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(TYPE_TUNER)
-		tc:RegisterEffect(e1)
-	end
-end
-
--- (2)
 function s.spfilter(c,e,tp,mc)
 	local mg=Group.FromCards(c,mc)
 	return c:IsSetCard(SET_SHIMMERBANE) and c:IsType(TYPE_TUNER)
@@ -142,7 +120,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
--- (3)
+-- (2)
 function s.setfilter(c)
 	return c:IsSetCard(SET_SHIMMERBANE) and c:IsSSetable(true)
 end

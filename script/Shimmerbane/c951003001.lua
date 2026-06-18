@@ -2,9 +2,16 @@
 local s,id=GetID()
 local SET_SHIMMERBANE=0x9617
 Duel.LoadScript('ReflexxionsAux.lua')
+
+local function shimmerbane_spfilter(e,se,sp,st)
+	return se
+		and se:IsHasType(EFFECT_TYPE_ACTIONS)
+		and se:GetHandler():IsSetCard(SET_SHIMMERBANE)
+end
+
 function s.initial_effect(c)
 	--Set as a Continuous Trap
-	Reflexxion.AddShimmerbaneRuling(c)
+	Reflexxion.AddAmbushProcedure(c)
 	-- (TRAP) Activation
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -23,7 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- (2) special summon procedure
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetRange(LOCATION_HAND)
@@ -36,7 +43,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
     -- (2) Synchro Summon 1 "Shimmerbane" monster
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,2))
+	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetProperty(EFFECT_FLAG_DELAY)

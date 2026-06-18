@@ -2,6 +2,7 @@
 local s,id=GetID()
 local SET_CRYSTADEL=0x9614
 local SET_SHIMMERBANE=0x9617
+local CARD_OBSIDIUS_CRYSTADEL=951000002
 function s.initial_effect(c)
 	-- (1) Activate
 	local e0=Effect.CreateEffect(c)
@@ -33,6 +34,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_CRYSTADEL}
+s.listed_names={CARD_OBSIDIUS_CRYSTADEL}
 
 -- (1)
 function s.setfilter(c)
@@ -57,7 +59,7 @@ end
 
 -- (2)
 function s.actcon(e)
-	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_CRYSTADEL),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_OBSIDIUS_CRYSTADEL),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 
 -- (3)

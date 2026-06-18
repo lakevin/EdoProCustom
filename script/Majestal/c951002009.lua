@@ -33,7 +33,7 @@ function s.spfilter(c,code,lv,e,tp,mc)
 		and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,true,false)
 end
 function s.tdfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_MAJESTAL) and c:IsType(TYPE_FUSION) and c:IsAbleToExtra()
+	return c:IsFaceup() and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_FUSION) and c:IsAbleToExtra()
 	and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetCode(),c:GetOriginalLevel(),e,tp,c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
