@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.attachtg)
 	e1:SetOperation(s.attachop)
 	c:RegisterEffect(e1)
-	-- (2) GY: Special Summon "Vitreas, the Possessed Dark Mage"
+	-- (2) GY: Special Summon "Vitreas, Possessed Dark Mage"
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)

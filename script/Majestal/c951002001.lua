@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	e2:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e2:SetValue(s.hspval)
 	c:RegisterEffect(e2)
-    -- (2) -- Register the fact it was sent from MZONE to GY this turn
+	-- (2) Register the fact it was sent from the field to the GY this turn
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -102,7 +102,7 @@ end
 
 -- (3)
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1)

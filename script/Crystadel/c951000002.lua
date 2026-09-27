@@ -1,4 +1,4 @@
--- Obsidius, the Witcher of Crystadel
+-- Obsidius, Witcher of Crystadel
 local s,id=GetID()
 local SET_CRYSTADEL=0x9614
 function s.initial_effect(c)

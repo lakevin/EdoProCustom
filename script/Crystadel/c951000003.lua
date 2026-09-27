@@ -1,4 +1,4 @@
--- Vitreas, the Medium of Crystadel
+-- Vitreas, Medium of Crystadel
 local s,id=GetID()
 local SET_CRYSTADEL=0x9614
 local SET_REVENTANTS=0x9616

@@ -1,6 +1,7 @@
 -- Sola, Wizard of Crystadel
 local s,id=GetID()
 local SET_CRYSTADEL=0x9614
+Duel.LoadScript("ReflexxionsAux.lua")
 function s.initial_effect(c)
 	--Add 1 "Crystaldel" monster from your Deck or GY to your hand
 	local e1=Effect.CreateEffect(c)
@@ -86,6 +87,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 			e2:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
 			oc:RegisterEffect(e2)
+			Reflexxion.RegisterCrystadelShimmerbaneSetCard(oc,tp)
 		end
 	end
 end

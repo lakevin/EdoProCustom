@@ -1,22 +1,26 @@
 -- Majestal Aurorion
 local s,id=GetID()
-local SET_CHRYSTALIA=0x9614
 local SET_MAJESTAL=0x9615
+Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_MAJESTAL),s.matfilter)
+	-- Manifest marker / activation as Continuous Spell
+	Reflexxion.AddManifestProcedure(c)
 	-- (SPELL) Fusion Summon 1 Dragon Fusion Monster
+	local params={fusfilter=s.fusfilter,matfilter=Card.IsAbleToRemove,extrafil=s.fextra,extraop=Fusion.BanishMaterial,extratg=s.extratg}
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON+CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetCountLimit(1,id)
-	e1:SetTarget(s.fustg)
-	e1:SetOperation(s.fusop)
+	e1:SetCondition(function(e) return e:GetHandler():IsContinuousSpell() end)
+	e1:SetTarget(Fusion.SummonEffTG(params))
+	e1:SetOperation(Fusion.SummonEffOP(params))
 	c:RegisterEffect(e1)
-	-- (1) Add 1 "Majestal" or "Chrystalia" to hand
+	-- (1) Add 1 "Majestal" card to hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -45,36 +49,23 @@ function s.matfilter(c,lc,sumtype,tp)
 end
 
 -- (SPELL)
-function s.fusfilter(c,e,tp,mg)
-	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_FUSION) and not c:IsCode(id)
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
-		and c:CheckFusionMaterial(mg,nil,tp)
+function s.fusfilter(c,tp)
+	return c:IsRace(RACE_DRAGON) and not c:IsCode(id)
 end
-function s.matfilter(c)
-	return c:IsMonster() or (c:IsOriginalType(TYPE_MONSTER) and c:IsLocation(LOCATION_SZONE))
+function s.extrafilter(c)
+	return c:IsAbleToRemove() and (c:IsMonster()
+		or (c:IsLocation(LOCATION_SZONE) and c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER)))
 end
-function s.fustg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local mg=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE,LOCATION_SZONE,nil)
-	if chk==0 then
-		return Duel.GetLocationCountFromEx(tp,tp,mg,nil)>0
-			and Duel.IsExistingMatchingCard(s.fusfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg)
+function s.fextra(e,tp,mg)
+	local g=Duel.GetMatchingGroup(s.extrafilter,tp,LOCATION_SZONE,0,nil)
+	if not Duel.IsPlayerAffectedByEffect(tp,CARD_SPIRIT_ELIMINATION) then
+		g:Merge(Duel.GetMatchingGroup(s.extrafilter,tp,LOCATION_GRAVE,0,nil))
 	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	return g
 end
-function s.fusop(e,tp,eg,ep,ev,re,r,rp)
-	local mg=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE,LOCATION_SZONE,nil)
-	if Duel.GetLocationCountFromEx(tp,tp,mg,nil)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sg=Duel.SelectMatchingCard(tp,s.fusfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,mg)
-	local fc=sg:GetFirst()
-	if not fc then return end
-	local mat=Duel.SelectFusionMaterial(tp,fc,mg,nil,tp)
-	if not mat or #mat==0 then return end
-	fc:SetMaterial(mat)
-	Duel.SendtoGrave(mat,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
-	Duel.BreakEffect()
-	Duel.SpecialSummon(fc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
-	fc:CompleteProcedure()
+function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,0,tp,LOCATION_HAND|LOCATION_ONFIELD|LOCATION_GRAVE)
 end
 
 -- (1)

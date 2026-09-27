@@ -8,10 +8,10 @@ function s.initial_effect(c)
 	local params2 = {aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),nil,s.fextra,nil,Fusion.ForcedHandler}
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetCountLimit(1)
 	e1:SetCondition(function(e) return e:GetHandler():IsContinuousSpell() end)
 	e1:SetTarget(Fusion.SummonEffTG(table.unpack(params2)))
 	e1:SetOperation(Fusion.SummonEffOP(table.unpack(params2)))
@@ -61,8 +61,8 @@ local function get_szone_seq_id(bit)
 end
 
 -- (1)
-function s.mfilter(c,tp)
-	return c:IsFaceup() and c:IsAbleToGrave() and c:IsCode(id)
+function s.mfilter(c)
+	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 function s.fextra(e,tp,mg)
 	return Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_SZONE,0,nil)

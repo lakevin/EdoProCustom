@@ -1,10 +1,13 @@
 -- Majestal Lustrouzard
 local s,id=GetID()
 local SET_MAJESTAL=0x9615
+Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_MAJESTAL),s.matfilter)
+	-- Manifest marker / activation as Continuous Spell
+	Reflexxion.AddManifestProcedure(c)
 	-- (SPELL) atkup
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

@@ -13,18 +13,21 @@ function s.initial_effect(c)
 	--Cannot be Normal Summoned/Set
 	c:EnableUnsummonable()
 	--Set as a Continuous Trap
-	Reflexxion.AddAmbushProcedure(c,shimmerbane_spfilter)
+	Reflexxion.AddAmbushProcedure(c)
 	-- (TRAP) Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EVENT_BECOME_TARGET)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetCost(Cost.SelfChangePosition(POS_FACEUP))
+	e1:SetCondition(s.actcon)
 	e1:SetTarget(s.target1)
 	e1:SetOperation(s.activate1)
-	c:RegisterEffect(e1)
+	Reflexxion.RegisterAmbushActivation(c,e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -41,7 +44,7 @@ function s.initial_effect(c)
 	e3:SetCode(EFFECT_SPSUMMON_PROC)
 	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e3:SetRange(LOCATION_HAND)
-	e3:SetValue(1)
+	--e3:SetValue(1)
 	e3:SetCondition(s.spcon)
 	c:RegisterEffect(e3)
 	-- (2) Add to hand
@@ -69,21 +72,21 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_SHIMMERBANE}
 
--- function s.actcon(e,tp,eg,ep,ev,re,r,rp)
---     local c=e:GetHandler()
---     return not c:IsStatus(STATUS_SET_TURN)
--- end
-
 -- (TRAP)
 	-- Special Summon
+function s.actcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsFacedown() and not c:IsStatus(STATUS_SET_TURN)
+end
 function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,c:GetLocation())
 end
 function s.activate1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
 	-- Draw

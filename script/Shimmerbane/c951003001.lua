@@ -12,25 +12,31 @@ end
 function s.initial_effect(c)
 	--Set as a Continuous Trap
 	Reflexxion.AddAmbushProcedure(c)
-	-- (TRAP) Activation
+	-- (TRAP) If this card is activated or this set card is destroyed
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EVENT_BECOME_TARGET)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetCost(Cost.SelfChangePosition(POS_FACEUP))
+	e1:SetCondition(s.actcon)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
-	c:RegisterEffect(e1)
+	Reflexxion.RegisterAmbushActivation(c,e1)
 	local e2=e1:Clone()
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(s.condition)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.activate)
 	c:RegisterEffect(e2)
 	-- (2) special summon procedure
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetRange(LOCATION_HAND)
@@ -43,7 +49,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
     -- (2) Synchro Summon 1 "Shimmerbane" monster
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetProperty(EFFECT_FLAG_DELAY)
@@ -58,7 +64,7 @@ s.listed_series={SET_SHIMMERBANE}
 -- (TRAP)
 function s.actcon(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
-    return not c:IsStatus(STATUS_SET_TURN)
+    return c:IsFacedown() and not c:IsStatus(STATUS_SET_TURN)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -66,13 +72,14 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 		and c:IsReason(REASON_DESTROY)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,c:GetLocation())
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE)~=0 then
 		--Cannot be destroyed by battle or card effects
 		local e1=Effect.CreateEffect(c)

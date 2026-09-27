@@ -5,7 +5,7 @@ function s.initial_effect(c)
     -- (1) search
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id)
@@ -29,7 +29,7 @@ end
 -- (1)
 function s.filter(c,e,tp)
 	return c:IsSetCard(SET_SHIMMERBANE) and c:IsMonster() and not c:IsPublic() 
-		and c:IsAbleToHand() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and c:IsAbleToGrave() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -38,7 +38,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		return aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,0)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)==0 then return end
@@ -48,11 +48,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(1-tp,sg)
 	local sc=sg:RandomSelect(1-tp,1):GetFirst()
 	if not sc or Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
-	Duel.ConfirmCards(tp,sc)
 	sg:RemoveCard(sc)
-	if Duel.SendtoHand(sg,nil,REASON_EFFECT)==0 then return end
-	Duel.ConfirmCards(1-tp,sg)
-	Duel.ShuffleHand(tp)
+	Duel.SendtoGrave(sg,REASON_EFFECT)
 end
 
 -- (2)

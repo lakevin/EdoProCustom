@@ -94,10 +94,11 @@ function s.sphop(e,tp,eg,ep,ev,re,r,rp)
 	local og=Duel.GetOperatedGroup()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 		--● Spell: Destroy 1 Spell/Trap
-		if og:IsExists(Card.IsSpellCard,1,nil) and Duel.IsExistingMatchingCard(Card.IsCanChangePosition,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+		if og:IsExists(Card.IsSpellCard,1,nil)
+			and Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_SZONE,1,nil)
 			and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			local g=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_SZONE,1,1,nil)
+			local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_SZONE,1,1,nil)
 			if #g>0 then
 				Duel.HintSelection(g)
 				Duel.BreakEffect()
@@ -105,10 +106,11 @@ function s.sphop(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 		--● Monster: Destroy 1 monster
-		if og:IsExists(Card.IsMonsterCard,1,nil) and Duel.IsPlayerCanDraw(tp,1)
+		if og:IsExists(Card.IsMonsterCard,1,nil)
+			and Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_MZONE,1,nil)
 			and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			local g=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_MZONE,1,1,nil)
+			local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_MZONE,1,1,nil)
 			if #g>0 then
 				Duel.HintSelection(g)
 				Duel.BreakEffect()

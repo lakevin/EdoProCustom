@@ -8,20 +8,30 @@ function s.initial_effect(c)
 	Synchro.AddProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_FIEND),1,1,Synchro.NonTuner(nil),1,99)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
+	--Set as a Continuous Trap
+	Reflexxion.AddAmbushProcedure(c)
 	-- (TRAP) Activation
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DRAW)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EVENT_BECOME_TARGET)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_LVCHANGE)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetCost(Cost.SelfChangePosition(POS_FACEUP))
+	e1:SetCondition(s.actcon)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
-	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	Reflexxion.RegisterAmbushActivation(c,e1)
+	-- (TRAP) If this Set card is destroyed
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_LVCHANGE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(s.condition)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.activate)
 	c:RegisterEffect(e2)
 	-- (1) Set 1 monster in the Spell/Trap Zone as Continuous Trap
 	local e3=Effect.CreateEffect(c)
@@ -49,19 +59,25 @@ s.listed_names={id}
 s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
+function s.actcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsFacedown() and not c:IsStatus(STATUS_SET_TURN) 
+end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEDOWN)
+	return c:IsPreviousLocation(LOCATION_SZONE)
+		and c:IsPreviousPosition(POS_FACEDOWN)
 		and c:IsReason(REASON_DESTROY)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,c:GetLocation())
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -95,6 +111,7 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then
 			Duel.SendtoGrave(tc,REASON_RULE,nil,PLAYER_NONE)
 		elseif Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEDOWN,tc:IsMonsterCard()) then
+			tc:SetStatus(STATUS_SET_TURN,true)
 			--Treat as Continuous Trap
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)

@@ -138,31 +138,33 @@ end
 -- c: The card that become a Manifest Monster.
 function Reflexxion.AddManifestProcedure(c)
 	-- Marker: This is a Manifest Monster
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e0:SetCode(EFFECT_REFLEXXION_MANIFEST)
-	c:RegisterEffect(e0)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_REFLEXXION_MANIFEST)
+	c:RegisterEffect(e1)
 	
 	-- Activation
     local function activate(e,tp,eg,ep,ev,re,r,rp)
         local c=e:GetHandler()
         -- Treat as Continuous Spell
-        local e1=Effect.CreateEffect(c)
-        e1:SetCode(EFFECT_CHANGE_TYPE)
-        e1:SetType(EFFECT_TYPE_SINGLE)
-        e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-        e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-        e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
-        c:RegisterEffect(e1)
+        local eff=Effect.CreateEffect(c)
+        eff:SetCode(EFFECT_CHANGE_TYPE)
+        eff:SetType(EFFECT_TYPE_SINGLE)
+        eff:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+        eff:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+        eff:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
+        c:RegisterEffect(eff)
     end
-    local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetCost(aux.RemainFieldCost)
-	e1:SetOperation(activate)
-	c:RegisterEffect(e1)
+
+    local e2=Effect.CreateEffect(c)
+	e2:SetDescription(2202)
+	e2:SetType(EFFECT_TYPE_ACTIVATE)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetCost(aux.RemainFieldCost)
+	e2:SetOperation(activate)
+	c:RegisterEffect(e2)
 end
 
 
@@ -172,6 +174,32 @@ end
 
 local SET_SHIMMERBANE=0x9617
 EFFECT_REFLEXXION_AMBUSH = 954321026
+EFFECT_REFLEXXION_AMBUSH_ACTIVATION = 954321027
+EFFECT_REFLEXXION_SHIMMERBANE_FORCED_ACTIVATION = 954321028
+EFFECT_REFLEXXION_CRYSTADEL_SHIMMERBANE_SET = 954321029
+EVENT_REFLEXXION_MONSTER_EFFECT_IN_SZONE = EVENT_CUSTOM+954321029
+
+--Marks a card that was placed in a Spell & Trap Zone by a Crystadel or Shimmerbane effect.
+--Parameters:
+-- c: the card that was placed in the Spell & Trap Zone
+-- tp: the player whose effect placed it there
+function Reflexxion.RegisterCrystadelShimmerbaneSetCard(c,tp)
+	local me=Effect.CreateEffect(c)
+	me:SetType(EFFECT_TYPE_SINGLE)
+	me:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	me:SetCode(EFFECT_REFLEXXION_CRYSTADEL_SHIMMERBANE_SET)
+	me:SetLabel(tp)
+	me:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(me)
+end
+
+function Card.IsSetByCrystadelShimmerbane(c,tp)
+	local me={c:IsHasEffect(EFFECT_REFLEXXION_CRYSTADEL_SHIMMERBANE_SET)}
+	for _,te in ipairs(me) do
+		if te:GetLabel()==tp then return true end
+	end
+	return false
+end
 
 --Parameters
 -- c: The card that will be checked for code "EFFECT_REFLEXXION_AMBUSH".
@@ -179,16 +207,54 @@ function Card.IsAmbushMonster(c)
 	return c:IsHasEffect(EFFECT_REFLEXXION_AMBUSH)
 end
 
+--Registers an effect as the activation effect of an Ambush Monster.
+--Use this instead of c:RegisterEffect(e) for the Ambush activation effect.
+--Parameters:
+-- c: the Ambush Monster that will receive the effect
+-- e: the effect used to activate the Ambush Monster while Set in the Spell & Trap Zone
+function Reflexxion.RegisterAmbushActivation(c,e)
+	c:RegisterEffect(e)
+	local me=Effect.CreateEffect(c)
+	me:SetType(EFFECT_TYPE_SINGLE)
+	me:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	me:SetCode(EFFECT_REFLEXXION_AMBUSH_ACTIVATION)
+	me:SetLabelObject(e)
+	c:RegisterEffect(me)
+end
+
+--Registers an activation effect that can only be performed by a Shimmerbane Force Activation effect.
+--Parameters:
+-- c: the generated Continuous Trap that will receive the effect
+-- e: the effect performed when the generated Continuous Trap is forcibly activated
+function Reflexxion.RegisterShimmerbaneForcedActivation(c,e,tp)
+	e:SetCondition(function() return false end)
+	c:RegisterEffect(e)
+	Reflexxion.RegisterCrystadelShimmerbaneSetCard(c,tp or e:GetOwnerPlayer())
+	local me=Effect.CreateEffect(c)
+	me:SetType(EFFECT_TYPE_SINGLE)
+	me:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	me:SetCode(EFFECT_REFLEXXION_SHIMMERBANE_FORCED_ACTIVATION)
+	me:SetLabelObject(e)
+	me:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(me)
+	local ce=Effect.CreateEffect(c)
+	ce:SetType(EFFECT_TYPE_SINGLE)
+	ce:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE)
+	ce:SetCode(EFFECT_CANNOT_TRIGGER)
+	ce:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(ce)
+end
+
 --Parameters:
 -- c: the card that will receive the effect
 -- spfilter: optional function(e,se,sp,st), returns true if this card can be Special Summoned
 function Reflexxion.AddAmbushProcedure(c,spfilter)
 	-- Marker: This is a Manifest Monster
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e0:SetCode(EFFECT_REFLEXXION_AMBUSH)
-	c:RegisterEffect(e0)
+	local me=Effect.CreateEffect(c)
+	me:SetType(EFFECT_TYPE_SINGLE)
+	me:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	me:SetCode(EFFECT_REFLEXXION_AMBUSH)
+	c:RegisterEffect(me)
 
 	-- Optional Special Summon condition
 	if spfilter then
@@ -213,8 +279,19 @@ end
 -- tc: the card that is related to the effect (it's basically the targeted card)
 function Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
 	if not tc:IsRelateToEffect(e) or tc:IsFaceup() then return end
-	if tc:IsTrap() and tc:IsSetCard(SET_SHIMMERBANE) then
-		local te=tc:GetActivateEffect()
+	local fe={tc:IsHasEffect(EFFECT_REFLEXXION_SHIMMERBANE_FORCED_ACTIVATION)}
+	local is_forced=#fe>0
+	if (tc:IsTrap() and tc:IsSetCard(SET_SHIMMERBANE)) or is_forced then
+		-- regular handler
+		local te=is_forced and fe[1]:GetLabelObject() or tc:GetActivateEffect()
+		local is_ambush=tc:IsAmbushMonster()
+		-- ambush handler
+		if not te and is_ambush then
+			local ae={tc:IsHasEffect(EFFECT_REFLEXXION_AMBUSH_ACTIVATION)}
+			if #ae>0 then
+				te=ae[1]:GetLabelObject()
+			end
+		end
 		local tep=tc:GetControler()
 		local condition
 		local cost
@@ -227,10 +304,10 @@ function Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
 			operation=te:GetOperation()
 		end
 		--local chk=te and te:GetCode()==EVENT_FREE_CHAIN and te:IsActivatable(tep)
-		local chk=te and ((te:GetCode()==EVENT_BECOME_TARGET and tc:IsOriginalType(TYPE_MONSTER)) 
-			or te:GetCode()==EVENT_FREE_CHAIN) --and te:IsActivatable(tep)
-			and (not condition or condition(te,tep,eg,ep,ev,re,r,rp))
-			and (not cost or cost(te,tep,eg,ep,ev,re,r,rp,0))
+		local chk=te and ((te:GetCode()==EVENT_BECOME_TARGET and tc:IsOriginalType(TYPE_MONSTER))
+			or te:GetCode()==EVENT_FREE_CHAIN)
+			and (is_ambush or is_forced or not condition or condition(te,tep,eg,ep,ev,re,r,rp))
+			and (is_ambush or is_forced or not cost or cost(te,tep,eg,ep,ev,re,r,rp,0))
 			and (not target or target(te,tep,eg,ep,ev,re,r,rp,0))
 		Duel.ChangePosition(tc,POS_FACEUP)
 		Duel.ConfirmCards(tp,tc)
@@ -242,7 +319,9 @@ function Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
 				tc:CancelToGrave(false)
 			end
 			tc:CreateEffectRelation(te)
-			if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
+			if cost and not is_ambush and not is_forced then
+				cost(te,tep,eg,ep,ev,re,r,rp,1)
+			end
 			if target~=te:GetTarget() then
 				target=te:GetTarget()
 			end
@@ -259,6 +338,9 @@ function Reflexxion.ShimmerbaneForceActivation(c,e,tp,eg,ep,ev,re,r,rp,tc)
 				operation=te:GetOperation()
 			end
 			if operation then operation(te,tep,eg,ep,ev,re,r,rp) end
+			if tc:IsOriginalType(TYPE_MONSTER) then
+				Duel.RaiseEvent(tc,EVENT_REFLEXXION_MONSTER_EFFECT_IN_SZONE,te,REASON_EFFECT,tep,tep,0)
+			end
 			tc:ReleaseEffectRelation(te)
 			for tg in aux.Next(g) do
 				tg:ReleaseEffectRelation(te)

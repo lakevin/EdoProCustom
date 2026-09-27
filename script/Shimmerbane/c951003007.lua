@@ -15,13 +15,16 @@ function s.initial_effect(c)
 	-- (TRAP) Activation
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EVENT_BECOME_TARGET)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetCost(Cost.SelfChangePosition(POS_FACEUP))
+	e1:SetCondition(s.actcon)
 	e1:SetTarget(s.target1)
 	e1:SetOperation(s.activate1)
-	c:RegisterEffect(e1)
+	Reflexxion.RegisterAmbushActivation(c,e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -59,14 +62,19 @@ s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
 	-- Special Summon this card
+function s.actcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsFacedown() and not c:IsStatus(STATUS_SET_TURN)
+end
 function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,c:GetLocation())
 end
 function s.activate1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
 	-- Special Summon from Deck
@@ -141,6 +149,18 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(TYPE_TRAP|TYPE_CONTINUOUS)
 		e1:SetReset(RESET_EVENT|(RESETS_STANDARD&~RESET_TURN_SET))
 		tc:RegisterEffect(e1)
+		--If activated by another card's effect, send it to the GY
+		local e2=Effect.CreateEffect(e:GetHandler())
+		e2:SetDescription(aux.Stringid(id,3))
+		e2:SetCategory(CATEGORY_TOGRAVE)
+		e2:SetType(EFFECT_TYPE_QUICK_O)
+		e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CLIENT_HINT)
+		e2:SetCode(EVENT_FREE_CHAIN)
+		e2:SetRange(LOCATION_SZONE)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e2:SetTarget(s.fatg)
+		e2:SetOperation(s.faop)
+		Reflexxion.RegisterShimmerbaneForcedActivation(tc,e2,tp)
 		--Shuffle it into the Deck during the End Phase of the next turn
 		local turn_count=Duel.GetTurnCount()
 		aux.DelayedOperation(tc,PHASE_END,id,e,tp,
@@ -148,5 +168,15 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 			function() return Duel.GetTurnCount()==turn_count+1 end,
 			nil,2,aux.Stringid(id,3)
 		)
+	end
+end
+function s.fatg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToGrave() end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,e:GetHandler(),1,0,0)
+end
+function s.faop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SendtoGrave(c,REASON_EFFECT)
 	end
 end

@@ -20,17 +20,17 @@ function s.initial_effect(c)
 	e1:SetCost(s.copycost)
 	e1:SetOperation(s.copyop)
 	c:RegisterEffect(e1)
-	-- (1) Special Summon Manifest Monster from S/T Zone + negate column
+	-- (1) Activate 1 of 2 Quick Effects
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetTarget(s.sptg2)
-	e2:SetOperation(s.spop2)
+	e2:SetTarget(s.efftg)
+	e2:SetOperation(s.effop)
 	c:RegisterEffect(e2)
 	-- (2) If Fusion Summoned card would be sent to GY, place in S/T Zone
 	local e3=Effect.CreateEffect(c)
@@ -79,40 +79,77 @@ function s.copyop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 -- (1)
-function s.spfilter2(c,e,tp)
+function s.spfilter(c,e,tp)
 	return c:IsManifestMonster() and c:IsOriginalType(TYPE_MONSTER)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then
-		return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE) and s.spfilter2(chkc,e,tp)
-	end
-	if chk==0 then
-		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-			and Duel.IsExistingTarget(s.spfilter2,tp,LOCATION_SZONE,0,1,nil,e,tp)
-	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,s.spfilter2,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+function s.plfilter(c)
+	return c:IsManifestMonster() and not c:IsForbidden()
+		and (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup())
 end
-function s.spop2(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if not tc or not tc:IsRelateToEffect(e) then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
-		--Unaffected by opponent's traps
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(3113)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCode(EFFECT_IMMUNE_EFFECT)
-		e1:SetValue(s.efilter)
-		e1:SetOwnerPlayer(tp)
-		e1:SetReset(RESETS_STANDARD_PHASE_END)
-		tc:RegisterEffect(e1,true)
+function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then
+		return e:GetLabel()==1 and chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE)
+			and s.spfilter(chkc,e,tp)
 	end
-	Duel.SpecialSummonComplete()
+	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_SZONE,0,1,nil,e,tp)
+	local b2=Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.plfilter),tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,nil)
+	if chk==0 then return b1 or b2 end
+	local op=Duel.SelectEffect(tp,
+		{b1,aux.Stringid(id,2)},
+		{b2,aux.Stringid(id,3)})
+	e:SetLabel(op)
+	if op==1 then
+		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
+		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,tp,LOCATION_SZONE)
+	else
+		e:SetCategory(CATEGORY_TOGRAVE)
+		e:SetProperty(0)
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,LOCATION_GRAVE)
+		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,PLAYER_ALL,LOCATION_ONFIELD)
+	end
+end
+function s.immfilter(e,te)
+	return te:GetOwnerPlayer()~=e:GetHandlerPlayer()
+end
+function s.effop(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetLabel()==1 then
+		local tc=Duel.GetFirstTarget()
+		if not tc or not tc:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetDescription(3110)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
+			e1:SetRange(LOCATION_MZONE)
+			e1:SetCode(EFFECT_IMMUNE_EFFECT)
+			e1:SetValue(s.immfilter)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+			tc:RegisterEffect(e1,true)
+		end
+	else
+		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+		local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.plfilter),tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,1,nil):GetFirst()
+		if not tc or not Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then return end
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetCode(EFFECT_CHANGE_TYPE)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetReset((RESET_EVENT|RESETS_STANDARD)&~RESET_TURN_SET)
+		e1:SetValue(TYPE_SPELL|TYPE_CONTINUOUS)
+		tc:RegisterEffect(e1)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+		if #g>0 then
+			Duel.SendtoGrave(g,REASON_EFFECT)
+		end
+	end
 end
 
 -- (2)

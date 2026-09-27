@@ -7,20 +7,32 @@ function s.initial_effect(c)
 	Synchro.AddProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_FIEND),1,1,Synchro.NonTuner(nil),1,99)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
+	--Set as a Continuous Trap
+	Reflexxion.AddAmbushProcedure(c)
 	-- (TRAP) Activation
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EVENT_BECOME_TARGET)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetCost(Cost.SelfChangePosition(POS_FACEUP))
+	e1:SetCondition(s.actcon)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
-	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	Reflexxion.RegisterAmbushActivation(c,e1)
+	-- (TRAP) If this Set card is destroyed
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(s.condition)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.activate)
 	c:RegisterEffect(e2)
 	-- (1) Double attack
 	local e3=Effect.CreateEffect(c)
@@ -42,22 +54,28 @@ s.listed_names={id}
 s.listed_series={SET_SHIMMERBANE}
 
 -- (TRAP)
+function s.actcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsFacedown() and not c:IsStatus(STATUS_SET_TURN)
+end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEDOWN)
+	return c:IsPreviousLocation(LOCATION_SZONE)
+		and c:IsPreviousPosition(POS_FACEDOWN)
 		and c:IsReason(REASON_DESTROY)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,c:GetLocation())
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		Duel.Hint(HINT_CARD,tp,id)
-		--Cannot activate cards/effects when your Fiend Monster attacks
+		--Cannot activate cards/effects when your Shimmerbane Monster attacks
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_CHAINING)
@@ -100,47 +118,35 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
 		tc:RegisterEffect(e1)
 		tc:SetStatus(STATUS_SET_TURN,true)
-		if tc:IsOriginalType(TYPE_MONSTER) then
-			--Can be activated
-			local e2=Effect.CreateEffect(c)
-			e2:SetDescription(aux.Stringid(id,3))
-			e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW)
-			e2:SetType(EFFECT_TYPE_ACTIVATE)
-			e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-			e2:SetCode(EVENT_FREE_CHAIN)
-			e2:SetRange(LOCATION_SZONE)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-			e2:SetCondition(s.actcon)
-			e2:SetTarget(s.osptg)
-			e2:SetOperation(s.ospop)
-			tc:RegisterEffect(e2)
-		end
+		--Can be activated by another card's effect
+		local e2=Effect.CreateEffect(c)
+		e2:SetDescription(aux.Stringid(id,3))
+		e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_HANDES+CATEGORY_DRAW)
+		e2:SetType(EFFECT_TYPE_QUICK_O)
+		e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CLIENT_HINT)
+		e2:SetCode(EVENT_FREE_CHAIN)
+		e2:SetRange(LOCATION_SZONE)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e2:SetTarget(s.osptg)
+		e2:SetOperation(s.ospop)
+		Reflexxion.RegisterShimmerbaneForcedActivation(tc,e2,tp)
 	end
-end
-function s.actcon(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
-    return not c:IsStatus(STATUS_SET_TURN)
 end
 function s.osptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,true) end
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(1)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND)
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	local p=e:GetHandler():GetOwner()
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,p,1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-p,1)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function s.ospop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,true,POS_FACEUP)~=0 then
-		local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-		Duel.Draw(p,d,REASON_EFFECT)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_HAND,0,1,1,nil)
-		if #g>0 then
-			Duel.BreakEffect()
-			Duel.SendtoGrave(g,REASON_EFFECT)
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+		local p=c:GetOwner()
+		if Duel.DiscardHand(p,Card.IsDiscardable,1,1,REASON_EFFECT|REASON_DISCARD)>0 then
+			Duel.Draw(1-p,1,REASON_EFFECT)
 		end
 	end
 end

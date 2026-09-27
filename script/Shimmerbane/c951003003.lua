@@ -78,7 +78,7 @@ end
 -- (1) Activate trap in hand
 function s.accon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsSummonType(SUMMON_TYPE_SPECIAL+1) and c:IsPreviousLocation(LOCATION_MZONE)
+	return c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

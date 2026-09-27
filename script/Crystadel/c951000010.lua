@@ -3,6 +3,7 @@ local s,id=GetID()
 local SET_CRYSTADEL=0x9614
 local SET_SHIMMERBANE=0x9617
 local CARD_OBSIDIUS_CRYSTADEL=951000002
+Duel.LoadScript("ReflexxionsAux.lua")
 function s.initial_effect(c)
 	-- (1) Activate
 	local e0=Effect.CreateEffect(c)
@@ -38,7 +39,7 @@ s.listed_names={CARD_OBSIDIUS_CRYSTADEL}
 
 -- (1)
 function s.setfilter(c)
-	return c:IsSetCard(SET_SHIMMERBANE) and c:IsMonster() and c:IsSSetable()
+	return c:IsAmbushMonster() and c:IsMonster() and c:IsSSetable()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.setfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)

@@ -1,10 +1,13 @@
 -- Majestal Zapshard
 local s,id=GetID()
 local SET_MAJESTAL=0x9615
+Duel.LoadScript('ReflexxionsAux.lua')
 function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,s.matfilter1,aux.FilterBoolFunctionEx(Card.IsType,TYPE_EFFECT))
+	-- Manifest marker / activation as Continuous Spell
+	Reflexxion.AddManifestProcedure(c)
 	-- (SPELL) Cannot be destroyed by card effects
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
