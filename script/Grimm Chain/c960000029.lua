@@ -41,6 +41,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_CONTRACTOR,SET_GRIMM_CHAIN}
+s.listed_names={960000006,960000009}
 
 function s.matfilter(c,lc,sumtype,tp)
 	return c:IsRace(RACE_SPELLCASTER,lc,sumtype,tp)
@@ -54,7 +55,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function s.filter(c)
-	return c:IsSetCard(SET_GRIMM_CHAIN) and c:GetType()==TYPE_SPELL+TYPE_RITUAL and c:IsAbleToHand()
+	return c:IsCode(960000006,960000009) and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end

@@ -1,5 +1,6 @@
 -- Contractor Gil Nightray
 local s,id=GetID()
+Duel.LoadScript("GrimmChainAux.lua")
 local SET_CONTRACTOR=0x9998
 local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
@@ -12,6 +13,7 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
+	GrimmChain.AddContractReturnOption(e1,id)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)

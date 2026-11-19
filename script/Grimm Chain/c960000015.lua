@@ -1,85 +1,51 @@
--- Jabberwock
+--Jabberwock, the Black Winged Chain
 local s,id=GetID()
-local SET_CONTRACTOR=0x9998
-local SET_GRIMM_CHAIN=0x9999
+Duel.LoadScript("GrimmChainAux.lua")
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
-	-- (1) destroy cards in column
+	GrimmChain.AddContractorSearch(c,id,960000005,2)
+	--Destroy either the opposing monsters or the opposing Spells/Traps.
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_REMOVE)
+	e1:SetDescription(aux.Stringid(id,3))
+	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,{id,0})
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.operation)
+	e1:SetCountLimit(1,id)
+	e1:SetCost(s.descost)
+	e1:SetTarget(s.destg)
+	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
-	-- (2) Move to another MMZ
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(aux.seqmovcon)
-	e2:SetCost(s.cost)
-	e2:SetTarget(aux.seqmovtg)
-	e2:SetOperation(aux.seqmovtgop)
-	c:RegisterEffect(e2)
-	-- (3) Destroy all opponent's face-up monsters
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetCode(EVENT_DESTROYED)
-	e3:SetCountLimit(1,{id,2})
-	e3:SetCondition(s.descon1)
-	e3:SetTarget(s.destg1)
-	e3:SetOperation(s.desop1)
-	c:RegisterEffect(e3)
 end
-
--- (1)
-function s.filter(c,g,mc)
-	return (g:IsContains(c) or c==mc)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+s.listed_names={960000005}
+s.listed_series={0x9999}
+function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local cg=c:GetColumnGroup()
-	local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil,cg,c)
-	if chkc then return s.filter(chkc,cg,c) and chkc:IsLocation(LOCATION_MZONE) end
-	if chk==0 then return #g>0 end
+	if chk==0 then return c:GetAttackAnnouncedCount()==0 end
+	--The restriction is paid on activation, even if the effect is negated.
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(3206)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_ATTACK)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e1)
+end
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g1=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
+	local g2=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,nil)
+	if chk==0 then return #g1>0 or #g2>0 end
+	local choice=Duel.SelectEffect(tp,{#g1>0,aux.Stringid(id,0)},{#g2>0,aux.Stringid(id,1)})
+	e:SetLabel(choice)
+	local g=choice==1 and g1 or g2
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local cg=c:GetColumnGroup()
-	local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil,cg,c)
-	if #g>0 then
-		Duel.Destroy(g,REASON_EFFECT)
+function s.desop(e,tp)
+	local g
+	if e:GetLabel()==1 then
+		g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
+	else
+		g=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,nil)
 	end
-end
-
--- (2)
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-end
-
--- (3)
-function s.descon1(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_RITUAL)
-end
-function s.destg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
-	if chk==0 then return #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
-end
-function s.desop1(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
-	Duel.Destroy(g,REASON_EFFECT)
+	if #g>0 then Duel.Destroy(g,REASON_EFFECT) end
 end

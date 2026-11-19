@@ -1,17 +1,21 @@
 --Owl
 local s,id=GetID()
+Duel.LoadScript("GrimmChainAux.lua")
 local SET_CONTRACTOR=0x9998
 local SET_GRIMM_CHAIN=0x9999
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
+	GrimmChain.AddContractorSearch(c,id,960000030,2)
 	-- (1) Banish card
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_REMOVE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
+	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL) end)
 	e1:SetTarget(s.rmtg)
 	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
@@ -24,6 +28,8 @@ function s.initial_effect(c)
 	e2:SetCondition(s.ritcon)
 	c:RegisterEffect(e2)
 end
+s.listed_names={960000030}
+s.listed_series={SET_GRIMM_CHAIN}
 
 -- (1)
 function s.rmfilter(c)
